@@ -257,18 +257,52 @@ let routeState = {
 };
 
 // --- Pricing Engine ---
-const PRICING = {
-    BASE_FARE: 8000,
-    PRICE_PER_KM: 1200,
-    BAGGAGE_PRICE: 15000
+const TARIFFS = {
+    start: { id: 'start', pricePerKm: 500, baggage: 5000 },
+    komfort: { id: 'komfort', pricePerKm: 700, baggage: 10000 },
+    biznes: { id: 'biznes', pricePerKm: 1000, baggage: 15000 }
 };
+let selectedTariff = 'start';
 
-function calculatePrice() {
-    if (!routeState.ready || !routeState.distance) return null;
-    const distanceKm = routeState.distance / 1000;
-    let baggageCost = needsBaggage ? PRICING.BAGGAGE_PRICE : 0;
+function selectTariff(tariffId) {
+    selectedTariff = tariffId;
     
-    const total = (PRICING.BASE_FARE + (distanceKm * PRICING.PRICE_PER_KM) + baggageCost) * paxCount;
+    // Reset styles
+    const cards = document.querySelectorAll('.tariff-card');
+    cards.forEach(card => {
+        card.classList.remove('border-primary', 'shadow-[0_4px_15px_rgba(255,214,0,0.25)]', 'scale-100', 'z-10');
+        card.classList.add('border-transparent', 'opacity-70', 'scale-[0.96]');
+        if(card.id === 'tariff-biznes') {
+            card.classList.remove('border-[#444]');
+        }
+    });
+    
+    // Set active styles
+    const activeCard = document.getElementById('tariff-' + tariffId);
+    if(activeCard) {
+        activeCard.classList.remove('border-transparent', 'opacity-70', 'scale-[0.96]');
+        activeCard.classList.add('scale-100', 'z-10');
+        
+        if(tariffId === 'biznes') {
+            activeCard.classList.add('border-[#444]', 'shadow-[0_4px_15px_rgba(0,0,0,0.5)]');
+        } else {
+            activeCard.classList.add('border-primary', 'shadow-[0_4px_15px_rgba(255,214,0,0.25)]');
+        }
+    }
+    
+    // Calculate and update prices in cards
+    updatePriceDisplay();
+}
+
+function calculatePrice(specificTariff = null) {
+    if (!routeState.ready || !routeState.distance) return null;
+    const distanceKm = Math.round(routeState.distance / 1000);
+    const tariffToUse = specificTariff ? specificTariff : selectedTariff;
+    
+    let baggageCost = needsBaggage ? TARIFFS[tariffToUse].baggage : 0;
+    
+    // distance * pricePerKm * passengers + baggage
+    const total = (distanceKm * TARIFFS[tariffToUse].pricePerKm + baggageCost) * paxCount;
     return Math.round(total);
 }
 
@@ -345,17 +379,23 @@ function updatePriceDisplay() {
     if (loadingState) loadingState.classList.add('hidden');
     if (contentState) contentState.classList.remove('hidden');
     
-    const price = calculatePrice();
-    const formattedPrice = price.toLocaleString('ru-RU') + " so'm";
-    
     const distanceKm = (routeState.distance / 1000).toFixed(1) + " km";
     const distEl = document.getElementById('preview-distance');
     if (distEl) distEl.innerText = distanceKm;
     
-    const priceEl = document.getElementById('preview-price');
-    if (priceEl) priceEl.innerText = formattedPrice;
-    
-    routeState.priceText = formattedPrice;
+    // Update all tariff cards realtime
+    Object.keys(TARIFFS).forEach(tariff => {
+        const tPrice = calculatePrice(tariff);
+        const tPriceEl = document.getElementById('price-' + tariff);
+        if(tPriceEl && tPrice !== null) {
+            tPriceEl.innerText = tPrice.toLocaleString('ru-RU') + " so'm";
+        }
+    });
+
+    const activePrice = calculatePrice();
+    if(activePrice !== null) {
+        routeState.priceText = activePrice.toLocaleString('ru-RU') + " so'm";
+    }
     
     if (orderBtn) {
         orderBtn.disabled = false;

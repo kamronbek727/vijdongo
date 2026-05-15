@@ -217,10 +217,7 @@
                                 <div class="w-2 h-2 rounded-full bg-graphite"></div>
                                 <div id="preview-distance" class="text-[12px] font-bold text-textSecondary uppercase tracking-wide">-- km</div>
                             </div>
-                            <div class="flex flex-col mt-1">
-                                <span class="text-[10px] text-textSecondary font-bold" data-i18n="priceLabel">Narxi:</span>
-                                <span id="preview-price" class="text-lg font-black text-graphite">-- so'm</span>
-                            </div>
+                            
                         </div>
 
                         <!-- Loading Skeletons -->
@@ -238,6 +235,36 @@
                     </div>
                 </div>
                 
+                
+                <!-- Tariffs Section -->
+                <div class="mt-5 overflow-hidden">
+                    <div class="flex gap-3 overflow-x-auto no-scrollbar pb-3 pt-1 px-4 scroll-smooth snap-x">
+                        <!-- START -->
+                        <div id="tariff-start" onclick="selectTariff('start')" class="tariff-card snap-center shrink-0 w-[120px] bg-white border-2 border-primary rounded-[1.25rem] p-3.5 flex flex-col gap-1 cursor-pointer transition-all relative shadow-[0_4px_15px_rgba(255,214,0,0.25)] scale-100 z-10">
+                            <div class="text-3xl mb-1 drop-shadow-sm">🚕</div>
+                            <span class="text-[11px] font-black uppercase tracking-widest text-graphite">START</span>
+                            <span class="text-[10px] text-textSecondary font-medium leading-tight">Oddiy avto</span>
+                            <span id="price-start" class="text-[13px] font-extrabold text-graphite mt-1.5">-- so'm</span>
+                        </div>
+                        
+                        <!-- KOMFORT -->
+                        <div id="tariff-komfort" onclick="selectTariff('komfort')" class="tariff-card snap-center shrink-0 w-[120px] bg-gray-50 border-2 border-transparent rounded-[1.25rem] p-3.5 flex flex-col gap-1 cursor-pointer transition-all relative opacity-70 scale-[0.96]">
+                            <div class="text-3xl mb-1 drop-shadow-sm">🚘</div>
+                            <span class="text-[11px] font-black uppercase tracking-widest text-[#1e3a8a]">KOMFORT</span>
+                            <span class="text-[10px] text-textSecondary font-medium leading-tight">Qulay avto</span>
+                            <span id="price-komfort" class="text-[13px] font-extrabold text-graphite mt-1.5">-- so'm</span>
+                        </div>
+                        
+                        <!-- BIZNES -->
+                        <div id="tariff-biznes" onclick="selectTariff('biznes')" class="tariff-card snap-center shrink-0 w-[120px] bg-graphite border-2 border-transparent rounded-[1.25rem] p-3.5 flex flex-col gap-1 cursor-pointer transition-all relative opacity-70 scale-[0.96]">
+                            <div class="text-3xl mb-1 drop-shadow-sm">🖤</div>
+                            <span class="text-[11px] font-black uppercase tracking-widest text-primary">BIZNES</span>
+                            <span class="text-[10px] text-gray-400 font-medium leading-tight">Premium</span>
+                            <span id="price-biznes" class="text-[13px] font-extrabold text-white mt-1.5">-- so'm</span>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Options -->
                 <div class="px-4 mt-5 flex flex-col gap-3">
                     <div class="flex justify-between items-center bg-bgLight p-4 rounded-2xl">
