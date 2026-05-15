@@ -1,0 +1,124 @@
+/* Custom Scrollbar hide */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+/* Modern Viewport Height Fix */
+:root {
+    --vh: 1vh;
+}
+
+/* Safe area padding for mobile notches */
+.pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.pt-safe {
+    padding-top: env(safe-area-inset-top, 0px);
+}
+.pl-safe {
+    padding-left: env(safe-area-inset-left, 0px);
+}
+.pr-safe {
+    padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* Viewport height utility */
+.h-screen-dynamic {
+    height: 100vh;
+    height: 100dvh;
+}
+
+/* Leaflet Map overrides to clean up UI */
+.leaflet-control-container .leaflet-routing-container {
+    display: none !important;
+}
+.leaflet-control-zoom {
+    display: none !important;
+}
+.leaflet-control-attribution {
+    display: none !important;
+}
+
+/* Base styles for screens - hidden by default to prevent flash */
+.screen {
+    will-change: transform;
+    visibility: hidden;
+    overflow-x: hidden;
+}
+
+/* Splash screen starts visible */
+#splash-screen {
+    visibility: visible;
+}
+
+/* Remove tap highlight on mobile and focus outlines */
+*, html, body, div, button, a {
+    -webkit-tap-highlight-color: transparent !important;
+    box-sizing: border-box;
+}
+button:focus, a:focus, input:focus, select:focus, textarea:focus {
+    outline: none !important;
+}
+
+/* Fix for mobile keyboard pushing content */
+@media screen and (max-height: 450px) {
+    .hide-on-keyboard {
+        display: none !important;
+    }
+}
+
+/* Taxi Marker */
+.car-marker-wrapper {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.car-marker-wrapper img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.25));
+}
+
+/* Yandex Map Container Fixes */
+#home-map, #trip-map, #pickup-map-container, #dest-map-container {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 300px;
+    background-color: transparent !important;
+    position: relative;
+    overflow: visible !important;
+    visibility: visible !important;
+}
+
+/* Force ALL internal Yandex layers to be visible (version-agnostic selectors) */
+[class*="ymaps"][class*="-map"],
+[class*="ymaps"][class*="-inner-panes"],
+[class*="ymaps"][class*="-events-pane"],
+[class*="ymaps"][class*="-ground-pane"],
+[class*="ymaps"][class*="-overlay"],
+[class*="ymaps"][class*="-svg"],
+[class*="ymaps"][class*="-route"] {
+    background-color: transparent !important;
+    visibility: visible !important;
+}
+
+/* Ensure route SVG paths render visibly */
+[class*="ymaps"] svg,
+[class*="ymaps"] svg path,
+[class*="ymaps"] svg polyline {
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Ensure parents have height */
+.screen {
+    height: 100vh;
+    height: 100dvh;
+}

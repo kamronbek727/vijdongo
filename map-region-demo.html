@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xaritadan Hududni Aniqlash</title>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        #map {
+            flex: 1;
+            width: 100%;
+        }
+
+        .info-panel {
+            padding: 24px;
+            background: #fff;
+            box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .info-panel h2 {
+            margin: 0 0 10px 0;
+            font-size: 1.3rem;
+            color: #111827;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.05rem;
+            border-bottom: 1.5px solid #E5E7EB;
+            padding-bottom: 12px;
+        }
+
+        .data-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .label {
+            color: #6B7280;
+            font-weight: 500;
+        }
+
+        .val {
+            font-weight: 700;
+            color: #22C55E;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="map"></div>
+    <div class="info-panel">
+        <h2>📍 Tanlangan hudud ma'lumotlari</h2>
+        <div class="data-row">
+            <span class="label">Koordinatalar:</span>
+            <span class="val" id="val-coords" style="color: #374151;">Hali tanlanmagan</span>
+        </div>
+        <div class="data-row">
+            <span class="label">Eng yaqin viloyat:</span>
+            <span class="val" id="val-region">Noma'lum</span>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        const REGIONS = {
+            tosh: { name: "Toshkent shahri", coords: [41.2995, 69.2401] },
+            toshv: { name: "Toshkent viloyati", coords: [41.11, 69.16] },
+            sam: { name: "Samarqand viloyati", coords: [39.6542, 66.9758] },
+            nav: { name: "Navoiy viloyati", coords: [40.0844, 65.3792] },
+            bux: { name: "Buxoro viloyati", coords: [39.7747, 64.4286] },
+            xor: { name: "Xorazm viloyati", coords: [41.55, 60.6333] },
+            and: { name: "Andijon viloyati", coords: [40.7833, 72.3333] },
+            nam: { name: "Namangan viloyati", coords: [41.0, 71.6667] },
+            far: { name: "Farg'ona viloyati", coords: [40.3833, 71.7833] },
+            qash: { name: "Qashqadaryo viloyati", coords: [38.8333, 65.8333] },
+            sur: { name: "Surxondaryo viloyati", coords: [37.9333, 67.2833] },
+            sir: { name: "Sirdaryo viloyati", coords: [40.5, 68.6667] },
+            jiz: { name: "Jizzax viloyati", coords: [40.1167, 67.8333] },
+            qor: { name: "Qoraqalpog'iston", coords: [43.15, 58.7167] }
+        };
+
+        // O'zbekiston markaziga yo'naltirilgan xaritani ochish
+        const map = L.map('map').setView([41.5, 64.0], 6);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        let currentMarker = null;
+
+        // Ikki nuqta (Koordinata) o'rtasidagi masofani o'lchovchi formula (Haversine km)
+        function getDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        }
+
+        // Bosilgan joyga eng yaqin bo'lgan viloyatni topish funksiyasi
+        function findClosestRegion(lat, lng) {
+            let closestKey = null;
+            let minDistance = Infinity;
+
+            for (const key in REGIONS) {
+                const reg = REGIONS[key];
+                const dist = getDistance(lat, lng, reg.coords[0], reg.coords[1]);
+                if (dist < minDistance) {
+                    minDistance = dist;
+                    closestKey = key;
+                }
+            }
+            return REGIONS[closestKey];
+        }
+
+        // Xaritaga bosilganda ishlaydigan hodisa
+        map.on('click', function (e) {
+            const lat = e.latlng.lat;
+            const lng = e.latlng.lng;
+
+            if (currentMarker) {
+                map.removeLayer(currentMarker);
+            }
+
+            // Eng yaqin viloyatni aniqlash
+            const closestRegion = findClosestRegion(lat, lng);
+
+            // Xaritada lokatsiya qoldirish va Marker-PopUp ochish
+            currentMarker = L.marker([lat, lng]).addTo(map)
+                .bindPopup(`<b>${closestRegion.name}</b><br>hududiga tegishli (Tahmin qilingan)`)
+                .openPopup();
+
+            // Kadrda natijalarni yangilash
+            document.getElementById('val-coords').textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+            document.getElementById('val-region').textContent = closestRegion.name;
+        });
+    </script>
+</body>
+
+</html>
