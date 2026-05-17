@@ -2245,4 +2245,38 @@ document.addEventListener('DOMContentLoaded', () => {
             if (installPrompt) installPrompt.classList.add('-translate-y-[150%]');
         });
     }
+
+    // Show iOS install prompt if applicable
+    showIosInstallPrompt();
 });
+
+// --- iOS Install Prompt ---
+function showIosInstallPrompt() {
+    // Detect iOS
+    const isIos = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+    // Detect Safari
+    const isSafari = /safari/i.test(window.navigator.userAgent) && !/crios|fxios/i.test(window.navigator.userAgent);
+    // Detect Standalone
+    const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+    
+    const dismissed = localStorage.getItem('ios-pwa-dismissed') === 'true';
+
+    if (isIos && isSafari && !isStandalone && !dismissed) {
+        const iosPrompt = document.getElementById('ios-install-prompt');
+        if (iosPrompt) {
+            iosPrompt.classList.remove('hidden');
+            setTimeout(() => {
+                iosPrompt.classList.remove('translate-y-[150%]');
+            }, 800); // Small delay so it appears smoothly after load
+            
+            const closePrompt = () => {
+                iosPrompt.classList.add('translate-y-[150%]');
+                localStorage.setItem('ios-pwa-dismissed', 'true');
+                setTimeout(() => iosPrompt.classList.add('hidden'), 500);
+            };
+
+            document.getElementById('ios-close-btn')?.addEventListener('click', closePrompt);
+            document.getElementById('ios-understand-btn')?.addEventListener('click', closePrompt);
+        }
+    }
+}
