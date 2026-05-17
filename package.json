@@ -1,0 +1,24 @@
+{
+  "name": "vijdon-go",
+  "version": "1.0.0",
+  "description": "Vijdon GO - Premium Taxi App",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "build": "node build.js",
+    "cap:sync": "npm run build && npx cap sync",
+    "cap:open:android": "npx cap open android",
+    "cap:add:android": "npx cap add android",
+    "cap:build:android": "npx cap build android"
+  },
+  "dependencies": {
+    "@capacitor/android": "latest",
+    "@capacitor/core": "latest",
+    "@capacitor/ios": "latest",
+    "@capacitor/geolocation": "latest",
+    "@capacitor/splash-screen": "latest"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "latest"
+  }
+}
