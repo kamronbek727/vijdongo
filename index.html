@@ -90,7 +90,7 @@
         </div>
         
         <!-- iOS Install Prompt -->
-        <div id="ios-install-prompt" class="hidden absolute bottom-safe mb-24 mx-4 bg-white rounded-[2rem] shadow-[0_15px_50px_rgba(0,0,0,0.15)] z-[100] p-6 flex flex-col gap-4 border border-gray-100 transform transition-transform duration-500 translate-y-[150%]">
+        <div id="ios-install-prompt" class="hidden absolute bottom-6 left-0 right-0 mx-4 bg-white rounded-[2rem] shadow-[0_15px_50px_rgba(0,0,0,0.15)] z-[100] p-6 flex flex-col gap-4 border border-gray-100 transform transition-transform duration-500 translate-y-[150%]">
             <div class="flex items-start justify-between">
                 <div class="flex items-center gap-3">
                     <div class="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center p-1 border border-gray-100 shrink-0">
@@ -226,9 +226,29 @@
             <!-- Content container -->
             <div class="flex-1 overflow-y-auto no-scrollbar pb-32 pb-safe relative flex flex-col">
                 <!-- Greeting -->
-                <div class="px-5 mt-6 mb-2">
+                <div class="px-5 mt-6 mb-4">
                     <h2 id="home-greeting" class="text-2xl font-extrabold text-graphite tracking-tight" data-i18n="greeting">Assalomu alaykum!</h2>
-                    <p class="text-sm text-textSecondary font-medium mt-1" data-i18n="greetingSub">Bugun qayerga boramiz?</p>
+                </div>
+
+                <!-- Services Grid -->
+                <div class="px-4 mb-2 mt-2">
+                    <div class="grid grid-cols-2 gap-3">
+                        <!-- Taxi Card -->
+                        <div onclick="startDestFlow()" class="bg-[#F5F5F7] hover:bg-[#ebebeb] rounded-3xl p-3 pt-4 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-gray-100/50 transition-all active:scale-95 flex flex-col items-center justify-center cursor-pointer group relative overflow-hidden">
+                            <div class="w-full h-20 mb-3 flex items-center justify-center transition-transform duration-300 group-hover:-translate-y-1">
+                                <img src="rasmlar/taxi.png" alt="Taxi" class="h-full w-auto object-contain drop-shadow-[0_8px_15px_rgba(0,0,0,0.12)]" onerror="this.src='rasmlar/logo.png'">
+                            </div>
+                            <h3 class="text-graphite font-bold text-[15px] w-full text-center">Taxi</h3>
+                        </div>
+                        
+                        <!-- Dostavka Card -->
+                        <div onclick="alert('Dostavka va Pochta xizmati tez orada ishga tushadi!')" class="bg-[#F5F5F7] hover:bg-[#ebebeb] rounded-3xl p-3 pt-4 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-gray-100/50 transition-all active:scale-95 flex flex-col items-center justify-center cursor-pointer group relative overflow-hidden">
+                            <div class="w-full h-20 mb-3 flex items-center justify-center transition-transform duration-300 group-hover:-translate-y-1">
+                                <img src="rasmlar/dostavka.png" alt="Dostavka" class="h-full w-auto object-contain drop-shadow-[0_8px_15px_rgba(0,0,0,0.12)]" onerror="this.src='rasmlar/logo.png'">
+                            </div>
+                            <h3 class="text-graphite font-bold text-[15px] w-full text-center">Dostavka, Pochta</h3>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Location Picker Card -->
