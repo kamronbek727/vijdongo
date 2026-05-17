@@ -2220,7 +2220,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
     }
 });
 
-document.addEventListener('DOMContentLoaded', () => {
+function initPWAButtons() {
     const installBtn = document.getElementById('pwa-install-btn');
     const closeBtn = document.getElementById('pwa-close-btn');
     const installPrompt = document.getElementById('pwa-install-prompt');
@@ -2245,23 +2245,34 @@ document.addEventListener('DOMContentLoaded', () => {
             if (installPrompt) installPrompt.classList.add('-translate-y-[150%]');
         });
     }
+}
 
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initPWA);
+} else {
+    initPWA();
+}
+
+function initPWA() {
+    initPWAButtons();
     // Show iOS install prompt if applicable
     showIosInstallPrompt();
-});
+}
 
 // --- iOS Install Prompt ---
 function showIosInstallPrompt() {
+    const ua = window.navigator.userAgent;
     // Detect iOS
-    const isIos = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
-    // Detect Safari
-    const isSafari = /safari/i.test(window.navigator.userAgent) && !/crios|fxios/i.test(window.navigator.userAgent);
-    // Detect Standalone
-    const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+    const isIos = /iphone|ipad|ipod/i.test(ua);
+    // Detect Standalone (already installed)
+    const isStandalone = (window.navigator.standalone === true) || window.matchMedia('(display-mode: standalone)').matches;
+
     
     const dismissed = localStorage.getItem('ios-pwa-dismissed') === 'true';
 
-    if (isIos && isSafari && !isStandalone && !dismissed) {
+    // We show on all iOS devices if not installed and not dismissed.
+    // Safari is the default, and even in Chrome, it's helpful to know it's a web app.
+    if (isIos && !isStandalone && !dismissed) {
         const iosPrompt = document.getElementById('ios-install-prompt');
         if (iosPrompt) {
             iosPrompt.classList.remove('hidden');
