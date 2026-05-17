@@ -234,7 +234,7 @@
                 <div class="px-4 mt-2 mb-6">
                     <div class="grid grid-cols-2 gap-4">
                         <!-- Taxi Card -->
-                        <div onclick="startDestFlow()" class="bg-white rounded-[2rem] p-4 shadow-[0_8px_25px_rgba(0,0,0,0.06)] transition-all duration-300 active:scale-[0.97] flex flex-col justify-between cursor-pointer group relative overflow-hidden h-[230px]">
+                        <div onclick="navigate('taxi-screen')" class="bg-white rounded-[2rem] p-4 shadow-[0_8px_25px_rgba(0,0,0,0.06)] transition-all duration-300 active:scale-[0.97] flex flex-col justify-between cursor-pointer group relative overflow-hidden h-[230px]">
                             
                             <!-- Image wrapper with mix-blend-multiply and NO drop shadow to prevent box outlines -->
                             <div class="w-full flex-1 flex items-start justify-center pt-2 transition-transform duration-500 ease-out group-hover:-translate-y-2 group-hover:scale-105 z-0">
@@ -269,6 +269,61 @@
                     </div>
                 </div>
 
+                <!-- Promo Section -->
+                <div class="px-4 mt-2 mb-6">
+                    <h3 class="text-graphite font-extrabold text-lg mb-3 px-1">Nega Vijdon GO?</h3>
+                    <div class="flex flex-col gap-3">
+                        <div class="bg-white rounded-[1.5rem] p-4 shadow-[0_4px_20px_rgba(0,0,0,0.03)] flex items-center gap-4 border border-gray-50/50">
+                            <div class="w-12 h-12 rounded-2xl bg-[#FFFBE6] flex items-center justify-center shrink-0">
+                                <span class="text-2xl">⚡</span>
+                            </div>
+                            <div>
+                                <h4 class="text-graphite font-bold text-sm">Tezkor yetib kelish</h4>
+                                <p class="text-[11px] text-textSecondary font-medium mt-0.5">O‘rtacha kutish vaqti 3 daqiqa</p>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-[1.5rem] p-4 shadow-[0_4px_20px_rgba(0,0,0,0.03)] flex items-center gap-4 border border-gray-50/50">
+                            <div class="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center shrink-0">
+                                <span class="text-2xl">🚕</span>
+                            </div>
+                            <div>
+                                <h4 class="text-graphite font-bold text-sm">24/7 xizmat ko‘rsatish</h4>
+                                <p class="text-[11px] text-textSecondary font-medium mt-0.5">Istalgan vaqtda safarga tayyormiz</p>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-[1.5rem] p-4 shadow-[0_4px_20px_rgba(0,0,0,0.03)] flex items-center gap-4 border border-gray-50/50">
+                            <div class="w-12 h-12 rounded-2xl bg-[#F0FDF4] flex items-center justify-center shrink-0">
+                                <span class="text-2xl">📦</span>
+                            </div>
+                            <div>
+                                <h4 class="text-graphite font-bold text-sm">Tez va ishonchli pochta</h4>
+                                <p class="text-[11px] text-textSecondary font-medium mt-0.5">Posylkangiz ishonchli qo'llarda</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ==============================
+             TAXI SCREEN
+             ============================== -->
+        <div id="taxi-screen" class="screen absolute inset-0 bg-[#F5F5F7] flex flex-col z-40 transition-transform duration-300 transform translate-x-full">
+            <!-- Header -->
+            <div class="px-4 py-3 flex items-center gap-3 z-10 bg-white pt-safe shadow-[0_4px_24px_rgba(0,0,0,0.04)] border-b border-gray-50/50">
+                <button onclick="navigate('home-screen')" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-50 active:bg-gray-100 transition-colors shrink-0">
+                    <i class="fa-solid fa-chevron-left text-sm text-graphite"></i>
+                </button>
+                <div class="flex items-center gap-2 flex-1">
+                    <div class="w-8 h-8 rounded-xl bg-primary/20 flex items-center justify-center">
+                        <i class="fa-solid fa-taxi text-primary text-sm"></i>
+                    </div>
+                    <h1 class="text-[18px] font-extrabold tracking-tight text-graphite">Taxi</h1>
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto no-scrollbar pb-32 pb-safe flex flex-col">
                 <!-- Location Picker Card -->
                 <div class="px-4 z-10 mt-4">
                     <div class="bg-white rounded-3xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100 relative">
@@ -301,7 +356,7 @@
                 
                 <!-- Empty State -->
                 <div id="home-empty-state" class="flex-1 flex flex-col items-center justify-center p-8 mt-4 text-center transition-all duration-500 opacity-100 scale-100">
-                    <div class="w-32 h-32 bg-gray-50 rounded-full flex items-center justify-center mb-6">
+                    <div class="w-32 h-32 bg-white rounded-full flex items-center justify-center mb-6 shadow-[0_8px_25px_rgba(0,0,0,0.05)]">
                         <i class="fa-solid fa-route text-4xl text-gray-300"></i>
                     </div>
                     <h3 class="text-lg font-bold text-graphite mb-2" data-i18n="emptyTitle">Manzillarni tanlang</h3>
@@ -321,7 +376,6 @@
                                 <div class="w-2 h-2 rounded-full bg-graphite"></div>
                                 <div id="preview-distance" class="text-[12px] font-bold text-textSecondary uppercase tracking-wide">-- km</div>
                             </div>
-                            
                         </div>
 
                         <!-- Loading Skeletons -->
@@ -371,17 +425,17 @@
 
                 <!-- Options -->
                 <div class="px-4 mt-5 flex flex-col gap-3">
-                    <div class="flex justify-between items-center bg-bgLight p-4 rounded-2xl">
-                        <span class="font-semibold text-sm" data-i18n="passengers">Yo'lovchilar soni</span>
+                    <div class="flex justify-between items-center bg-white p-4 rounded-2xl shadow-[0_4px_15px_rgba(0,0,0,0.02)] border border-gray-50">
+                        <span class="font-semibold text-sm text-graphite" data-i18n="passengers">Yo'lovchilar soni</span>
                         <div class="flex items-center gap-3">
-                            <button id="pax-minus" class="w-9 h-9 rounded-full bg-white shadow-sm flex items-center justify-center text-textSecondary active:bg-gray-50 transition-colors"><i class="fa-solid fa-minus text-xs"></i></button>
-                            <span id="pax-count" class="font-bold w-6 text-center text-lg">1</span>
-                            <button id="pax-plus" class="w-9 h-9 rounded-full bg-white shadow-sm flex items-center justify-center text-textSecondary active:bg-gray-50 transition-colors"><i class="fa-solid fa-plus text-xs"></i></button>
+                            <button id="pax-minus" class="w-9 h-9 rounded-full bg-gray-50 shadow-sm flex items-center justify-center text-textSecondary active:bg-gray-100 transition-colors"><i class="fa-solid fa-minus text-xs"></i></button>
+                            <span id="pax-count" class="font-bold w-6 text-center text-lg text-graphite">1</span>
+                            <button id="pax-plus" class="w-9 h-9 rounded-full bg-gray-50 shadow-sm flex items-center justify-center text-textSecondary active:bg-gray-100 transition-colors"><i class="fa-solid fa-plus text-xs"></i></button>
                         </div>
                     </div>
                     
-                    <div class="flex justify-between items-center bg-bgLight p-4 rounded-2xl cursor-pointer active:bg-gray-100 transition-colors">
-                        <span class="font-semibold text-sm" data-i18n="baggage">Bagaj kerakmi?</span>
+                    <div class="flex justify-between items-center bg-white p-4 rounded-2xl shadow-[0_4px_15px_rgba(0,0,0,0.02)] border border-gray-50 cursor-pointer active:bg-gray-50 transition-colors">
+                        <span class="font-semibold text-sm text-graphite" data-i18n="baggage">Bagaj kerakmi?</span>
                         <div class="flex items-center gap-2">
                             <span id="baggage-status" class="text-sm font-medium text-textSecondary" data-i18n="no">Yo'q</span>
                             <i class="fa-solid fa-chevron-right text-textSecondary text-xs"></i>
@@ -394,6 +448,7 @@
                 </div>
                 </div> <!-- End of route-preview-section -->
             </div>
+
         </div>
 
         <!-- ==============================

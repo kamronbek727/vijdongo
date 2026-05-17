@@ -1192,22 +1192,8 @@ function navigate(screenId, animate = true) {
         
         // Trigger resize/fit for engine-managed maps
         setTimeout(() => {
-            if (screenId === 'home-screen') {
-                YandexTrackingEngine.showHomeMap();
-                if (YandexTrackingEngine.homeMap) YandexTrackingEngine.homeMap.container.fitToViewport();
-                // Rebuild route if both addresses exist but route not ready
-                if (selectedPickup.latlng && selectedDest.latlng && !routeState.ready) {
-                    setTimeout(() => drawHomeRoute(), 500);
-                }
-                updateOrderButton();
-                updatePriceDisplay();
-            }
             if (screenId === 'active-trip-screen' && YandexTrackingEngine.tripMap) {
                 YandexTrackingEngine.tripMap.container.fitToViewport();
-            }
-            if (screenId === 'delivery-screen' && delMap) {
-                delMap.container.fitToViewport();
-                updateDeliveryPriceDisplay();
             }
         }, 350);
         
@@ -1219,8 +1205,22 @@ function navigate(screenId, animate = true) {
         if (bottomNav) bottomNav.style.display = 'none';
         
         // Handle maps on non-nav screens
-        if (['pickup-map-screen', 'dest-map-screen', 'active-trip-screen'].includes(screenId)) {
+        if (['pickup-map-screen', 'dest-map-screen', 'active-trip-screen', 'taxi-screen', 'delivery-screen'].includes(screenId)) {
             setTimeout(() => {
+                if (screenId === 'taxi-screen') {
+                    YandexTrackingEngine.showHomeMap();
+                    if (YandexTrackingEngine.homeMap) YandexTrackingEngine.homeMap.container.fitToViewport();
+                    // Rebuild route if both addresses exist but route not ready
+                    if (selectedPickup.latlng && selectedDest.latlng && !routeState.ready) {
+                        setTimeout(() => drawHomeRoute(), 500);
+                    }
+                    updateOrderButton();
+                    updatePriceDisplay();
+                }
+                if (screenId === 'delivery-screen' && delMap) {
+                    delMap.container.fitToViewport();
+                    updateDeliveryPriceDisplay();
+                }
                 if (screenId === 'pickup-map-screen' && pickupMap) {
                     pickupMap.container.fitToViewport();
                     const center = pickupMap.getCenter();
@@ -1746,7 +1746,7 @@ function confirmDestLocation() {
     updatePriceDisplay();
 
     localStorage.setItem(DB_SKIP_ONBOARDING, 'true');
-    navigate('home-screen');
+    navigate('taxi-screen');
 
     // Update button to loading state immediately
     setTimeout(() => updateOrderButton(), 100);
