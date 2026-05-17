@@ -234,35 +234,35 @@
                 <div class="px-4 mt-2 mb-6">
                     <div class="grid grid-cols-2 gap-4">
                         <!-- Taxi Card -->
-                        <div onclick="startDestFlow()" class="bg-gradient-to-br from-white to-[#F2F2F6] rounded-[2rem] p-4 shadow-[0_15px_35px_rgba(0,0,0,0.06)] border border-white/80 transition-all duration-300 active:scale-[0.97] flex flex-col justify-between cursor-pointer group relative overflow-hidden h-[230px]">
+                        <div onclick="startDestFlow()" class="bg-white rounded-[2rem] p-4 shadow-[0_8px_25px_rgba(0,0,0,0.06)] transition-all duration-300 active:scale-[0.97] flex flex-col justify-between cursor-pointer group relative overflow-hidden h-[230px]">
                             
-                            <!-- Image wrapper with mix-blend-multiply to remove white background -->
+                            <!-- Image wrapper with mix-blend-multiply and NO drop shadow to prevent box outlines -->
                             <div class="w-full flex-1 flex items-start justify-center pt-2 transition-transform duration-500 ease-out group-hover:-translate-y-2 group-hover:scale-105 z-0">
-                                <img src="rasmlar/taxi.png" alt="Taxi" class="w-full h-[120px] object-contain mix-blend-multiply drop-shadow-[0_20px_25px_rgba(0,0,0,0.12)] rounded-2xl" onerror="this.src='rasmlar/logo.png'">
+                                <img src="rasmlar/taxi.png" alt="Taxi" class="w-[95%] h-[135px] object-contain mix-blend-multiply" onerror="this.src='rasmlar/logo.png'">
                             </div>
                             
                             <!-- Text and Arrow -->
                             <div class="flex items-end justify-between w-full z-10 pb-1 pl-1">
                                 <h3 class="text-graphite font-extrabold text-[22px] tracking-tight leading-none">Taxi</h3>
-                                <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center shadow-[0_5px_15px_rgba(250,204,21,0.4)] shrink-0 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1">
-                                    <i class="fa-solid fa-arrow-right text-graphite text-[13px] font-bold"></i>
+                                <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center shadow-[0_5px_15px_rgba(250,204,21,0.3)] shrink-0 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1">
+                                    <i class="fa-solid fa-arrow-right text-graphite text-[14px] font-bold"></i>
                                 </div>
                             </div>
                         </div>
                         
                         <!-- Dostavka Card -->
-                        <div onclick="alert('Dostavka va Pochta xizmati tez orada ishga tushadi!')" class="bg-gradient-to-br from-white to-[#F2F2F6] rounded-[2rem] p-4 shadow-[0_15px_35px_rgba(0,0,0,0.06)] border border-white/80 transition-all duration-300 active:scale-[0.97] flex flex-col justify-between cursor-pointer group relative overflow-hidden h-[230px]">
+                        <div onclick="alert('Dostavka va Pochta xizmati tez orada ishga tushadi!')" class="bg-white rounded-[2rem] p-4 shadow-[0_8px_25px_rgba(0,0,0,0.06)] transition-all duration-300 active:scale-[0.97] flex flex-col justify-between cursor-pointer group relative overflow-hidden h-[230px]">
                             
-                            <!-- Image wrapper with mix-blend-multiply to remove white background -->
+                            <!-- Image wrapper with mix-blend-multiply and NO drop shadow to prevent box outlines -->
                             <div class="w-full flex-1 flex items-start justify-center pt-2 transition-transform duration-500 ease-out group-hover:-translate-y-2 group-hover:scale-105 z-0">
-                                <img src="rasmlar/dostavka.png" alt="Dostavka" class="w-full h-[120px] object-contain mix-blend-multiply drop-shadow-[0_20px_25px_rgba(0,0,0,0.12)] rounded-2xl" onerror="this.src='rasmlar/logo.png'">
+                                <img src="rasmlar/dostavka.png" alt="Dostavka" class="w-[95%] h-[135px] object-contain mix-blend-multiply" onerror="this.src='rasmlar/logo.png'">
                             </div>
                             
                             <!-- Text and Arrow -->
                             <div class="flex items-end justify-between w-full z-10 pb-1 pl-1">
-                                <h3 class="text-graphite font-extrabold text-[18px] tracking-tight leading-[1.15]">Dostavka,<br>Pochta</h3>
-                                <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center shadow-[0_5px_15px_rgba(250,204,21,0.4)] shrink-0 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1">
-                                    <i class="fa-solid fa-arrow-right text-graphite text-[13px] font-bold"></i>
+                                <h3 class="text-graphite font-extrabold text-[19px] tracking-tight leading-[1.15]">Dostavka,<br>Pochta</h3>
+                                <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center shadow-[0_5px_15px_rgba(250,204,21,0.3)] shrink-0 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1">
+                                    <i class="fa-solid fa-arrow-right text-graphite text-[14px] font-bold"></i>
                                 </div>
                             </div>
                         </div>
