@@ -256,6 +256,233 @@ let routeState = {
     routeObject: null
 };
 
+// --- Delivery Module (independent from Taxi) ---
+let delPickup = { region: null, latlng: null, address: '' };
+let delDest = { region: null, latlng: null, address: '' };
+let delMap = null;
+let delPickupMarker = null;
+let delDestMarker = null;
+let delRouteState = {
+    ready: false,
+    distance: null,
+    distanceText: '',
+    priceText: ''
+};
+const DEL_PRICE_PER_KM = 100;
+const DEL_MIN_PRICE = 3000;
+
+function startDeliveryPickupFlow() {
+    // Reuse the existing pickup region screen but flag we are in delivery mode
+    window._deliveryFlowMode = 'pickup';
+    navigate('pickup-region-screen');
+}
+
+function startDeliveryDestFlow() {
+    window._deliveryFlowMode = 'dest';
+    navigate('dest-region-screen');
+}
+
+function calculateDeliveryPrice() {
+    if (!delRouteState.ready || !delRouteState.distance) return null;
+    const distanceKm = Math.max(1, Math.round(delRouteState.distance / 1000));
+    const total = distanceKm * DEL_PRICE_PER_KM;
+    return Math.max(total, DEL_MIN_PRICE);
+}
+
+function updateDeliveryPriceDisplay() {
+    const infoCard = document.getElementById('del-info-card');
+    const contentState = document.getElementById('del-content-state');
+    const loadingState = document.getElementById('del-loading-state');
+    const previewSection = document.getElementById('del-route-preview');
+    const emptyState = document.getElementById('del-empty-state');
+    const orderBtn = document.getElementById('del-order-btn');
+    const priceEl = document.getElementById('del-price');
+
+    const hasAddresses = delPickup.latlng && delDest.latlng;
+
+    // 1. NO ADDRESSES
+    if (!hasAddresses) {
+        if (infoCard) infoCard.classList.add('hidden');
+        if (previewSection) {
+            previewSection.classList.remove('opacity-100', 'translate-y-0', 'pointer-events-auto');
+            previewSection.classList.add('opacity-0', 'translate-y-10', 'pointer-events-none');
+            setTimeout(() => {
+                if (!delPickup.latlng || !delDest.latlng) previewSection.style.display = 'none';
+            }, 500);
+        }
+        if (emptyState) {
+            emptyState.style.display = 'flex';
+            requestAnimationFrame(() => {
+                emptyState.classList.remove('opacity-0', 'scale-95');
+                emptyState.classList.add('opacity-100', 'scale-100');
+            });
+        }
+        return;
+    }
+
+    // Hide empty state
+    if (emptyState) {
+        emptyState.classList.remove('opacity-100', 'scale-100');
+        emptyState.classList.add('opacity-0', 'scale-95');
+        setTimeout(() => {
+            if (delPickup.latlng && delDest.latlng) emptyState.style.display = 'none';
+        }, 500);
+    }
+
+    // Show preview
+    if (previewSection && previewSection.style.display === 'none') {
+        previewSection.style.display = 'flex';
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                previewSection.classList.remove('opacity-0', 'translate-y-10', 'pointer-events-none');
+                previewSection.classList.add('opacity-100', 'translate-y-0', 'pointer-events-auto');
+                if (delMap) delMap.container.fitToViewport();
+            });
+        });
+    }
+
+    // 2. LOADING
+    if (!delRouteState.ready || !delRouteState.distance) {
+        if (infoCard) infoCard.classList.remove('hidden');
+        if (contentState) contentState.classList.add('hidden');
+        if (loadingState) loadingState.classList.remove('hidden');
+        if (orderBtn) {
+            orderBtn.disabled = true;
+            orderBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            orderBtn.innerHTML = "<i class='fa-solid fa-box-open'></i> Yo'l hisoblanmoqda...";
+        }
+        return;
+    }
+
+    // 3. READY
+    if (infoCard) infoCard.classList.remove('hidden');
+    if (loadingState) loadingState.classList.add('hidden');
+    if (contentState) contentState.classList.remove('hidden');
+
+    const distKm = (delRouteState.distance / 1000).toFixed(1) + " km";
+    const distEl = document.getElementById('del-distance');
+    if (distEl) distEl.innerText = distKm;
+
+    const price = calculateDeliveryPrice();
+    if (price !== null) {
+        const priceFormatted = price.toLocaleString('ru-RU') + " so'm";
+        if (priceEl) priceEl.innerText = priceFormatted;
+        delRouteState.priceText = priceFormatted;
+    }
+
+    if (orderBtn) {
+        orderBtn.disabled = false;
+        orderBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        orderBtn.innerHTML = "<i class='fa-solid fa-box-open'></i> Dostavka chaqirish";
+    }
+}
+
+function buildDeliveryRoute() {
+    if (!delPickup.latlng || !delDest.latlng) return;
+
+    delRouteState.ready = false;
+    updateDeliveryPriceDisplay();
+
+    ymaps.ready(() => {
+        if (!delMap) {
+            delMap = new ymaps.Map('del-map', {
+                center: [41.2995, 69.2401], zoom: 12, controls: []
+            }, { suppressMapOpenBlock: true, autoFitToViewport: 'always' });
+        }
+
+        delMap.geoObjects.removeAll();
+        delMap.container.fitToViewport();
+
+        const lat1 = Number(delPickup.latlng.lat);
+        const lng1 = Number(delPickup.latlng.lng);
+        const lat2 = Number(delDest.latlng.lat);
+        const lng2 = Number(delDest.latlng.lng);
+
+        // Pickup marker
+        delMap.geoObjects.add(new ymaps.Placemark([lat1, lng1],
+            { hintContent: delPickup.address },
+            { preset: 'islands#yellowCircleDotIcon', zIndex: 500 }
+        ));
+        // Dest marker
+        delMap.geoObjects.add(new ymaps.Placemark([lat2, lng2],
+            { hintContent: delDest.address },
+            { preset: 'islands#blackCircleDotIcon', zIndex: 500 }
+        ));
+
+        const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${lng1},${lat1};${lng2},${lat2}?overview=full&geometries=polyline`;
+
+        fetch(osrmUrl)
+            .then(res => res.json())
+            .then(data => {
+                if (data.code !== 'Ok' || !data.routes || data.routes.length === 0) {
+                    drawFallbackLine(delMap, lat1, lng1, lat2, lng2);
+                    return;
+                }
+                const route = data.routes[0];
+                const routeCoords = decodeOSRMPolyline(route.geometry);
+
+                if (routeCoords.length > 0) {
+                    delMap.geoObjects.add(new ymaps.Polyline(routeCoords, {}, {
+                        strokeColor: '#00000044', strokeWidth: 10, strokeOpacity: 0.25, zIndex: 99
+                    }));
+                    delMap.geoObjects.add(new ymaps.Polyline(routeCoords, {}, {
+                        strokeColor: '#111111', strokeWidth: 5, strokeOpacity: 1, zIndex: 100
+                    }));
+                }
+
+                delRouteState.ready = true;
+                delRouteState.distance = route.distance;
+                delRouteState.distanceText = (route.distance / 1000).toFixed(0) + " km";
+
+                updateDeliveryPriceDisplay();
+
+                delMap.container.fitToViewport();
+                const bounds = [
+                    [Math.min(lat1, lat2) - 0.1, Math.min(lng1, lng2) - 0.1],
+                    [Math.max(lat1, lat2) + 0.1, Math.max(lng1, lng2) + 0.1]
+                ];
+                delMap.setBounds(bounds, { checkZoomRange: true, zoomMargin: 60 });
+            })
+            .catch(err => {
+                console.error("Delivery route error:", err);
+                drawFallbackLine(delMap, lat1, lng1, lat2, lng2);
+            });
+    });
+}
+
+function createDeliveryOrder() {
+    if (!delPickup.latlng || !delDest.latlng || !delPickup.address || !delDest.address) {
+        alert("Iltimos, pochta olib ketish va yetkazish manzillarini tanlang!");
+        return;
+    }
+    if (!delRouteState.ready) {
+        alert("Yo'l hali hisoblanmoqda, iltimos kuting...");
+        return;
+    }
+
+    const order = {
+        id: Date.now(),
+        type: 'delivery',
+        from: { name: delPickup.address, lat: Number(delPickup.latlng.lat), lng: Number(delPickup.latlng.lng) },
+        to: { name: delDest.address, lat: Number(delDest.latlng.lat), lng: Number(delDest.latlng.lng) },
+        distance: delRouteState.distanceText,
+        price: delRouteState.priceText,
+        status: 'pending',
+        date: new Date().toISOString()
+    };
+
+    const activeOrders = JSON.parse(localStorage.getItem(DB_ACTIVE_ORDERS) || '[]');
+    activeOrders.push(order);
+    localStorage.setItem(DB_ACTIVE_ORDERS, JSON.stringify(activeOrders));
+
+    navigate('waiting-screen');
+
+    setTimeout(() => {
+        simulateDriverAcceptance(order);
+    }, 4000 + Math.random() * 2000);
+}
+
+
 // --- Pricing Engine ---
 const TARIFFS = {
     start: { id: 'start', pricePerKm: 500, baggage: 5000 },
@@ -978,6 +1205,10 @@ function navigate(screenId, animate = true) {
             if (screenId === 'active-trip-screen' && YandexTrackingEngine.tripMap) {
                 YandexTrackingEngine.tripMap.container.fitToViewport();
             }
+            if (screenId === 'delivery-screen' && delMap) {
+                delMap.container.fitToViewport();
+                updateDeliveryPriceDisplay();
+            }
         }, 350);
         
         // Refresh dynamic screens
@@ -1450,6 +1681,26 @@ function drawHomeRoute() {
 }
 
 function confirmPickupLocation() {
+    // Check if in delivery flow mode
+    if (window._deliveryFlowMode === 'pickup') {
+        if (!selectedPickup.latlng || !selectedPickup.address || selectedPickup.address === "Manzil aniqlanmoqda...") {
+            alert("Iltimos, manzil aniqlanishini kuting yoki xaritadan tanlang.");
+            return;
+        }
+        delPickup.latlng = { ...selectedPickup.latlng };
+        delPickup.address = selectedPickup.address;
+        delPickup.region = selectedPickup.region;
+        const display = document.getElementById('del-from-display');
+        if (display) display.innerText = delPickup.address;
+        window._deliveryFlowMode = null;
+        navigate('delivery-screen');
+        // If both addresses ready, build route
+        if (delPickup.latlng && delDest.latlng) {
+            setTimeout(() => buildDeliveryRoute(), 500);
+        }
+        return;
+    }
+
     if (!selectedPickup.latlng || !selectedPickup.address || selectedPickup.address === "Manzil aniqlanmoqda...") {
         alert("Iltimos, manzil aniqlanishini kuting yoki xaritadan tanlang.");
         return;
@@ -1460,6 +1711,28 @@ function confirmPickupLocation() {
 }
 
 function confirmDestLocation() {
+    // Check if in delivery flow mode
+    if (window._deliveryFlowMode === 'dest') {
+        if (!selectedDest.latlng || !selectedDest.address || selectedDest.address === "Manzil aniqlanmoqda...") {
+            alert("Iltimos, manzil aniqlanishini kuting yoki xaritadan tanlang.");
+            return;
+        }
+        delDest.latlng = { ...selectedDest.latlng };
+        delDest.address = selectedDest.address;
+        delDest.region = selectedDest.region;
+        const display = document.getElementById('del-to-display');
+        if (display) display.innerText = delDest.address;
+        window._deliveryFlowMode = null;
+        navigate('delivery-screen');
+        // Build route
+        if (delPickup.latlng && delDest.latlng) {
+            delRouteState.ready = false;
+            updateDeliveryPriceDisplay();
+            setTimeout(() => buildDeliveryRoute(), 500);
+        }
+        return;
+    }
+
     if (!selectedDest.latlng || !selectedDest.address || selectedDest.address === "Manzil aniqlanmoqda...") {
         alert("Iltimos, manzil aniqlanishini kuting yoki xaritadan tanlang.");
         return;
