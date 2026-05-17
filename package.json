@@ -14,11 +14,12 @@
   "dependencies": {
     "@capacitor/android": "latest",
     "@capacitor/core": "latest",
-    "@capacitor/ios": "latest",
     "@capacitor/geolocation": "latest",
+    "@capacitor/ios": "latest",
     "@capacitor/splash-screen": "latest"
   },
   "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "latest"
   }
 }
