@@ -1445,6 +1445,9 @@ async function initMapScreen(type, region) {
                     pickupMap.setCenter([Number(region.lat), Number(region.lng)], 13);
                 }
                 
+                // Automatically initialize marker and address at the center of the region on map load
+                updateMarkerAndAddress('pickup', { lat: Number(region.lat), lng: Number(region.lng) });
+                
                 // Critical for rendering tiles
                 pickupMap.container.fitToViewport();
                 setTimeout(() => { 
@@ -1473,6 +1476,9 @@ async function initMapScreen(type, region) {
                 } else {
                     destMap.setCenter([Number(region.lat), Number(region.lng)], 13);
                 }
+                
+                // Automatically initialize marker and address at the center of the region on map load
+                updateMarkerAndAddress('dest', { lat: Number(region.lat), lng: Number(region.lng) });
                 
                 // Critical for rendering tiles
                 destMap.container.fitToViewport();
