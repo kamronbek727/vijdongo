@@ -1660,12 +1660,72 @@ function drawFallbackLine(map, lat1, lng1, lat2, lng2) {
     });
 }
 
+function startTaxiBookingFlow() {
+    window._deliveryFlowMode = null;
+    
+    // Clear previous addresses
+    selectedPickup = { region: null, latlng: null, address: '' };
+    selectedDest = { region: null, latlng: null, address: '' };
+    
+    const fromEl = document.getElementById('from-display');
+    if (fromEl) fromEl.innerText = translations[currentLang]?.fromPlaceholder || "Qayerdasiz?";
+    const toEl = document.getElementById('to-display');
+    if (toEl) toEl.innerText = translations[currentLang]?.toPlaceholder || "Qayerga borasiz?";
+    
+    // Reset route UI
+    routeState.ready = false;
+    const previewSection = document.getElementById('route-preview-section');
+    if (previewSection) {
+        previewSection.classList.remove('opacity-100', 'translate-y-0', 'pointer-events-auto');
+        previewSection.classList.add('opacity-0', 'translate-y-10', 'pointer-events-none');
+        setTimeout(() => { previewSection.style.display = 'none'; }, 500);
+    }
+    const emptyState = document.getElementById('home-empty-state');
+    if (emptyState) {
+        emptyState.style.display = 'flex';
+        emptyState.classList.add('opacity-100', 'scale-100');
+    }
+
+    // Go to pickup region screen first
+    navigate('pickup-region-screen');
+}
+
 function startPickupFlow() {
     navigate('pickup-region-screen');
 }
 
 function startDestFlow() {
+    if (!selectedPickup.latlng) {
+        alert("Avval qayerdan ketishingizni (Qayerdasiz?) tanlang!");
+        // Optional: animate the pickup input to draw attention
+        const pickupContainer = document.getElementById('from-display')?.parentElement;
+        if (pickupContainer) {
+            pickupContainer.classList.add('animate-pulse', 'bg-yellow-50');
+            setTimeout(() => pickupContainer.classList.remove('animate-pulse', 'bg-yellow-50'), 1000);
+        }
+        return;
+    }
     navigate('dest-region-screen');
+}
+
+function goBackFromPickup() {
+    if (window._deliveryFlowMode === 'pickup') {
+        navigate('delivery-screen');
+    } else if (selectedPickup.latlng) {
+        navigate('taxi-screen');
+    } else {
+        navigate('home-screen');
+    }
+}
+
+function goBackFromDest() {
+    if (window._deliveryFlowMode === 'dest') {
+        navigate('delivery-screen');
+    } else if (selectedDest.latlng) {
+        navigate('taxi-screen');
+    } else {
+        navigate('pickup-region-screen');
+    }
 }
 
 // --- Map Logic ---
@@ -1707,7 +1767,20 @@ function confirmPickupLocation() {
     }
     const display = document.getElementById('from-display');
     if (display) display.innerText = selectedPickup.address;
-    navigate('dest-region-screen');
+    
+    if (!selectedDest.latlng) {
+        navigate('dest-region-screen');
+    } else {
+        // We already have a destination, just go back to taxi screen to recalculate
+        routeState.ready = false;
+        updatePriceDisplay();
+        navigate('taxi-screen');
+        setTimeout(() => updateOrderButton(), 100);
+        setTimeout(() => {
+            YandexTrackingEngine.showHomeMap();
+            setTimeout(() => drawHomeRoute(), 500);
+        }, 400);
+    }
 }
 
 function confirmDestLocation() {

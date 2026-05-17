@@ -209,97 +209,67 @@
         <!-- ==============================
              3. HOME SCREEN
              ============================== -->
-        <div id="home-screen" class="screen absolute inset-0 bg-white flex flex-col z-30 transition-transform duration-300 transform translate-x-full">
+        <div id="home-screen" class="screen absolute inset-0 bg-bgLight flex flex-col z-30 transition-transform duration-300 transform translate-x-full">
             <!-- Header -->
-            <div class="px-4 py-3 flex justify-between items-center z-10 bg-white pt-safe shadow-[0_4px_24px_rgba(0,0,0,0.04)] relative border-b border-gray-50/50">
-                <div class="flex items-center gap-2 flex-1 overflow-hidden">
-                    <div class="h-12 w-16 sm:w-20 flex-shrink-0 flex items-center justify-start overflow-hidden">
-                        <img src="assets/images/logo.jpeg" alt="Vijdon GO" class="h-[120%] w-auto object-contain mix-blend-multiply transform -translate-x-1" style="max-height: none;">
+            <div class="px-5 py-4 flex justify-between items-center z-10 bg-bgLight pt-safe relative">
+                <div class="flex items-center gap-3 flex-1 overflow-hidden">
+                    <div class="w-12 h-12 rounded-2xl bg-white flex items-center justify-center border border-gray-100 shadow-sm shrink-0 overflow-hidden">
+                        <img src="rasmlar/logo.png" alt="Vijdon GO" class="w-[120%] h-[120%] object-contain mix-blend-multiply" onerror="this.src='assets/images/logo.jpeg'">
                     </div>
-                    <h1 class="text-[18px] sm:text-[20px] font-extrabold tracking-tight text-graphite truncate leading-tight mt-0.5" data-i18n="whereTo">Qayerga boramiz?</h1>
+                    <div class="flex flex-col">
+                        <h1 class="text-[20px] font-extrabold tracking-tight text-graphite leading-none mt-1">Vijdon GO</h1>
+                    </div>
                 </div>
-                <button class="w-10 h-10 flex-shrink-0 ml-2 flex items-center justify-center rounded-full bg-gray-50 active:bg-gray-100 transition-colors shadow-sm border border-gray-100">
-                    <i class="fa-regular fa-bell text-[18px] text-gray-700"></i>
-                </button>
+                <div class="flex items-center gap-2">
+                    <button onclick="navigate('profil-screen')" class="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-full bg-white hover:bg-gray-50 transition-colors border border-gray-100 shadow-sm">
+                        <i class="fa-regular fa-user text-[16px] text-graphite"></i>
+                    </button>
+                </div>
             </div>
             
             <!-- Content container -->
             <div class="flex-1 overflow-y-auto no-scrollbar pb-32 pb-safe relative flex flex-col">
                 <!-- Greeting -->
-                <div class="px-5 mt-6 mb-4">
-                    <h2 id="home-greeting" class="text-2xl font-extrabold text-graphite tracking-tight" data-i18n="greeting">Assalomu alaykum!</h2>
+                <div class="px-5 mt-2 mb-6">
+                    <h2 id="home-greeting" class="text-[28px] font-bold text-graphite tracking-tight leading-tight" data-i18n="greeting">Assalomu alaykum!</h2>
+                    <p class="text-[14px] font-medium text-textSecondary mt-1" data-i18n="greetingSub">Bugun qayerga boramiz?</p>
                 </div>
 
                 <!-- Services Grid -->
-                <div class="px-4 mt-2 mb-6">
-                    <div class="grid grid-cols-2 gap-4">
+                <div class="px-5">
+                    <div class="grid grid-cols-2 gap-3 sm:gap-4">
                         <!-- Taxi Card -->
-                        <div onclick="navigate('taxi-screen')" class="bg-white rounded-[2rem] p-4 shadow-[0_8px_25px_rgba(0,0,0,0.06)] transition-all duration-300 active:scale-[0.97] flex flex-col justify-between cursor-pointer group relative overflow-hidden h-[230px]">
-                            
-                            <!-- Image wrapper with mix-blend-multiply and NO drop shadow to prevent box outlines -->
-                            <div class="w-full flex-1 flex items-start justify-center pt-2 transition-transform duration-500 ease-out group-hover:-translate-y-2 group-hover:scale-105 z-0">
-                                <img src="rasmlar/taxi.png" alt="Taxi" class="w-[95%] h-[135px] object-contain mix-blend-multiply" onerror="this.src='rasmlar/logo.png'">
-                            </div>
-                            
-                            <!-- Text and Arrow -->
-                            <div class="flex items-end justify-between w-full z-10 pb-1 pl-1">
-                                <h3 class="text-graphite font-extrabold text-[22px] tracking-tight leading-none">Taxi</h3>
-                                <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center shadow-[0_5px_15px_rgba(250,204,21,0.3)] shrink-0 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1">
-                                    <i class="fa-solid fa-arrow-right text-graphite text-[14px] font-bold"></i>
+                        <div onclick="startTaxiBookingFlow()" class="bg-white rounded-[24px] p-4 shadow-[0_4px_24px_rgba(0,0,0,0.04)] border border-gray-50 transition-all duration-300 active:scale-[0.96] flex flex-col justify-between cursor-pointer h-[150px] sm:h-[160px]">
+                            <div class="flex justify-between items-start">
+                                <h3 class="text-graphite font-bold text-[18px] tracking-tight leading-none">Taxi</h3>
+                                <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-sm shrink-0">
+                                    <i class="fa-solid fa-arrow-right text-graphite text-[12px] font-bold"></i>
                                 </div>
+                            </div>
+                            <div class="flex-1 flex items-center justify-center pt-3 pb-1">
+                                <img src="rasmlar/taxi.png" alt="Taxi" class="w-[80%] max-h-full object-contain" onerror="this.src='rasmlar/logo.png'">
                             </div>
                         </div>
                         
                         <!-- Dostavka Card -->
-                        <div onclick="navigate('delivery-screen')" class="bg-white rounded-[2rem] p-4 shadow-[0_8px_25px_rgba(0,0,0,0.06)] transition-all duration-300 active:scale-[0.97] flex flex-col justify-between cursor-pointer group relative overflow-hidden h-[230px]">
-                            
-                            <!-- Image wrapper with mix-blend-multiply and NO drop shadow to prevent box outlines -->
-                            <div class="w-full flex-1 flex items-start justify-center pt-2 transition-transform duration-500 ease-out group-hover:-translate-y-2 group-hover:scale-105 z-0">
-                                <img src="rasmlar/dostavka.png" alt="Dostavka" class="w-[95%] h-[135px] object-contain mix-blend-multiply" onerror="this.src='rasmlar/logo.png'">
-                            </div>
-                            
-                            <!-- Text and Arrow -->
-                            <div class="flex items-end justify-between w-full z-10 pb-1 pl-1">
-                                <h3 class="text-graphite font-extrabold text-[19px] tracking-tight leading-[1.15]">Dostavka,<br>Pochta</h3>
-                                <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center shadow-[0_5px_15px_rgba(250,204,21,0.3)] shrink-0 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1">
-                                    <i class="fa-solid fa-arrow-right text-graphite text-[14px] font-bold"></i>
+                        <div onclick="navigate('delivery-screen')" class="bg-white rounded-[24px] p-4 shadow-[0_4px_24px_rgba(0,0,0,0.04)] border border-gray-50 transition-all duration-300 active:scale-[0.96] flex flex-col justify-between cursor-pointer h-[150px] sm:h-[160px]">
+                            <div class="flex justify-between items-start">
+                                <h3 class="text-graphite font-bold text-[16px] tracking-tight leading-[1.15]">Dostavka,<br>Pochta</h3>
+                                <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-sm shrink-0">
+                                    <i class="fa-solid fa-arrow-right text-graphite text-[12px] font-bold"></i>
                                 </div>
+                            </div>
+                            <div class="flex-1 flex items-center justify-center pt-3 pb-1">
+                                <img src="rasmlar/dostavka.png" alt="Dostavka" class="w-[75%] max-h-full object-contain" onerror="this.src='rasmlar/logo.png'">
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Promo Section -->
-                <div class="px-4 mt-2 mb-6">
-                    <h3 class="text-graphite font-extrabold text-lg mb-3 px-1">Nega Vijdon GO?</h3>
-                    <div class="flex flex-col gap-3">
-                        <div class="bg-white rounded-[1.5rem] p-4 shadow-[0_4px_20px_rgba(0,0,0,0.03)] flex items-center gap-4 border border-gray-50/50">
-                            <div class="w-12 h-12 rounded-2xl bg-[#FFFBE6] flex items-center justify-center shrink-0">
-                                <span class="text-2xl">⚡</span>
-                            </div>
-                            <div>
-                                <h4 class="text-graphite font-bold text-sm">Tezkor yetib kelish</h4>
-                                <p class="text-[11px] text-textSecondary font-medium mt-0.5">O‘rtacha kutish vaqti 3 daqiqa</p>
-                            </div>
-                        </div>
-                        <div class="bg-white rounded-[1.5rem] p-4 shadow-[0_4px_20px_rgba(0,0,0,0.03)] flex items-center gap-4 border border-gray-50/50">
-                            <div class="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center shrink-0">
-                                <span class="text-2xl">🚕</span>
-                            </div>
-                            <div>
-                                <h4 class="text-graphite font-bold text-sm">24/7 xizmat ko‘rsatish</h4>
-                                <p class="text-[11px] text-textSecondary font-medium mt-0.5">Istalgan vaqtda safarga tayyormiz</p>
-                            </div>
-                        </div>
-                        <div class="bg-white rounded-[1.5rem] p-4 shadow-[0_4px_20px_rgba(0,0,0,0.03)] flex items-center gap-4 border border-gray-50/50">
-                            <div class="w-12 h-12 rounded-2xl bg-[#F0FDF4] flex items-center justify-center shrink-0">
-                                <span class="text-2xl">📦</span>
-                            </div>
-                            <div>
-                                <h4 class="text-graphite font-bold text-sm">Tez va ishonchli pochta</h4>
-                                <p class="text-[11px] text-textSecondary font-medium mt-0.5">Posylkangiz ishonchli qo'llarda</p>
-                            </div>
-                        </div>
+                <!-- Promo Banner -->
+                <div class="px-5 mt-4">
+                    <div class="w-full bg-white rounded-[24px] shadow-[0_4px_24px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] border border-gray-50 transition-all duration-300 active:scale-[0.98] hover:scale-[1.01] cursor-pointer overflow-hidden flex">
+                        <img src="rasmlar/banner.png" alt="Promo Banner" class="w-full h-auto object-cover object-center pointer-events-none" onerror="this.parentElement.parentElement.style.display='none'">
                     </div>
                 </div>
 
@@ -457,7 +427,7 @@
         <div id="pickup-region-screen" class="screen absolute inset-0 bg-white flex flex-col z-40 transition-transform duration-300 transform translate-x-full">
             <div class="px-5 py-4 flex items-center justify-between shadow-sm z-10 pt-safe border-b border-gray-50">
                 <div class="flex items-center">
-                    <button onclick="navigate('home-screen')" class="w-10 h-10 flex items-center justify-center rounded-full bg-bgLight hover:bg-gray-200 transition-colors mr-3">
+                    <button onclick="goBackFromPickup()" class="w-10 h-10 flex items-center justify-center rounded-full bg-bgLight hover:bg-gray-200 transition-colors mr-3">
                         <i class="fa-solid fa-chevron-left text-sm"></i>
                     </button>
                     <h1 class="text-xl font-bold" data-i18n="fromPlaceholder">Qayerdasiz?</h1>
@@ -512,7 +482,7 @@
         <div id="dest-region-screen" class="screen absolute inset-0 bg-white flex flex-col z-40 transition-transform duration-300 transform translate-x-full">
             <div class="px-5 py-4 flex items-center justify-between shadow-sm z-10 pt-safe border-b border-gray-50">
                 <div class="flex items-center">
-                    <button onclick="navigate('home-screen')" class="w-10 h-10 flex items-center justify-center rounded-full bg-bgLight hover:bg-gray-200 transition-colors mr-3">
+                    <button onclick="goBackFromDest()" class="w-10 h-10 flex items-center justify-center rounded-full bg-bgLight hover:bg-gray-200 transition-colors mr-3">
                         <i class="fa-solid fa-chevron-left text-sm"></i>
                     </button>
                     <h1 class="text-xl font-bold" data-i18n="toPlaceholder">Qayerga borasiz?</h1>
