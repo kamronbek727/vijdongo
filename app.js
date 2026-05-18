@@ -216,13 +216,18 @@ function updateUITranslations() {
 const regionsData = [
     { id: 'toshkent_sh', name: "Toshkent shahri", lat: 41.2995, lng: 69.2401 },
     { id: 'toshkent_v', name: "Toshkent viloyati", lat: 41.2000, lng: 69.2500 },
-    { id: 'samarqand', name: "Samarqand shahri", lat: 39.6270, lng: 66.9750 },
-    { id: 'buxoro', name: "Buxoro shahri", lat: 39.7681, lng: 64.4556 },
-    { id: 'navoiy', name: "Navoiy shahri", lat: 40.0844, lng: 65.3792 },
-    { id: 'andijon', name: "Andijon shahri", lat: 40.7821, lng: 72.3442 },
-    { id: 'fargona', name: "Farg'ona shahri", lat: 40.3842, lng: 71.7843 },
-    { id: 'namangan', name: "Namangan shahri", lat: 41.0011, lng: 71.6683 },
-    { id: 'qarshi', name: "Qarshi shahri", lat: 38.8612, lng: 65.7847 }
+    { id: 'andijon', name: "Andijon", lat: 40.7821, lng: 72.3442 },
+    { id: 'fargona', name: "Farg‘ona", lat: 40.3842, lng: 71.7843 },
+    { id: 'namangan', name: "Namangan", lat: 41.0011, lng: 71.6683 },
+    { id: 'samarqand', name: "Samarqand", lat: 39.6270, lng: 66.9750 },
+    { id: 'buxoro', name: "Buxoro", lat: 39.7681, lng: 64.4556 },
+    { id: 'navoiy', name: "Navoiy", lat: 40.0844, lng: 65.3792 },
+    { id: 'qashqadaryo', name: "Qashqadaryo", lat: 38.8612, lng: 65.7847 },
+    { id: 'surxondaryo', name: "Surxondaryo", lat: 37.2242, lng: 67.2783 },
+    { id: 'jizzax', name: "Jizzax", lat: 40.1158, lng: 67.8422 },
+    { id: 'sirdaryo', name: "Sirdaryo", lat: 40.4897, lng: 68.7842 },
+    { id: 'xorazm', name: "Xorazm", lat: 41.5500, lng: 60.6333 },
+    { id: 'qoraqalpogiston', name: "Qoraqalpog‘iston Respublikasi", lat: 42.4619, lng: 59.6166 }
 ];
 
 const mockDrivers = [
@@ -1499,31 +1504,52 @@ function updateMarkerAndAddress(type, latlng) {
     const lng = Number(latlng.lng);
     const coords = [lat, lng];
     
+    // Clear old state before updating
+    if (type === 'pickup') {
+        selectedPickup.address = '';
+    } else {
+        selectedDest.address = '';
+    }
+    
     setMarker(type, { lat, lng }, "Manzil aniqlanmoqda...");
     
-    // Add a race against a timeout to prevent hanging
-    const geocodePromise = ymaps.geocode(coords, { results: 1 });
+    // Reverse geocoding real coordinates bilan ishlashi
+    // Yandex by default accepts [lat, lng] in ymaps.geocode
+    const geocodePromise = ymaps.geocode(coords, { results: 1, kind: 'house' })
+        .then(res => {
+            if (res.geoObjects.getLength() === 0) {
+                // Agar kind: 'house' bilan topolmasa, oddiy qidiramiz
+                return ymaps.geocode(coords, { results: 1 });
+            }
+            return res;
+        });
+        
     const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error("Geocode Timeout")), 4000)
+        setTimeout(() => reject(new Error("Geocode Timeout")), 5000)
     );
 
     Promise.race([geocodePromise, timeoutPromise]).then(res => {
-        const firstGeoObject = res.geoObjects.get(0);
+        let firstGeoObject = res.geoObjects.get(0);
         if (firstGeoObject) {
             let addressName = firstGeoObject.getAddressLine();
             addressName = addressName.replace("O'zbekiston, ", "").replace("Узбекистан, ", "");
+            
+            console.log("Selected coords:", coords);
+            console.log("Resolved address:", addressName);
+            
             setMarker(type, { lat, lng }, addressName);
         } else {
             throw new Error("No address found");
         }
     }).catch(err => {
-        console.warn("Geocoding failed/timed out, using fallback:", err);
-        const region = (type === 'pickup' ? selectedPickup.region : selectedDest.region);
-        const regionName = region ? region.name : "Toshkent shahri";
-        const mockStreets = ["Mustaqillik ko'chasi", "Amir Temur ko'chasi", "Navoiy ko'chasi", "Bobur ko'chasi", "Farg'ona yo'li"];
-        const randomStreet = mockStreets[Math.floor(Math.random() * mockStreets.length)];
-        const mockAddress = `${regionName}, ${randomStreet}, ${Math.floor(Math.random()*80)+1}-uy`;
-        setMarker(type, { lat, lng }, mockAddress);
+        console.warn("Geocoding failed/timed out:", err);
+        console.log("Selected coords:", coords);
+        
+        // Random address chiqarish yo‘qolsin!
+        // Koordinatalarni manzil sifatida ko'rsatamiz
+        const fallbackAddress = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+        console.log("Resolved address:", fallbackAddress);
+        setMarker(type, { lat, lng }, fallbackAddress);
     });
 }
 
@@ -1540,7 +1566,12 @@ function setMarker(type, latlng, addressName) {
             pickupMarker.geometry.setCoordinates([latlng.lat, latlng.lng]);
         } else {
             pickupMarker = new ymaps.Placemark([latlng.lat, latlng.lng], {}, {
-                preset: 'islands#yellowDotIcon'
+                preset: 'islands#yellowDotIcon',
+                draggable: true // Marker move bo'lsa
+            });
+            pickupMarker.events.add('dragend', function (e) {
+                const newCoords = pickupMarker.geometry.getCoordinates();
+                updateMarkerAndAddress('pickup', { lat: newCoords[0], lng: newCoords[1] });
             });
             map.geoObjects.add(pickupMarker);
         }
@@ -1553,7 +1584,12 @@ function setMarker(type, latlng, addressName) {
             destMarker.geometry.setCoordinates([latlng.lat, latlng.lng]);
         } else {
             destMarker = new ymaps.Placemark([latlng.lat, latlng.lng], {}, {
-                preset: 'islands#blackDotIcon'
+                preset: 'islands#blackDotIcon',
+                draggable: true // Marker move bo'lsa
+            });
+            destMarker.events.add('dragend', function (e) {
+                const newCoords = destMarker.geometry.getCoordinates();
+                updateMarkerAndAddress('dest', { lat: newCoords[0], lng: newCoords[1] });
             });
             map.geoObjects.add(destMarker);
         }
@@ -2545,101 +2581,4 @@ function openActiveDriverChat() {
     }
 }
 
-// --- PWA Support & Service Worker ---
-let deferredPrompt;
 
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js')
-            .then(registration => {
-                console.log('ServiceWorker registration successful');
-            })
-            .catch(err => {
-                console.log('ServiceWorker registration failed: ', err);
-            });
-    });
-}
-
-window.addEventListener('beforeinstallprompt', (e) => {
-    // Prevent the mini-infobar from appearing on mobile
-    e.preventDefault();
-    // Stash the event so it can be triggered later.
-    deferredPrompt = e;
-    // Update UI notify the user they can install the PWA
-    const installPrompt = document.getElementById('pwa-install-prompt');
-    if (installPrompt) {
-        installPrompt.classList.remove('-translate-y-[150%]');
-    }
-});
-
-function initPWAButtons() {
-    const installBtn = document.getElementById('pwa-install-btn');
-    const closeBtn = document.getElementById('pwa-close-btn');
-    const installPrompt = document.getElementById('pwa-install-prompt');
-
-    if (installBtn) {
-        installBtn.addEventListener('click', async () => {
-            if (installPrompt) installPrompt.classList.add('-translate-y-[150%]');
-            if (deferredPrompt) {
-                // Show the install prompt
-                deferredPrompt.prompt();
-                // Wait for the user to respond to the prompt
-                const { outcome } = await deferredPrompt.userChoice;
-                console.log(`User response to the install prompt: ${outcome}`);
-                // We've used the prompt, and can't use it again, throw it away
-                deferredPrompt = null;
-            }
-        });
-    }
-
-    if (closeBtn) {
-        closeBtn.addEventListener('click', () => {
-            if (installPrompt) installPrompt.classList.add('-translate-y-[150%]');
-        });
-    }
-}
-
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initPWA);
-} else {
-    initPWA();
-}
-
-function initPWA() {
-    initPWAButtons();
-    // Show iOS install prompt if applicable
-    showIosInstallPrompt();
-}
-
-// --- iOS Install Prompt ---
-function showIosInstallPrompt() {
-    const ua = window.navigator.userAgent;
-    // Detect iOS
-    const isIos = /iphone|ipad|ipod/i.test(ua);
-    // Detect Standalone (already installed)
-    const isStandalone = (window.navigator.standalone === true) || window.matchMedia('(display-mode: standalone)').matches;
-
-    
-    const dismissed = localStorage.getItem('ios-pwa-dismissed') === 'true';
-
-    // We show on all iOS devices if not installed and not dismissed.
-    // Safari is the default, and even in Chrome, it's helpful to know it's a web app.
-    if (isIos && !isStandalone && !dismissed) {
-        const iosPrompt = document.getElementById('ios-install-prompt');
-        if (iosPrompt) {
-            iosPrompt.classList.remove('hidden');
-            setTimeout(() => {
-                iosPrompt.classList.remove('translate-y-[150%]');
-            }, 800); // Small delay so it appears smoothly after load
-            
-            const closePrompt = () => {
-                iosPrompt.classList.add('translate-y-[150%]');
-                localStorage.setItem('ios-pwa-dismissed', 'true');
-                setTimeout(() => iosPrompt.classList.add('hidden'), 500);
-            };
-
-            document.getElementById('ios-close-btn')?.addEventListener('click', closePrompt);
-            document.getElementById('ios-understand-btn')?.addEventListener('click', closePrompt);
-        }
-    }
-}

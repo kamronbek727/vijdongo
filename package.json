@@ -5,21 +5,6 @@
   "main": "index.html",
   "scripts": {
     "start": "npx serve .",
-    "build": "node build.js",
-    "cap:sync": "npm run build && npx cap sync",
-    "cap:open:android": "npx cap open android",
-    "cap:add:android": "npx cap add android",
-    "cap:build:android": "npx cap build android"
-  },
-  "dependencies": {
-    "@capacitor/android": "latest",
-    "@capacitor/core": "latest",
-    "@capacitor/geolocation": "latest",
-    "@capacitor/ios": "latest",
-    "@capacitor/splash-screen": "latest"
-  },
-  "devDependencies": {
-    "@capacitor/assets": "^3.0.5",
-    "@capacitor/cli": "latest"
+    "build": "node build.js"
   }
 }

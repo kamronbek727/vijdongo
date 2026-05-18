@@ -12,8 +12,6 @@ const filesToCopy = [
     'index.html',
     'app.js',
     'style.css',
-    'manifest.json',
-    'sw.js',
     'rasmlar',
     'assets'
 ];
