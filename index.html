@@ -299,30 +299,42 @@
                 
                 
                 <!-- Tariffs Section -->
-                <div class="mt-5 overflow-hidden">
-                    <div class="flex gap-3 overflow-x-auto no-scrollbar pb-3 pt-1 px-4 scroll-smooth snap-x">
+                <div class="mt-5 px-4">
+                    <div class="grid grid-cols-3 gap-3 w-full">
                         <!-- START -->
-                        <div id="tariff-start" onclick="selectTariff('start')" class="tariff-card snap-center shrink-0 w-[120px] bg-white border-2 border-primary rounded-[1.25rem] p-3.5 flex flex-col gap-1 cursor-pointer transition-all relative shadow-[0_4px_15px_rgba(255,214,0,0.25)] scale-100 z-10">
-                            <div class="text-3xl mb-1 drop-shadow-sm">🚕</div>
-                            <span class="text-[11px] font-black uppercase tracking-widest text-graphite">START</span>
-                            <span class="text-[10px] text-textSecondary font-medium leading-tight">Oddiy avto</span>
-                            <span id="price-start" class="text-[13px] font-extrabold text-graphite mt-1.5">-- so'm</span>
+                        <div id="tariff-start" onclick="selectTariff('start')" class="tariff-card bg-white border-2 border-[#FFD400] rounded-[22px] p-0 flex flex-col justify-between items-center cursor-pointer transition-all relative h-[175px] shadow-[0_2px_10px_rgba(0,0,0,0.05)] overflow-hidden">
+                            <div class="w-full flex justify-center items-center h-[95px] pt-3 relative overflow-visible">
+                                <img src="rasmlar/gentra.png" alt="Start" class="w-[95%] h-full object-contain">
+                            </div>
+                            <div class="w-full flex flex-col items-center text-center bg-white pt-[14px] px-[16px] pb-[18px] mt-auto">
+                                <span class="text-[14px] font-bold uppercase tracking-tight text-graphite leading-none">START</span>
+                                <span class="text-[10px] text-textSecondary font-medium leading-none mt-1">Oddiy avto</span>
+                                <span id="price-start" class="text-[13.5px] font-semibold text-black mt-2 leading-none">-- so'm</span>
+                            </div>
                         </div>
                         
                         <!-- KOMFORT -->
-                        <div id="tariff-komfort" onclick="selectTariff('komfort')" class="tariff-card snap-center shrink-0 w-[120px] bg-gray-50 border-2 border-transparent rounded-[1.25rem] p-3.5 flex flex-col gap-1 cursor-pointer transition-all relative opacity-70 scale-[0.96]">
-                            <div class="text-3xl mb-1 drop-shadow-sm">🚘</div>
-                            <span class="text-[11px] font-black uppercase tracking-widest text-[#1e3a8a]">KOMFORT</span>
-                            <span class="text-[10px] text-textSecondary font-medium leading-tight">Qulay avto</span>
-                            <span id="price-komfort" class="text-[13px] font-extrabold text-graphite mt-1.5">-- so'm</span>
+                        <div id="tariff-komfort" onclick="selectTariff('komfort')" class="tariff-card bg-white border-2 border-transparent rounded-[22px] p-0 flex flex-col justify-between items-center cursor-pointer transition-all relative h-[175px] shadow-[0_2px_10px_rgba(0,0,0,0.05)] overflow-hidden">
+                            <div class="w-full flex justify-center items-center h-[95px] pt-3 relative overflow-visible">
+                                <img src="rasmlar/malibu.png" alt="Komfort" class="w-[95%] h-full object-contain">
+                            </div>
+                            <div class="w-full flex flex-col items-center text-center bg-white pt-[14px] px-[16px] pb-[18px] mt-auto">
+                                <span class="text-[14px] font-bold uppercase tracking-tight text-graphite leading-none">KOMFORT</span>
+                                <span class="text-[10px] text-textSecondary font-medium leading-none mt-1">Qulay avto</span>
+                                <span id="price-komfort" class="text-[13.5px] font-semibold text-black mt-2 leading-none">-- so'm</span>
+                            </div>
                         </div>
                         
                         <!-- BIZNES -->
-                        <div id="tariff-biznes" onclick="selectTariff('biznes')" class="tariff-card snap-center shrink-0 w-[120px] bg-graphite border-2 border-transparent rounded-[1.25rem] p-3.5 flex flex-col gap-1 cursor-pointer transition-all relative opacity-70 scale-[0.96]">
-                            <div class="text-3xl mb-1 drop-shadow-sm">🖤</div>
-                            <span class="text-[11px] font-black uppercase tracking-widest text-primary">BIZNES</span>
-                            <span class="text-[10px] text-gray-400 font-medium leading-tight">Premium</span>
-                            <span id="price-biznes" class="text-[13px] font-extrabold text-white mt-1.5">-- so'm</span>
+                        <div id="tariff-biznes" onclick="selectTariff('biznes')" class="tariff-card bg-white border-2 border-transparent rounded-[22px] p-0 flex flex-col justify-between items-center cursor-pointer transition-all relative h-[175px] shadow-[0_2px_10px_rgba(0,0,0,0.05)] overflow-hidden">
+                            <div class="w-full flex justify-center items-center h-[95px] pt-3 relative overflow-visible">
+                                <img src="rasmlar/byd.png" alt="Biznes" class="w-[95%] h-full object-contain">
+                            </div>
+                            <div class="w-full flex flex-col items-center text-center bg-white pt-[14px] px-[16px] pb-[18px] mt-auto">
+                                <span class="text-[14px] font-bold uppercase tracking-tight text-graphite leading-none">BIZNES</span>
+                                <span class="text-[10px] text-textSecondary font-medium leading-none mt-1">Premium</span>
+                                <span id="price-biznes" class="text-[13.5px] font-semibold text-black mt-2 leading-none">-- so'm</span>
+                            </div>
                         </div>
                     </div>
                 </div>

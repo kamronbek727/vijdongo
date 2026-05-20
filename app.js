@@ -502,24 +502,15 @@ function selectTariff(tariffId) {
     // Reset styles
     const cards = document.querySelectorAll('.tariff-card');
     cards.forEach(card => {
-        card.classList.remove('border-primary', 'shadow-[0_4px_15px_rgba(255,214,0,0.25)]', 'scale-100', 'z-10');
-        card.classList.add('border-transparent', 'opacity-70', 'scale-[0.96]');
-        if(card.id === 'tariff-biznes') {
-            card.classList.remove('border-[#444]');
-        }
+        card.classList.remove('border-[#FFD400]');
+        card.classList.add('border-transparent');
     });
     
     // Set active styles
     const activeCard = document.getElementById('tariff-' + tariffId);
     if(activeCard) {
-        activeCard.classList.remove('border-transparent', 'opacity-70', 'scale-[0.96]');
-        activeCard.classList.add('scale-100', 'z-10');
-        
-        if(tariffId === 'biznes') {
-            activeCard.classList.add('border-[#444]', 'shadow-[0_4px_15px_rgba(0,0,0,0.5)]');
-        } else {
-            activeCard.classList.add('border-primary', 'shadow-[0_4px_15px_rgba(255,214,0,0.25)]');
-        }
+        activeCard.classList.remove('border-transparent');
+        activeCard.classList.add('border-[#FFD400]');
     }
     
     // Calculate and update prices in cards
