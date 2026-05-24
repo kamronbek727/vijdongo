@@ -68,77 +68,197 @@
             <img src="rasmlar/splash.jpeg" onerror="this.src='assets/images/splash.jpeg'" alt="Splash Background" class="absolute inset-0 w-full h-full object-cover z-0" loading="eager" decoding="async">
             
             <div class="absolute bottom-0 w-full p-6 pb-12 pb-safe bg-white z-50 rounded-t-[2.5rem] shadow-[0_-20px_50px_rgba(0,0,0,0.2)] border-t border-gray-100 flex flex-col gap-3">
-                <button id="start-journey-btn" class="w-full bg-primary hover:bg-yellow-500 text-graphite font-black text-xl py-5 rounded-2xl transition-all active:scale-95 shadow-xl shadow-yellow-400/40 relative z-[100]" style="touch-action: manipulation;">
+                <button id="start-journey-btn" class="w-full bg-primary hover:bg-yellow-500 text-graphite font-black text-xl py-5 rounded-2xl transition-all active:scale-95 shadow-xl shadow-yellow-400/40 relative z-[100]" style="touch-action: manipulation;" data-i18n="splash.startJourney">
                     Safarni boshlash
                 </button>
             </div>
         </div>
 
         <!-- ==============================
-             2. LOGIN SCREEN
+             2. LOGIN FLOW (4 STEPS)
              ============================== -->
-        <div id="login-screen" class="screen absolute inset-0 bg-white flex flex-col z-50 transition-transform duration-300 transform translate-x-full">
-            <div class="px-4 py-5 flex items-center border-b border-gray-50 pt-safe shrink-0">
+        <!-- STEP 1: Phone Number -->
+        <div id="login-step-1" class="screen absolute inset-0 bg-white flex flex-col z-50 transition-transform duration-300 transform translate-x-full">
+            <div class="px-4 py-5 flex items-center justify-between border-b border-gray-50 pt-safe shrink-0">
                 <button onclick="navigate('splash-screen')" class="w-10 h-10 flex items-center justify-center rounded-full bg-bgLight hover:bg-gray-200 transition-colors" style="touch-action: manipulation;">
                     <i class="fa-solid fa-chevron-left text-sm"></i>
                 </button>
-                <h1 class="flex-1 text-center text-lg font-semibold mr-10" data-i18n="loginTitle">Tizimga kirish</h1>
+                <h1 class="text-lg font-bold text-graphite" data-i18n="login.title">Tizimga kirish</h1>
+                <span class="text-sm font-bold text-textSecondary w-10 text-right">1/4</span>
             </div>
             
-            <div class="flex-1 p-6 flex flex-col gap-5 mt-4 overflow-y-auto no-scrollbar">
-                <div class="flex justify-center mb-2 shrink-0">
-                    <img src="assets/images/logo.jpeg" alt="Logo" class="h-20 w-auto object-contain mix-blend-multiply" style="border-radius: 12px; mix-blend-mode: multiply;">
-                </div>
-                <div class="shrink-0 mb-4">
-                    <label class="block text-sm font-semibold text-graphite mb-2" data-i18n="langSelectTitle">Tilni tanlang</label>
-                    <div class="relative">
-                        <select id="login-language" onchange="setLanguage(this.value)" class="w-full bg-bgLight px-5 py-4 rounded-2xl border-none focus:ring-2 focus:ring-primary outline-none transition-shadow text-base font-medium appearance-none cursor-pointer">
-                            <option value="uz">O‘zbekcha 🇺🇿</option>
-                            <option value="ru">Русский 🇷🇺</option>
-                            <option value="en">English 🇺🇸</option>
-                        </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-5 text-textSecondary">
-                            <i class="fa-solid fa-chevron-down"></i>
-                        </div>
+            <div class="flex-1 p-6 flex flex-col justify-between overflow-y-auto no-scrollbar">
+                <div class="flex flex-col gap-6 mt-4">
+                    <div class="flex justify-center mb-2 shrink-0">
+                        <img src="assets/images/logo.jpeg" alt="Logo" class="h-20 w-auto object-contain mix-blend-multiply rounded-2xl shadow-sm">
+                    </div>
+                    
+                    <div class="text-center px-4 shrink-0">
+                        <h2 class="text-2xl font-bold text-graphite" data-i18n="login.phoneLabel">Telefon raqami</h2>
+                        <p class="text-sm text-textSecondary mt-2" data-i18n="login.phoneDescription">Safar buyurtma qilish va hisobingizga kirish uchun telefon raqamingizni kiriting</p>
+                    </div>
+
+                    <div class="shrink-0 mt-4">
+                        <label class="block text-xs font-bold text-textSecondary uppercase tracking-wider mb-2 ml-1" data-i18n="login.phoneLabel">Telefon raqami</label>
+                        <input type="tel" id="login-phone" placeholder="+998" value="+998" class="w-full bg-bgLight px-5 py-4 rounded-2xl border border-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-base font-semibold text-graphite shadow-sm">
+                        <p id="login-phone-error" class="text-xs text-red-500 font-semibold mt-2 ml-1 hidden"></p>
                     </div>
                 </div>
-                <div class="shrink-0">
-                    <label class="block text-sm font-semibold text-graphite mb-2" data-i18n="nameLabel">Ism</label>
-                    <input type="text" id="login-name" placeholder="Ismingizni kiriting" data-i18n-placeholder="namePlaceholder" class="w-full bg-bgLight px-5 py-4 rounded-2xl border-none focus:ring-2 focus:ring-primary outline-none transition-shadow text-base">
+                
+                <div class="py-4 shrink-0">
+                    <button onclick="validateStep1()" class="w-full bg-primary hover:bg-primaryHover text-graphite font-bold text-lg py-4 rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-yellow-500/20" style="touch-action: manipulation;" data-i18n="common.continueBtn">
+                        Davom etish
+                    </button>
                 </div>
-                <div class="shrink-0">
-                    <label class="block text-sm font-semibold text-graphite mb-2" data-i18n="surnameLabel">Familiya</label>
-                    <input type="text" id="login-surname" placeholder="Familiyangizni kiriting" data-i18n-placeholder="surnamePlaceholder" class="w-full bg-bgLight px-5 py-4 rounded-2xl border-none focus:ring-2 focus:ring-primary outline-none transition-shadow text-base">
-                </div>
-                <div class="shrink-0">
-                    <label class="block text-sm font-semibold text-graphite mb-2" data-i18n="phoneLabel">Telefon raqami</label>
-                    <input type="tel" id="login-phone" placeholder="+998" value="+998 " class="w-full bg-bgLight px-5 py-4 rounded-2xl border-none focus:ring-2 focus:ring-primary outline-none transition-shadow text-base font-medium">
-                </div>
-                <div class="shrink-0 mb-4">
-                    <label class="block text-sm font-semibold text-graphite mb-3" data-i18n="genderLabel">Jinsingiz</label>
-                    <div class="flex gap-3">
-                        <button onclick="setLoginGender('male')" id="gender-male" class="gender-btn flex-1 bg-bgLight p-4 rounded-2xl border-2 border-transparent transition-all flex flex-col items-center gap-2" style="touch-action: manipulation;">
-                            <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-500 text-lg">
-                                <i class="fa-solid fa-mars"></i>
-                            </div>
-                            <span class="text-sm font-bold text-graphite" data-i18n="male">Erkak</span>
-                        </button>
-                        <button onclick="setLoginGender('female')" id="gender-female" class="gender-btn flex-1 bg-bgLight p-4 rounded-2xl border-2 border-transparent transition-all flex flex-col items-center gap-2" style="touch-action: manipulation;">
-                            <div class="w-10 h-10 rounded-full bg-pink-50 flex items-center justify-center text-pink-500 text-lg">
-                                <i class="fa-solid fa-venus"></i>
-                            </div>
-                            <span class="text-sm font-bold text-graphite" data-i18n="female">Ayol</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="p-6 pb-safe shrink-0 border-t border-gray-50 bg-white">
-                <button onclick="handleLogin()" class="w-full bg-primary hover:bg-primaryHover text-graphite font-semibold text-lg py-4 rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-yellow-500/20" style="touch-action: manipulation;">
-                    Davom etish
-                </button>
             </div>
         </div>
+
+        <!-- STEP 2: Name & Surname -->
+        <div id="login-step-2" class="screen absolute inset-0 bg-white flex flex-col z-50 transition-transform duration-300 transform translate-x-full">
+            <div class="px-4 py-5 flex items-center justify-between border-b border-gray-50 pt-safe shrink-0">
+                <button onclick="navigate('login-step-1')" class="w-10 h-10 flex items-center justify-center rounded-full bg-bgLight hover:bg-gray-200 transition-colors" style="touch-action: manipulation;">
+                    <i class="fa-solid fa-chevron-left text-sm"></i>
+                </button>
+                <h1 class="text-lg font-bold text-graphite" data-i18n="login.title">Tizimga kirish</h1>
+                <span class="text-sm font-bold text-textSecondary w-10 text-right">2/4</span>
+            </div>
+            
+            <div class="flex-1 p-6 flex flex-col justify-between overflow-y-auto no-scrollbar">
+                <div class="flex flex-col gap-5 mt-4">
+                    <div class="text-center px-4 shrink-0">
+                        <h2 class="text-2xl font-bold text-graphite" data-i18n="login.nameSurnameTitle">Ism va familiya</h2>
+                        <p class="text-sm text-textSecondary mt-2" data-i18n="login.nameSurnameDescription">Iltimos, ismingiz va familiyangizni kiriting</p>
+                    </div>
+
+                    <div class="shrink-0 mt-4">
+                        <label class="block text-xs font-bold text-textSecondary uppercase tracking-wider mb-2 ml-1" data-i18n="login.nameLabel">Ism</label>
+                        <input type="text" id="login-name" placeholder="Ismingizni kiriting" data-i18n-placeholder="login.namePlaceholder" class="w-full bg-bgLight px-5 py-4 rounded-2xl border border-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-base font-semibold text-graphite shadow-sm">
+                        <p id="login-name-error" class="text-xs text-red-500 font-semibold mt-2 ml-1 hidden"></p>
+                    </div>
+
+                    <div class="shrink-0">
+                        <label class="block text-xs font-bold text-textSecondary uppercase tracking-wider mb-2 ml-1" data-i18n="login.surnameLabel">Familiya</label>
+                        <input type="text" id="login-surname" placeholder="Familiyangizni kiriting" data-i18n-placeholder="login.surnamePlaceholder" class="w-full bg-bgLight px-5 py-4 rounded-2xl border border-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-base font-semibold text-graphite shadow-sm">
+                    </div>
+                </div>
+                
+                <div class="py-4 shrink-0">
+                    <button onclick="validateStep2()" class="w-full bg-primary hover:bg-primaryHover text-graphite font-bold text-lg py-4 rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-yellow-500/20" style="touch-action: manipulation;" data-i18n="common.continueBtn">
+                        Davom etish
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 3: Gender -->
+        <div id="login-step-3" class="screen absolute inset-0 bg-white flex flex-col z-50 transition-transform duration-300 transform translate-x-full">
+            <div class="px-4 py-5 flex items-center justify-between border-b border-gray-50 pt-safe shrink-0">
+                <button onclick="navigate('login-step-2')" class="w-10 h-10 flex items-center justify-center rounded-full bg-bgLight hover:bg-gray-200 transition-colors" style="touch-action: manipulation;">
+                    <i class="fa-solid fa-chevron-left text-sm"></i>
+                </button>
+                <h1 class="text-lg font-bold text-graphite" data-i18n="login.title">Tizimga kirish</h1>
+                <span class="text-sm font-bold text-textSecondary w-10 text-right">3/4</span>
+            </div>
+            
+            <div class="flex-1 p-6 flex flex-col justify-between overflow-y-auto no-scrollbar">
+                <div class="flex flex-col gap-6 mt-4">
+                    <div class="text-center px-4 shrink-0">
+                        <h2 class="text-2xl font-bold text-graphite" data-i18n="login.genderLabel">Jinsingiz</h2>
+                        <p class="text-sm text-textSecondary mt-2" data-i18n="login.genderDescription">Profil ma'lumotlarini to'ldirish uchun jinsingizni tanlang</p>
+                    </div>
+
+                    <div class="flex flex-col gap-4 mt-4">
+                        <!-- Male Button Card -->
+                        <button onclick="setLoginGender('male')" id="gender-male" class="gender-btn w-full bg-bgLight p-5 rounded-2xl border-2 border-transparent transition-all flex items-center gap-4 text-left shadow-sm active:scale-[0.98]" style="touch-action: manipulation;">
+                            <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-500 text-xl shadow-inner">
+                                <i class="fa-solid fa-mars"></i>
+                            </div>
+                            <div class="flex-1">
+                                <span class="block text-base font-bold text-graphite" data-i18n="login.male">Erkak</span>
+                                <span class="block text-xs text-textSecondary" data-i18n="login.maleDesc">Erkaklar uchun profil rasmi</span>
+                            </div>
+                            <div class="gender-check hidden text-primary">
+                                <i class="fa-solid fa-circle-check text-xl"></i>
+                            </div>
+                        </button>
+                        
+                        <!-- Female Button Card -->
+                        <button onclick="setLoginGender('female')" id="gender-female" class="gender-btn w-full bg-bgLight p-5 rounded-2xl border-2 border-transparent transition-all flex items-center gap-4 text-left shadow-sm active:scale-[0.98]" style="touch-action: manipulation;">
+                            <div class="w-12 h-12 rounded-full bg-pink-50 flex items-center justify-center text-pink-500 text-xl shadow-inner">
+                                <i class="fa-solid fa-venus"></i>
+                            </div>
+                            <div class="flex-1">
+                                <span class="block text-base font-bold text-graphite" data-i18n="login.female">Ayol</span>
+                                <span class="block text-xs text-textSecondary" data-i18n="login.femaleDesc">Ayollar uchun profil rasmi</span>
+                            </div>
+                            <div class="gender-check hidden text-primary">
+                                <i class="fa-solid fa-circle-check text-xl"></i>
+                            </div>
+                        </button>
+                    </div>
+                    <p id="login-gender-error" class="text-xs text-red-500 font-semibold mt-2 text-center hidden"></p>
+                </div>
+                
+                <div class="py-4 shrink-0">
+                    <button onclick="validateStep3()" class="w-full bg-primary hover:bg-primaryHover text-graphite font-bold text-lg py-4 rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-yellow-500/20" style="touch-action: manipulation;" data-i18n="common.continueBtn">
+                        Davom etish
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 4: Language Selection -->
+        <div id="login-step-4" class="screen absolute inset-0 bg-white flex flex-col z-50 transition-transform duration-300 transform translate-x-full">
+            <div class="px-4 py-5 flex items-center justify-between border-b border-gray-50 pt-safe shrink-0">
+                <button onclick="navigate('login-step-3')" class="w-10 h-10 flex items-center justify-center rounded-full bg-bgLight hover:bg-gray-200 transition-colors" style="touch-action: manipulation;">
+                    <i class="fa-solid fa-chevron-left text-sm"></i>
+                </button>
+                <h1 class="text-lg font-bold text-graphite" data-i18n="login.title">Tizimga kirish</h1>
+                <span class="text-sm font-bold text-textSecondary w-10 text-right">4/4</span>
+            </div>
+            
+            <div class="flex-1 p-6 flex flex-col justify-between overflow-y-auto no-scrollbar">
+                <div class="flex flex-col gap-6 mt-4">
+                    <div class="text-center px-4 shrink-0">
+                        <h2 class="text-2xl font-bold text-graphite" data-i18n="login.langSelectTitle">Tilni tanlang</h2>
+                        <p class="text-sm text-textSecondary mt-2" data-i18n="login.langSelectDescription">Ilova interfeysi uchun qulay tilni tanlang</p>
+                    </div>
+
+                    <div class="flex flex-col gap-3 mt-4">
+                        <!-- Uzbek Card -->
+                        <button onclick="setLoginLanguage('uz')" id="lang-uz" class="lang-btn w-full bg-bgLight p-5 rounded-2xl border border-transparent transition-all flex items-center justify-between text-left shadow-sm active:scale-[0.98]" style="touch-action: manipulation;">
+                            <span class="text-base font-bold text-graphite" data-i18n="login.uzbek">O‘zbekcha 🇺🇿</span>
+                            <div class="lang-check hidden text-primary">
+                                <i class="fa-solid fa-circle-check text-xl"></i>
+                            </div>
+                        </button>
+                        
+                        <!-- Russian Card -->
+                        <button onclick="setLoginLanguage('ru')" id="lang-ru" class="lang-btn w-full bg-bgLight p-5 rounded-2xl border border-transparent transition-all flex items-center justify-between text-left shadow-sm active:scale-[0.98]" style="touch-action: manipulation;">
+                            <span class="text-base font-bold text-graphite" data-i18n="login.russian">Русский 🇷🇺</span>
+                            <div class="lang-check hidden text-primary">
+                                <i class="fa-solid fa-circle-check text-xl"></i>
+                            </div>
+                        </button>
+                        
+                        <!-- English Card -->
+                        <button onclick="setLoginLanguage('en')" id="lang-en" class="lang-btn w-full bg-bgLight p-5 rounded-2xl border border-transparent transition-all flex items-center justify-between text-left shadow-sm active:scale-[0.98]" style="touch-action: manipulation;">
+                            <span class="text-base font-bold text-graphite" data-i18n="login.english">English 🇺🇸</span>
+                            <div class="lang-check hidden text-primary">
+                                <i class="fa-solid fa-circle-check text-xl"></i>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="py-4 shrink-0">
+                    <button onclick="handleLogin()" class="w-full bg-primary hover:bg-primaryHover text-graphite font-bold text-lg py-4 rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-yellow-500/20" style="touch-action: manipulation;" data-i18n="common.finishBtn">
+                        Tugatish
+                    </button>
+                </div>
+            </div>
+        </div>
+
 
         <!-- ==============================
              3. HOME SCREEN
@@ -165,8 +285,8 @@
             <div class="flex-1 overflow-y-auto no-scrollbar pb-32 pb-safe relative flex flex-col">
                 <!-- Greeting -->
                 <div class="px-5 mt-2 mb-6">
-                    <h2 id="home-greeting" class="text-[28px] font-bold text-graphite tracking-tight leading-tight" data-i18n="greeting">Assalomu alaykum!</h2>
-                    <p class="text-[14px] font-medium text-textSecondary mt-1" data-i18n="greetingSub">Bugun qayerga boramiz?</p>
+                    <h2 id="home-greeting" class="text-[28px] font-bold text-graphite tracking-tight leading-tight" data-i18n="home.greeting">Assalomu alaykum!</h2>
+                    <p class="text-[14px] font-medium text-textSecondary mt-1" data-i18n="home.greetingSub">Bugun qayerga boramiz?</p>
                 </div>
 
                 <!-- Services Grid -->
@@ -175,7 +295,7 @@
                         <!-- Taxi Card -->
                         <div onclick="startTaxiBookingFlow()" class="bg-white rounded-[24px] p-4 shadow-[0_4px_24px_rgba(0,0,0,0.04)] border border-gray-50 transition-all duration-300 active:scale-[0.96] flex flex-col justify-between cursor-pointer h-[150px] sm:h-[160px]">
                             <div class="flex justify-between items-start">
-                                <h3 class="text-graphite font-bold text-[18px] tracking-tight leading-none">Taxi</h3>
+                                <h3 class="text-graphite font-bold text-[18px] tracking-tight leading-none" data-i18n="home.services.taxi">Taxi</h3>
                                 <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-sm shrink-0">
                                     <i class="fa-solid fa-arrow-right text-graphite text-[12px] font-bold"></i>
                                 </div>
@@ -186,9 +306,9 @@
                         </div>
                         
                         <!-- Dostavka Card -->
-                        <div onclick="navigate('delivery-screen')" class="bg-white rounded-[24px] p-4 shadow-[0_4px_24px_rgba(0,0,0,0.04)] border border-gray-50 transition-all duration-300 active:scale-[0.96] flex flex-col justify-between cursor-pointer h-[150px] sm:h-[160px]">
+                        <div onclick="startDeliveryFlow()" class="bg-white rounded-[24px] p-4 shadow-[0_4px_24px_rgba(0,0,0,0.04)] border border-gray-50 transition-all duration-300 active:scale-[0.96] flex flex-col justify-between cursor-pointer h-[150px] sm:h-[160px]">
                             <div class="flex justify-between items-start">
-                                <h3 class="text-graphite font-bold text-[16px] tracking-tight leading-[1.15]">Dostavka,<br>Pochta</h3>
+                                <h3 class="text-graphite font-bold text-[16px] tracking-tight leading-[1.15]" data-i18n="home.services.delivery">Dostavka,<br>Pochta</h3>
                                 <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-sm shrink-0">
                                     <i class="fa-solid fa-arrow-right text-graphite text-[12px] font-bold"></i>
                                 </div>
@@ -203,7 +323,7 @@
                 <!-- Promo Banner -->
                 <div class="px-5 mt-4">
                     <div class="w-full bg-white rounded-[24px] shadow-[0_4px_24px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] border border-gray-50 transition-all duration-300 active:scale-[0.98] hover:scale-[1.01] cursor-pointer overflow-hidden flex">
-                        <img src="rasmlar/banner.png" alt="Promo Banner" class="w-full h-auto object-cover object-center pointer-events-none" onerror="this.parentElement.parentElement.style.display='none'">
+                        <img id="home-promo-banner" src="rasmlar/banner.png" alt="Promo Banner" class="w-full h-auto object-cover object-center pointer-events-none" onerror="this.parentElement.parentElement.style.display='none'">
                     </div>
                 </div>
 
@@ -223,7 +343,7 @@
                     <div class="w-8 h-8 rounded-xl bg-primary/20 flex items-center justify-center">
                         <i class="fa-solid fa-taxi text-primary text-sm"></i>
                     </div>
-                    <h1 class="text-[18px] font-extrabold tracking-tight text-graphite">Taxi</h1>
+                    <h1 class="text-[18px] font-extrabold tracking-tight text-graphite" data-i18n="taxi.title">Taxi</h1>
                 </div>
             </div>
 
@@ -240,8 +360,8 @@
                                     <div class="w-2 h-2 rounded-full bg-primary"></div>
                                 </div>
                                 <div class="flex-1 border-b border-gray-100 pb-3" onclick="startPickupFlow()" style="cursor: pointer;">
-                                    <p class="text-[11px] text-textSecondary mb-0.5 font-medium uppercase tracking-wide" data-i18n="fromLabel">Qayerdan</p>
-                                    <div id="from-display" class="w-full bg-transparent font-semibold text-sm text-graphite truncate" data-i18n="fromPlaceholder">Qayerdasiz?</div>
+                                    <p class="text-[11px] text-textSecondary mb-0.5 font-medium uppercase tracking-wide" data-i18n="taxi.fromLabel">Qayerdan</p>
+                                    <div id="from-display" class="w-full bg-transparent font-semibold text-sm text-graphite truncate" data-i18n="taxi.fromPlaceholder">Qayerdasiz?</div>
                                 </div>
                             </div>
                             
@@ -250,22 +370,15 @@
                                     <div class="w-2 h-2 rounded-full bg-graphite"></div>
                                 </div>
                                 <div class="flex-1 pt-1" onclick="startDestFlow()" style="cursor: pointer;">
-                                    <p class="text-[11px] text-textSecondary mb-0.5 font-medium uppercase tracking-wide" data-i18n="toLabel">Qayerga</p>
-                                    <div id="to-display" class="w-full bg-transparent font-semibold text-sm text-graphite truncate" data-i18n="toPlaceholder">Qayerga borasiz?</div>
+                                    <p class="text-[11px] text-textSecondary mb-0.5 font-medium uppercase tracking-wide" data-i18n="taxi.toLabel">Qayerga</p>
+                                    <div id="to-display" class="w-full bg-transparent font-semibold text-sm text-graphite truncate" data-i18n="taxi.toPlaceholder">Qayerga borasiz?</div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Empty State -->
-                <div id="home-empty-state" class="flex-1 flex flex-col items-center justify-center p-8 mt-4 text-center transition-all duration-500 opacity-100 scale-100">
-                    <div class="w-32 h-32 bg-white rounded-full flex items-center justify-center mb-6 shadow-[0_8px_25px_rgba(0,0,0,0.05)]">
-                        <i class="fa-solid fa-route text-4xl text-gray-300"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-graphite mb-2" data-i18n="emptyTitle">Manzillarni tanlang</h3>
-                    <p class="text-sm text-textSecondary" data-i18n="emptyDesc">Olib ketish va borish joyini ko'rsating. Shundan so'ng narx va marshrut paydo bo'ladi.</p>
-                </div>
+
 
                 <!-- Route Preview Section (Hidden initially) -->
                 <div id="route-preview-section" class="flex flex-col opacity-0 translate-y-10 pointer-events-none transition-all duration-700 ease-out" style="display: none;">
@@ -286,7 +399,7 @@
                         <div id="preview-loading-state" class="flex flex-col py-0.5">
                             <div class="flex items-center gap-2.5 mb-2">
                                 <div class="w-4 h-4 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
-                                <span class="text-[13px] font-bold text-graphite" data-i18n="calcRoute">Yo'nalish hisoblanmoqda...</span>
+                                <span class="text-[13px] font-bold text-graphite" data-i18n="taxi.calcRoute">Yo'nalish hisoblanmoqda...</span>
                             </div>
                             <div class="flex items-center gap-3 pl-6">
                                 <div class="h-3.5 w-12 bg-gray-200 rounded animate-pulse"></div>
@@ -307,8 +420,8 @@
                                 <img src="rasmlar/gentra.png" alt="Start" class="w-[95%] h-full object-contain">
                             </div>
                             <div class="w-full flex flex-col items-center text-center bg-white pt-[14px] px-[16px] pb-[18px] mt-auto">
-                                <span class="text-[14px] font-bold uppercase tracking-tight text-graphite leading-none">START</span>
-                                <span class="text-[10px] text-textSecondary font-medium leading-none mt-1">Oddiy avto</span>
+                                <span class="text-[14px] font-bold uppercase tracking-tight text-graphite leading-none" data-i18n="taxi.tariffs.start">START</span>
+                                <span class="text-[10px] text-textSecondary font-medium leading-none mt-1" data-i18n="taxi.tariffs.startDesc">Oddiy avto</span>
                                 <span id="price-start" class="text-[13.5px] font-semibold text-black mt-2 leading-none">-- so'm</span>
                             </div>
                         </div>
@@ -319,8 +432,8 @@
                                 <img src="rasmlar/malibu.png" alt="Komfort" class="w-[95%] h-full object-contain">
                             </div>
                             <div class="w-full flex flex-col items-center text-center bg-white pt-[14px] px-[16px] pb-[18px] mt-auto">
-                                <span class="text-[14px] font-bold uppercase tracking-tight text-graphite leading-none">KOMFORT</span>
-                                <span class="text-[10px] text-textSecondary font-medium leading-none mt-1">Qulay avto</span>
+                                <span class="text-[14px] font-bold uppercase tracking-tight text-graphite leading-none" data-i18n="taxi.tariffs.komfort">KOMFORT</span>
+                                <span class="text-[10px] text-textSecondary font-medium leading-none mt-1" data-i18n="taxi.tariffs.komfortDesc">Qulay avto</span>
                                 <span id="price-komfort" class="text-[13.5px] font-semibold text-black mt-2 leading-none">-- so'm</span>
                             </div>
                         </div>
@@ -331,8 +444,8 @@
                                 <img src="rasmlar/byd.png" alt="Biznes" class="w-[95%] h-full object-contain">
                             </div>
                             <div class="w-full flex flex-col items-center text-center bg-white pt-[14px] px-[16px] pb-[18px] mt-auto">
-                                <span class="text-[14px] font-bold uppercase tracking-tight text-graphite leading-none">BIZNES</span>
-                                <span class="text-[10px] text-textSecondary font-medium leading-none mt-1">Premium</span>
+                                <span class="text-[14px] font-bold uppercase tracking-tight text-graphite leading-none" data-i18n="taxi.tariffs.biznes">BIZNES</span>
+                                <span class="text-[10px] text-textSecondary font-medium leading-none mt-1" data-i18n="taxi.tariffs.biznesDesc">Premium</span>
                                 <span id="price-biznes" class="text-[13.5px] font-semibold text-black mt-2 leading-none">-- so'm</span>
                             </div>
                         </div>
@@ -342,7 +455,7 @@
                 <!-- Options -->
                 <div class="px-4 mt-5 flex flex-col gap-3">
                     <div class="flex justify-between items-center bg-white p-4 rounded-2xl shadow-[0_4px_15px_rgba(0,0,0,0.02)] border border-gray-50">
-                        <span class="font-semibold text-sm text-graphite" data-i18n="passengers">Yo'lovchilar soni</span>
+                        <span class="font-semibold text-sm text-graphite" data-i18n="taxi.passengers">Yo'lovchilar soni</span>
                         <div class="flex items-center gap-3">
                             <button id="pax-minus" class="w-9 h-9 rounded-full bg-gray-50 shadow-sm flex items-center justify-center text-textSecondary active:bg-gray-100 transition-colors"><i class="fa-solid fa-minus text-xs"></i></button>
                             <span id="pax-count" class="font-bold w-6 text-center text-lg text-graphite">1</span>
@@ -351,14 +464,14 @@
                     </div>
                     
                     <div class="flex justify-between items-center bg-white p-4 rounded-2xl shadow-[0_4px_15px_rgba(0,0,0,0.02)] border border-gray-50 cursor-pointer active:bg-gray-50 transition-colors">
-                        <span class="font-semibold text-sm text-graphite" data-i18n="baggage">Bagaj kerakmi?</span>
+                        <span class="font-semibold text-sm text-graphite" data-i18n="taxi.baggage">Bagaj kerakmi?</span>
                         <div class="flex items-center gap-2">
-                            <span id="baggage-status" class="text-sm font-medium text-textSecondary" data-i18n="no">Yo'q</span>
+                            <span id="baggage-status" class="text-sm font-medium text-textSecondary" data-i18n="common.no">Yo'q</span>
                             <i class="fa-solid fa-chevron-right text-textSecondary text-xs"></i>
                         </div>
                     </div>
                     
-                    <button onclick="createOrder()" id="order-btn" disabled class="w-full bg-primary active:bg-primaryHover text-graphite font-semibold text-lg py-4 rounded-2xl transition-all active:scale-[0.98] mt-3 opacity-50 cursor-not-allowed">
+                    <button onclick="createOrder()" id="order-btn" disabled class="w-full bg-primary active:bg-primaryHover text-graphite font-semibold text-lg py-4 rounded-2xl transition-all active:scale-[0.98] mt-3 opacity-50 cursor-not-allowed" data-i18n="taxi.orderBtn">
                         Buyurtma berish
                     </button>
                 </div>
@@ -376,11 +489,9 @@
                     <button onclick="goBackFromPickup()" class="w-10 h-10 flex items-center justify-center rounded-full bg-bgLight hover:bg-gray-200 transition-colors mr-3">
                         <i class="fa-solid fa-chevron-left text-sm"></i>
                     </button>
-                    <h1 class="text-xl font-bold" data-i18n="fromPlaceholder">Qayerdasiz?</h1>
+                    <h1 class="text-xl font-bold" data-i18n="pickup.title">Qayerdasiz?</h1>
                 </div>
-                <button onclick="skipOnboarding()" class="text-[13px] font-semibold text-textSecondary hover:text-graphite transition-colors px-2 py-1">
-                    O‘tkazib yuborish
-                </button>
+
             </div>
             <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 pb-32 pb-safe" id="pickup-region-list">
                 <!-- Injected via JS -->
@@ -413,10 +524,10 @@
             <!-- Bottom Sheet -->
             <div class="absolute bottom-0 w-full p-6 bg-white rounded-t-[2rem] shadow-[0_-10px_40px_rgba(0,0,0,0.08)] z-20 pb-safe">
                 <div class="mb-4">
-                    <p class="text-[11px] text-textSecondary uppercase font-bold tracking-wide" data-i18n="selectedAddress">Tanlangan manzil</p>
-                    <p id="pickup-address-text" class="text-sm font-bold text-graphite truncate mt-1">Manzil aniqlanmoqda...</p>
+                    <p class="text-[11px] text-textSecondary uppercase font-bold tracking-wide" data-i18n="common.selectedAddress">Tanlangan manzil</p>
+                    <p id="pickup-address-text" class="text-sm font-bold text-graphite truncate mt-1" data-i18n="common.addressLoading">Manzil aniqlanmoqda...</p>
                 </div>
-                <button onclick="confirmPickupLocation()" class="w-full bg-primary hover:bg-primaryHover text-graphite font-semibold text-lg py-4 rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-yellow-500/20">
+                <button onclick="confirmPickupLocation()" class="w-full bg-primary hover:bg-primaryHover text-graphite font-semibold text-lg py-4 rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-yellow-500/20" data-i18n="common.confirmBtn">
                     Tasdiqlash
                 </button>
             </div>
@@ -431,11 +542,9 @@
                     <button onclick="goBackFromDest()" class="w-10 h-10 flex items-center justify-center rounded-full bg-bgLight hover:bg-gray-200 transition-colors mr-3">
                         <i class="fa-solid fa-chevron-left text-sm"></i>
                     </button>
-                    <h1 class="text-xl font-bold" data-i18n="toPlaceholder">Qayerga borasiz?</h1>
+                    <h1 class="text-xl font-bold" data-i18n="dest.title">Qayerga borasiz?</h1>
                 </div>
-                <button onclick="skipOnboarding()" class="text-[13px] font-semibold text-textSecondary hover:text-graphite transition-colors px-2 py-1">
-                    O‘tkazib yuborish
-                </button>
+
             </div>
             <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 pb-32 pb-safe" id="dest-region-list">
                 <!-- Injected via JS -->
@@ -467,10 +576,10 @@
 
             <div class="absolute bottom-0 w-full p-6 bg-white rounded-t-[2rem] shadow-[0_-10px_40px_rgba(0,0,0,0.08)] z-20 pb-safe">
                 <div class="mb-4">
-                    <p class="text-[11px] text-textSecondary uppercase font-bold tracking-wide" data-i18n="selectedAddress">Tanlangan manzil</p>
-                    <p id="dest-address-text" class="text-sm font-bold text-graphite truncate mt-1">Manzil aniqlanmoqda...</p>
+                    <p class="text-[11px] text-textSecondary uppercase font-bold tracking-wide" data-i18n="common.selectedAddress">Tanlangan manzil</p>
+                    <p id="dest-address-text" class="text-sm font-bold text-graphite truncate mt-1" data-i18n="common.addressLoading">Manzil aniqlanmoqda...</p>
                 </div>
-                <button onclick="confirmDestLocation()" class="w-full bg-primary hover:bg-primaryHover text-graphite font-semibold text-lg py-4 rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-yellow-500/20">
+                <button onclick="confirmDestLocation()" class="w-full bg-primary hover:bg-primaryHover text-graphite font-semibold text-lg py-4 rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-yellow-500/20" data-i18n="common.confirmBtn">
                     Tasdiqlash
                 </button>
             </div>
@@ -487,9 +596,9 @@
                     <img src="assets/images/logo.jpeg" alt="Logo" class="w-full h-full object-contain rounded-full" style="mix-blend-mode: multiply;">
                 </div>
             </div>
-            <h2 class="text-xl font-bold mb-2" data-i18n="searchDriver">Haydovchi qidirilmoqda...</h2>
-            <p class="text-sm text-textSecondary px-8 text-center" data-i18n="searchDesc">Iltimos, kuting. Sizning yo'nalishingiz bo'yicha haydovchilarga so'rov yuborildi.</p>
-            <button onclick="cancelOrder()" class="mt-12 bg-red-50 text-red-600 font-bold py-3 px-8 rounded-full transition-colors active:bg-red-100 text-sm">
+            <h2 class="text-xl font-bold mb-2" data-i18n="waiting.searchDriver">Haydovchi qidirilmoqda...</h2>
+            <p class="text-sm text-textSecondary px-8 text-center" data-i18n="waiting.searchDesc">Iltimos, kuting. Sizning yo'nalishingiz bo'yicha haydovchilarga so'rov yuborildi.</p>
+            <button onclick="cancelOrder()" class="mt-12 bg-red-50 text-red-600 font-bold py-3 px-8 rounded-full transition-colors active:bg-red-100 text-sm" data-i18n="common.cancelBtn">
                 Bekor qilish
             </button>
         </div>
@@ -509,7 +618,7 @@
                         <i class="fa-solid fa-chevron-left text-sm"></i>
                     </button>
                     <div class="flex-1 text-center pr-10">
-                        <h1 id="trip-status" class="text-sm font-extrabold uppercase tracking-tight" data-i18n="tripActive">Safar davom etmoqda</h1>
+                        <h1 id="trip-status" class="text-sm font-extrabold uppercase tracking-tight" data-i18n="trip.statusActive">Safar davom etmoqda</h1>
                         <p id="trip-date" class="text-[10px] font-bold text-textSecondary">24 may, 08:30</p>
                     </div>
                 </div>
@@ -532,10 +641,10 @@
                         <img src="rasmlar/avatar.png" id="trip-driver-img" class="w-14 h-14 rounded-full object-cover shadow-sm">
                         <div class="flex-1">
                             <div class="flex items-center gap-2">
-                                <span id="trip-driver-name" class="font-extrabold text-sm" data-i18n="driverName">Haydovchi</span>
+                                <span id="trip-driver-name" class="font-extrabold text-sm" data-i18n="trip.driverName">Haydovchi</span>
                                 <span class="text-[10px] font-bold text-yellow-600 bg-yellow-50 px-1.5 py-0.5 rounded flex items-center gap-1"><i class="fa-solid fa-star text-[8px]"></i> <span id="trip-driver-rating">5.0</span></span>
                             </div>
-                            <div id="trip-car-info" class="text-[11px] font-medium text-textSecondary mt-0.5" data-i18n="carInfo">Avtomobil</div>
+                            <div id="trip-car-info" class="text-[11px] font-medium text-textSecondary mt-0.5" data-i18n="trip.carInfo">Avtomobil</div>
                         </div>
                         <div class="flex gap-2">
                             <button onclick="showCallModal()" class="w-11 h-11 rounded-full bg-green-50 shadow-sm flex items-center justify-center text-green-600 hover:bg-green-100 transition-colors">
@@ -553,7 +662,7 @@
                         <div class="flex items-center gap-4 mb-4 relative">
                             <div class="w-3 h-3 rounded-full bg-primary border-2 border-white shadow-sm ring-1 ring-gray-200 z-10"></div>
                             <div>
-                                <p class="text-[10px] text-textSecondary uppercase tracking-widest font-bold mb-0.5" data-i18n="fromLabel">Qayerdan</p>
+                                <p class="text-[10px] text-textSecondary uppercase tracking-widest font-bold mb-0.5" data-i18n="taxi.fromLabel">Qayerdan</p>
                                 <p id="trip-from" class="text-sm font-bold text-graphite">...</p>
                             </div>
                         </div>
@@ -561,13 +670,13 @@
                         <div class="flex items-center gap-4 relative">
                             <div class="w-3 h-3 rounded-full bg-graphite border-2 border-white shadow-sm ring-1 ring-gray-200 z-10"></div>
                             <div>
-                                <p class="text-[10px] text-textSecondary uppercase tracking-widest font-bold mb-0.5" data-i18n="toLabel">Qayerga</p>
+                                <p class="text-[10px] text-textSecondary uppercase tracking-widest font-bold mb-0.5" data-i18n="taxi.toLabel">Qayerga</p>
                                 <p id="trip-to" class="text-sm font-bold text-graphite">...</p>
                             </div>
                         </div>
                     </div>
                     
-                    <button onclick="cancelOrder()" class="w-full bg-white border-2 border-red-100 hover:bg-red-50 text-red-600 font-bold py-4 rounded-2xl transition-colors text-sm">
+                    <button onclick="cancelOrder()" class="w-full bg-white border-2 border-red-100 hover:bg-red-50 text-red-600 font-bold py-4 rounded-2xl transition-colors text-sm" data-i18n="trip.cancelBtn">
                         Safarni bekor qilish
                     </button>
                 </div>
@@ -579,7 +688,7 @@
              ============================== -->
         <div id="safarlarim-screen" class="screen absolute inset-0 bg-bgLight flex flex-col z-30 transition-transform duration-300 transform translate-x-full">
             <div class="px-5 py-4 bg-white shadow-sm z-10 pt-safe">
-                <h1 class="text-xl font-bold" data-i18n="myTrips">Safarlarim</h1>
+                <h1 class="text-xl font-bold" data-i18n="trips.title">Safarlarim</h1>
             </div>
             <div id="safarlarim-list" class="flex-1 overflow-y-auto p-4 flex flex-col gap-4 pb-32 pb-safe">
                 <!-- Injected via JS -->
@@ -591,7 +700,7 @@
              ============================== -->
         <div id="xabarlar-screen" class="screen absolute inset-0 bg-bgLight flex flex-col z-30 transition-transform duration-300 transform translate-x-full">
             <div class="px-5 py-4 bg-white shadow-sm z-10 pt-safe">
-                <h1 class="text-xl font-bold" data-i18n="messages">Xabarlar</h1>
+                <h1 class="text-xl font-bold" data-i18n="messages.title">Xabarlar</h1>
             </div>
             <div id="xabarlar-list" class="flex-1 overflow-y-auto flex flex-col pb-32 pb-safe">
                 <!-- Injected via JS -->
@@ -603,7 +712,7 @@
              ============================== -->
         <div id="profil-screen" class="screen absolute inset-0 bg-bgLight flex flex-col z-30 transition-transform duration-300 transform translate-x-full">
             <div class="px-5 py-4 bg-white shadow-sm z-10 pt-safe">
-                <h1 class="text-xl font-bold" data-i18n="profile">Profil</h1>
+                <h1 class="text-xl font-bold" data-i18n="profile.title">Profil</h1>
             </div>
             <div class="flex-1 overflow-y-auto p-4 pb-32 pb-safe flex flex-col">
                 <div class="bg-white rounded-[1.5rem] p-5 shadow-sm border border-gray-50 flex items-center gap-4 mb-6">
@@ -618,20 +727,20 @@
                     <div onclick="openSettings()" class="p-4 border-b border-gray-50 flex items-center justify-between active:bg-gray-50 transition-colors cursor-pointer">
                         <div class="flex items-center gap-3">
                             <i class="fa-solid fa-gear text-textSecondary w-5 text-center"></i>
-                            <span class="font-medium text-sm" data-i18n="settings">Sozlamalar</span>
+                            <span class="font-medium text-sm" data-i18n="profile.settings">Sozlamalar</span>
                         </div>
                         <i class="fa-solid fa-chevron-right text-gray-300 text-xs"></i>
                     </div>
                     <div onclick="openHelp()" class="p-4 flex items-center justify-between active:bg-gray-50 transition-colors cursor-pointer">
                         <div class="flex items-center gap-3">
                             <i class="fa-regular fa-circle-question text-textSecondary w-5 text-center"></i>
-                            <span class="font-medium text-sm" data-i18n="help">Yordam</span>
+                            <span class="font-medium text-sm" data-i18n="profile.help">Yordam</span>
                         </div>
                         <i class="fa-solid fa-chevron-right text-gray-300 text-xs"></i>
                     </div>
                 </div>
                 
-                <button onclick="logout()" class="w-full bg-red-50 text-red-600 font-bold py-4 rounded-2xl transition-colors active:bg-red-100 text-sm mb-8">
+                <button onclick="logout()" class="w-full bg-red-50 text-red-600 font-bold py-4 rounded-2xl transition-colors active:bg-red-100 text-sm mb-8" data-i18n="profile.logout">
                     Tizimdan chiqish
                 </button>
                 
@@ -650,7 +759,7 @@
                 <button onclick="navigate('profil-screen')" class="w-10 h-10 flex items-center justify-center rounded-full bg-bgLight hover:bg-gray-200 transition-colors mr-3">
                     <i class="fa-solid fa-chevron-left text-sm"></i>
                 </button>
-                <h1 class="text-xl font-bold" data-i18n="settings">Sozlamalar</h1>
+                <h1 class="text-xl font-bold" data-i18n="settings.title">Sozlamalar</h1>
             </div>
             
             <div class="flex-1 overflow-y-auto p-6 flex flex-col gap-6 pb-10 pb-safe">
@@ -662,26 +771,26 @@
 
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-xs font-bold text-textSecondary uppercase tracking-wider mb-2 ml-1" data-i18n="nameLabel">Ism</label>
+                        <label class="block text-xs font-bold text-textSecondary uppercase tracking-wider mb-2 ml-1" data-i18n="login.nameLabel">Ism</label>
                         <input type="text" id="settings-name" class="w-full bg-white px-5 py-4 rounded-2xl border border-gray-100 shadow-sm focus:ring-2 focus:ring-primary outline-none transition-shadow text-base font-semibold">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-textSecondary uppercase tracking-wider mb-2 ml-1" data-i18n="surnameLabel">Familiya</label>
+                        <label class="block text-xs font-bold text-textSecondary uppercase tracking-wider mb-2 ml-1" data-i18n="login.surnameLabel">Familiya</label>
                         <input type="text" id="settings-surname" class="w-full bg-white px-5 py-4 rounded-2xl border border-gray-100 shadow-sm focus:ring-2 focus:ring-primary outline-none transition-shadow text-base font-semibold">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-textSecondary uppercase tracking-wider mb-2 ml-1" data-i18n="genderLabel">Jinsingiz</label>
+                        <label class="block text-xs font-bold text-textSecondary uppercase tracking-wider mb-2 ml-1" data-i18n="login.genderLabel">Jinsingiz</label>
                         <div class="flex gap-3">
                             <button onclick="setSettingsGender('male')" id="settings-gender-male" class="settings-gender-btn flex-1 bg-white p-4 rounded-2xl border-2 border-gray-50 transition-all flex flex-col items-center gap-1">
-                                <span class="text-xs font-bold" data-i18n="male">Erkak</span>
+                                <span class="text-xs font-bold" data-i18n="login.male">Erkak</span>
                             </button>
                             <button onclick="setSettingsGender('female')" id="settings-gender-female" class="settings-gender-btn flex-1 bg-white p-4 rounded-2xl border-2 border-gray-50 transition-all flex flex-col items-center gap-1">
-                                <span class="text-xs font-bold" data-i18n="female">Ayol</span>
+                                <span class="text-xs font-bold" data-i18n="login.female">Ayol</span>
                             </button>
                         </div>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-textSecondary uppercase tracking-wider mb-2 ml-1" data-i18n="language">Til / Language</label>
+                        <label class="block text-xs font-bold text-textSecondary uppercase tracking-wider mb-2 ml-1" data-i18n="settings.language">Til / Language</label>
                         <div class="relative">
                             <select id="settings-language" onchange="setLanguage(this.value)" class="w-full bg-white px-5 py-4 rounded-2xl border border-gray-100 shadow-sm focus:ring-2 focus:ring-primary outline-none transition-shadow text-base font-semibold appearance-none cursor-pointer">
                                 <option value="uz">O‘zbekcha 🇺🇿</option>
@@ -694,7 +803,7 @@
                         </div>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-textSecondary uppercase tracking-wider mb-2 ml-1" data-i18n="phoneUnchangeable">Telefon raqami (O'zgartirib bo'lmaydi)</label>
+                        <label class="block text-xs font-bold text-textSecondary uppercase tracking-wider mb-2 ml-1" data-i18n="settings.phoneUnchangeable">Telefon raqami (O'zgartirib bo'lmaydi)</label>
                         <div class="w-full bg-gray-50 px-5 py-4 rounded-2xl border border-gray-100 text-base font-semibold text-textSecondary flex items-center justify-between">
                             <span id="settings-phone"></span>
                             <i class="fa-solid fa-lock text-[10px] opacity-40"></i>
@@ -703,10 +812,10 @@
                 </div>
 
                 <div class="mt-auto pt-10 flex flex-col gap-3">
-                    <button onclick="saveSettings()" class="w-full bg-primary active:bg-primaryHover text-graphite font-bold text-lg py-4 rounded-2xl transition-all shadow-lg shadow-yellow-500/20">
+                    <button onclick="saveSettings()" class="w-full bg-primary active:bg-primaryHover text-graphite font-bold text-lg py-4 rounded-2xl transition-all shadow-lg shadow-yellow-500/20" data-i18n="common.saveBtn">
                         Saqlash
                     </button>
-                    <button onclick="navigate('profil-screen')" class="w-full bg-white text-textSecondary font-bold py-4 rounded-2xl border border-gray-100 transition-colors active:bg-gray-50">
+                    <button onclick="navigate('profil-screen')" class="w-full bg-white text-textSecondary font-bold py-4 rounded-2xl border border-gray-100 transition-colors active:bg-gray-50" data-i18n="common.cancelBtn">
                         Bekor qilish
                     </button>
                 </div>
@@ -726,7 +835,7 @@
                     <div class="w-8 h-8 rounded-xl bg-primary/20 flex items-center justify-center">
                         <i class="fa-solid fa-box-open text-primary text-sm"></i>
                     </div>
-                    <h1 class="text-[18px] font-extrabold tracking-tight text-graphite">Dostavka</h1>
+                    <h1 class="text-[18px] font-extrabold tracking-tight text-graphite" data-i18n="delivery.title">Dostavka</h1>
                 </div>
             </div>
 
@@ -739,8 +848,8 @@
                         <img src="rasmlar/dostavka.png" alt="Dostavka" class="w-10 h-10 object-contain mix-blend-multiply">
                     </div>
                     <div>
-                        <h3 class="text-sm font-extrabold text-graphite">Pochta va Posylka</h3>
-                        <p class="text-[11px] text-textSecondary font-medium mt-0.5">Tez va ishonchli yetkazib berish xizmati</p>
+                        <h3 class="text-sm font-extrabold text-graphite" data-i18n="delivery.bannerTitle">Pochta va Posylka</h3>
+                        <p class="text-[11px] text-textSecondary font-medium mt-0.5" data-i18n="delivery.bannerSub">Tez va ishonchli yetkazib berish xizmati</p>
                     </div>
                 </div>
 
@@ -756,8 +865,8 @@
                                     <div class="w-2 h-2 rounded-full bg-primary"></div>
                                 </div>
                                 <div class="flex-1 border-b border-gray-100 pb-3" onclick="startDeliveryPickupFlow()" style="cursor: pointer;">
-                                    <p class="text-[11px] text-textSecondary mb-0.5 font-medium uppercase tracking-wide">Qayerdan</p>
-                                    <div id="del-from-display" class="w-full bg-transparent font-semibold text-sm text-graphite truncate">Pochta qayerdan?</div>
+                                    <p class="text-[11px] text-textSecondary mb-0.5 font-medium uppercase tracking-wide" data-i18n="taxi.fromLabel">Qayerdan</p>
+                                    <div id="del-from-display" class="w-full bg-transparent font-semibold text-sm text-graphite truncate" data-i18n="delivery.fromPlaceholder">Pochta qayerdan?</div>
                                 </div>
                             </div>
 
@@ -766,8 +875,8 @@
                                     <div class="w-2 h-2 rounded-full bg-graphite"></div>
                                 </div>
                                 <div class="flex-1 pt-1" onclick="startDeliveryDestFlow()" style="cursor: pointer;">
-                                    <p class="text-[11px] text-textSecondary mb-0.5 font-medium uppercase tracking-wide">Qayerga</p>
-                                    <div id="del-to-display" class="w-full bg-transparent font-semibold text-sm text-graphite truncate">Pochta qayerga?</div>
+                                    <p class="text-[11px] text-textSecondary mb-0.5 font-medium uppercase tracking-wide" data-i18n="taxi.toLabel">Qayerga</p>
+                                    <div id="del-to-display" class="w-full bg-transparent font-semibold text-sm text-graphite truncate" data-i18n="delivery.toPlaceholder">Pochta qayerga?</div>
                                 </div>
                             </div>
                         </div>
@@ -788,7 +897,7 @@
                             <div id="del-loading-state" class="flex flex-col py-0.5">
                                 <div class="flex items-center gap-2.5 mb-2">
                                     <div class="w-4 h-4 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
-                                    <span class="text-[13px] font-bold text-graphite">Yo'nalish hisoblanmoqda...</span>
+                                    <span class="text-[13px] font-bold text-graphite" data-i18n="taxi.calcRoute">Yo'nalish hisoblanmoqda...</span>
                                 </div>
                                 <div class="flex items-center gap-3 pl-6">
                                     <div class="h-3.5 w-12 bg-gray-200 rounded animate-pulse"></div>
@@ -806,34 +915,26 @@
                                     <i class="fa-solid fa-truck-fast text-xl text-primary"></i>
                                 </div>
                                 <div>
-                                    <span class="text-[11px] font-black uppercase tracking-widest text-graphite">DOSTAVKA</span>
-                                    <p class="text-[10px] text-textSecondary font-medium">Pochta yetkazish</p>
+                                    <span class="text-[11px] font-black uppercase tracking-widest text-graphite" data-i18n="delivery.tariffName">DOSTAVKA</span>
+                                    <p class="text-[10px] text-textSecondary font-medium" data-i18n="delivery.tariffSub">Pochta yetkazish</p>
                                 </div>
                             </div>
                             <div class="text-right">
                                 <span id="del-price" class="text-[18px] font-extrabold text-graphite">-- so'm</span>
-                                <p class="text-[10px] text-textSecondary font-medium">100 so'm/km</p>
+                                <p class="text-[10px] text-textSecondary font-medium" data-i18n="delivery.tariffRate">100 so'm/km</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Order Button -->
                     <div class="px-4 mt-5">
                         <button onclick="createDeliveryOrder()" id="del-order-btn" disabled class="w-full bg-primary active:bg-primaryHover text-graphite font-semibold text-lg py-4 rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-yellow-500/20 opacity-50 cursor-not-allowed flex items-center justify-center gap-2">
                             <i class="fa-solid fa-box-open"></i>
-                            Dostavka chaqirish
+                            <span data-i18n="delivery.orderBtn">Dostavka chaqirish</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- Delivery Empty State -->
-                <div id="del-empty-state" class="flex-1 flex flex-col items-center justify-center p-8 mt-4 text-center transition-all duration-500 opacity-100 scale-100">
-                    <div class="w-32 h-32 bg-white rounded-full flex items-center justify-center mb-6 shadow-[0_8px_25px_rgba(0,0,0,0.05)]">
-                        <i class="fa-solid fa-truck-fast text-4xl text-gray-300"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-graphite mb-2">Manzillarni tanlang</h3>
-                    <p class="text-sm text-textSecondary">Pochta olib ketish va yetkazish joyini ko'rsating.</p>
-                </div>
+
             </div>
         </div>
 
@@ -843,19 +944,19 @@
         <nav id="bottom-nav" class="hidden absolute bottom-0 w-full bg-white border-t border-gray-100 justify-around items-center pb-safe pt-2 px-2 z-[35] shadow-[0_-5px_20px_rgba(0,0,0,0.03)] h-20 min-h-[5rem]">
                     <button id="nav-btn-home-screen" onclick="navigate('home-screen')" class="nav-btn flex flex-col items-center justify-center w-16 h-full text-textSecondary active:text-graphite transition-colors" style="touch-action: manipulation;">
                         <i class="fa-solid fa-house text-xl mb-1"></i>
-                        <span class="text-[10px] font-bold" data-i18n="navHome">Asosiy</span>
+                        <span class="text-[10px] font-bold" data-i18n="nav.home">Asosiy</span>
                     </button>
                     <button id="nav-btn-safarlarim-screen" onclick="navigate('safarlarim-screen')" class="nav-btn flex flex-col items-center justify-center w-16 h-full text-textSecondary active:text-graphite transition-colors" style="touch-action: manipulation;">
                         <i class="fa-solid fa-route text-xl mb-1"></i>
-                        <span class="text-[10px] font-semibold" data-i18n="myTrips">Safarlarim</span>
+                        <span class="text-[10px] font-semibold" data-i18n="nav.trips">Safarlarim</span>
                     </button>
                     <button id="nav-btn-xabarlar-screen" onclick="navigate('xabarlar-screen')" class="nav-btn flex flex-col items-center justify-center w-16 h-full text-textSecondary active:text-graphite transition-colors" style="touch-action: manipulation;">
                         <i class="fa-regular fa-comment-dots text-xl mb-1"></i>
-                        <span class="text-[10px] font-semibold" data-i18n="messages">Xabarlar</span>
+                        <span class="text-[10px] font-semibold" data-i18n="nav.messages">Xabarlar</span>
                     </button>
                     <button id="nav-btn-profil-screen" onclick="navigate('profil-screen')" class="nav-btn flex flex-col items-center justify-center w-16 h-full text-textSecondary active:text-graphite transition-colors" style="touch-action: manipulation;">
                         <i class="fa-regular fa-user text-xl mb-1"></i>
-                        <span class="text-[10px] font-semibold" data-i18n="profile">Profil</span>
+                        <span class="text-[10px] font-semibold" data-i18n="nav.profile">Profil</span>
                     </button>
                 </nav>
                 
@@ -863,8 +964,8 @@
                 <div id="call-modal" class="hidden absolute inset-0 z-[60] bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center p-6 opacity-0 transition-opacity duration-300">
                     <div class="bg-white w-full max-w-xs rounded-3xl p-6 flex flex-col items-center shadow-2xl transform scale-95 transition-transform duration-300">
                         <img src="rasmlar/avatar.png" id="call-avatar" class="w-24 h-24 rounded-full object-cover shadow-md mb-4 border-4 border-green-50">
-                        <h2 id="call-name" class="text-xl font-bold mb-1" data-i18n="driverName">Haydovchi</h2>
-                        <p class="text-sm text-textSecondary mb-8 animate-pulse">Chaqirilmoqda...</p>
+                        <h2 id="call-name" class="text-xl font-bold mb-1" data-i18n="trip.driverName">Haydovchi</h2>
+                        <p class="text-sm text-textSecondary mb-8 animate-pulse" data-i18n="call.status">Chaqirilmoqda...</p>
                         <div class="flex gap-6">
                             <button onclick="hideCallModal()" class="w-16 h-16 rounded-full bg-red-500 shadow-lg shadow-red-500/30 flex items-center justify-center text-white hover:bg-red-600 transition-transform active:scale-95" style="touch-action: manipulation;">
                                 <i class="fa-solid fa-phone-slash text-2xl"></i>
@@ -880,8 +981,8 @@
                             <i class="fa-solid fa-chevron-down text-sm"></i>
                         </button>
                         <div class="flex-1 flex flex-col items-center mr-10">
-                            <h1 id="chat-name" class="text-base font-bold" data-i18n="driverName">Haydovchi</h1>
-                            <span class="text-[10px] text-green-500 font-semibold">Online</span>
+                            <h1 id="chat-name" class="text-base font-bold" data-i18n="trip.driverName">Haydovchi</h1>
+                            <span class="text-[10px] text-green-500 font-semibold" data-i18n="chat.online">Online</span>
                         </div>
                     </div>
                     
@@ -890,7 +991,7 @@
                     </div>
                     
                     <div class="p-4 pb-safe bg-white border-t border-gray-100 flex gap-2 items-center shrink-0">
-                        <input type="text" id="chat-input" placeholder="Xabar yozing..." class="flex-1 bg-bgLight px-4 py-3 rounded-full border-none focus:ring-2 focus:ring-primary outline-none text-sm">
+                        <input type="text" id="chat-input" placeholder="Xabar yozing..." data-i18n-placeholder="chat.inputPlaceholder" class="flex-1 bg-bgLight px-4 py-3 rounded-full border-none focus:ring-2 focus:ring-primary outline-none text-sm">
                         <button onclick="sendChatMessage()" class="w-11 h-11 rounded-full bg-primary flex items-center justify-center text-graphite hover:bg-primaryHover transition-colors shadow-sm" style="touch-action: manipulation;">
                             <i class="fa-solid fa-paper-plane text-sm ml-0.5"></i>
                         </button>

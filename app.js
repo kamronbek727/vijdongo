@@ -1,181 +1,647 @@
 
 // --- Translations ---
-const translations = {
-  uz: {
-    startJourney: "Safarni boshlash",
-    loginTitle: "Tizimga kirish",
-    nameLabel: "Ism",
-    namePlaceholder: "Ismingizni kiriting",
-    surnameLabel: "Familiya",
-    surnamePlaceholder: "Familiyangizni kiriting",
-    phoneLabel: "Telefon raqami",
-    genderLabel: "Jinsingiz",
-    male: "Erkak",
-    female: "Ayol",
-    continueBtn: "Davom etish",
-    whereTo: "Qayerga boramiz?",
-    greeting: "Assalomu alaykum!",
-    greetingSub: "Bugun qayerga boramiz?",
-    fromLabel: "Qayerdan",
-    toLabel: "Qayerga",
-    fromPlaceholder: "Qayerdasiz?",
-    toPlaceholder: "Qayerga borasiz?",
-    emptyTitle: "Manzillarni tanlang",
-    emptyDesc: "Olib ketish va borish joyini ko'rsating. Shundan so'ng narx va marshrut paydo bo'ladi.",
-    calcRoute: "Yo'nalish hisoblanmoqda...",
-    priceLabel: "Narxi:",
-    passengers: "Yo'lovchilar soni",
-    baggage: "Bagaj kerakmi?",
-    yes: "Ha",
-    no: "Yo'q",
-    orderTaxi: "Buyurtma berish",
-    pickupScreenTitle: "Qayerdasiz?",
-    skipBtn: "O‘tkazib yuborish",
-    destScreenTitle: "Qayerga borasiz?",
-    confirmBtn: "Tasdiqlash",
-    selectedAddress: "Tanlangan manzil",
-    searchDriver: "Haydovchi qidirilmoqda...",
-    searchDesc: "Iltimos, kuting. Sizning yo'nalishingiz bo'yicha haydovchilarga so'rov yuborildi.",
-    cancelBtn: "Bekor qilish",
-    tripActive: "Safar davom etmoqda",
-    driverName: "Haydovchi",
-    carInfo: "Avtomobil",
-    cancelTrip: "Safarni bekor qilish",
-    myTrips: "Safarlarim",
-    messages: "Xabarlar",
-    profile: "Profil",
-    settings: "Sozlamalar",
-    help: "Yordam",
-    logout: "Tizimdan chiqish",
-    phoneUnchangeable: "Telefon raqami (O'zgartirib bo'lmaydi)",
-    saveBtn: "Saqlash",
-    navHome: "Asosiy",
-    navTrips: "Safarlarim",
-    navMessages: "Xabarlar",
-    navProfile: "Profil",
-    langSelectTitle: "Tilni tanlang",
-    language: "Til / Language",
-    uzbek: "O‘zbekcha 🇺🇿",
-    russian: "Русский 🇷🇺",
-    english: "English 🇺🇸"
-  },
-  ru: {
-    startJourney: "Начать поездку",
-    loginTitle: "Вход в систему",
-    nameLabel: "Имя",
-    namePlaceholder: "Введите ваше имя",
-    surnameLabel: "Фамилия",
-    surnamePlaceholder: "Введите вашу фамилию",
-    phoneLabel: "Номер телефона",
-    genderLabel: "Ваш пол",
-    male: "Мужской",
-    female: "Женский",
-    continueBtn: "Продолжить",
-    whereTo: "Куда поедем?",
-    greeting: "Здравствуйте!",
-    greetingSub: "Куда поедем сегодня?",
-    fromLabel: "Откуда",
-    toLabel: "Куда",
-    fromPlaceholder: "Где вы?",
-    toPlaceholder: "Куда вы едете?",
-    emptyTitle: "Выберите адреса",
-    emptyDesc: "Укажите места посадки и высадки. После этого появятся цена и маршрут.",
-    calcRoute: "Рассчитывается маршрут...",
-    priceLabel: "Цена:",
-    passengers: "Количество пассажиров",
-    baggage: "Нужен багаж?",
-    yes: "Да",
-    no: "Нет",
-    orderTaxi: "Заказать такси",
-    pickupScreenTitle: "Где вы находитесь?",
-    skipBtn: "Пропустить",
-    destScreenTitle: "Куда вы направляетесь?",
-    confirmBtn: "Подтвердить",
-    selectedAddress: "Выбранный адрес",
-    searchDriver: "Поиск водителя...",
-    searchDesc: "Пожалуйста, подождите. Ваш запрос отправлен водителям.",
-    cancelBtn: "Отменить",
-    tripActive: "Поездка продолжается",
-    driverName: "Водитель",
-    carInfo: "Автомобиль",
-    cancelTrip: "Отменить поездку",
-    myTrips: "Мои поездки",
-    messages: "Сообщения",
-    profile: "Профиль",
-    settings: "Настройки",
-    help: "Помощь",
-    logout: "Выйти из системы",
-    phoneUnchangeable: "Номер телефона (Нельзя изменить)",
-    saveBtn: "Сохранить",
-    navHome: "Главная",
-    navTrips: "Поездки",
-    navMessages: "Сообщения",
-    navProfile: "Профиль",
-    langSelectTitle: "Выберите язык",
-    language: "Язык / Language",
-    uzbek: "O‘zbekcha 🇺🇿",
-    russian: "Русский 🇷🇺",
-    english: "English 🇺🇸"
-  },
-  en: {
-    startJourney: "Start Journey",
-    loginTitle: "Login",
-    nameLabel: "Name",
-    namePlaceholder: "Enter your name",
-    surnameLabel: "Surname",
-    surnamePlaceholder: "Enter your surname",
-    phoneLabel: "Phone number",
-    genderLabel: "Gender",
-    male: "Male",
-    female: "Female",
-    continueBtn: "Continue",
-    whereTo: "Where are we going?",
-    greeting: "Hello!",
-    greetingSub: "Where are we going today?",
-    fromLabel: "From",
-    toLabel: "To",
-    fromPlaceholder: "Where are you?",
-    toPlaceholder: "Where are you going?",
-    emptyTitle: "Select locations",
-    emptyDesc: "Indicate pickup and drop-off locations. Price and route will appear afterward.",
-    calcRoute: "Calculating route...",
-    priceLabel: "Price:",
-    passengers: "Passengers",
-    baggage: "Need baggage?",
-    yes: "Yes",
-    no: "No",
-    orderTaxi: "Order Taxi",
-    pickupScreenTitle: "Where are you?",
-    skipBtn: "Skip",
-    destScreenTitle: "Where are you going?",
-    confirmBtn: "Confirm",
-    selectedAddress: "Selected address",
-    searchDriver: "Searching for driver...",
-    searchDesc: "Please wait. Your request has been sent to drivers.",
-    cancelBtn: "Cancel",
-    tripActive: "Trip in progress",
-    driverName: "Driver",
-    carInfo: "Car",
-    cancelTrip: "Cancel Trip",
-    myTrips: "My Trips",
-    messages: "Messages",
-    profile: "Profile",
-    settings: "Settings",
-    help: "Help",
-    logout: "Log out",
-    phoneUnchangeable: "Phone number (Cannot be changed)",
-    saveBtn: "Save",
-    navHome: "Home",
-    navTrips: "My Trips",
-    navMessages: "Messages",
-    navProfile: "Profile",
-    langSelectTitle: "Choose Language",
-    language: "Language / Til",
-    uzbek: "O‘zbekcha 🇺🇿",
-    russian: "Русский 🇷🇺",
-    english: "English 🇺🇸"
-  }
+let loadedTranslations = {
+    uz: {
+    "common": {
+        "continueBtn": "Davom etish",
+        "backBtn": "Ortga",
+        "confirmBtn": "Tasdiqlash",
+        "cancelBtn": "Bekor qilish",
+        "yes": "Ha",
+        "no": "Yo'q",
+        "saveBtn": "Saqlash",
+        "finishBtn": "Tugatish",
+        "selectedAddress": "Tanlangan manzil",
+        "addressLoading": "Manzil aniqlanmoqda...",
+        "addressNotFound": "Manzil topilmadi",
+        "selectAddress": "Manzilni tanlang",
+        "gpsLocating": "Joylashuv aniqlanmoqda...",
+        "gpsNotSupported": "Brauzeringiz joylashuvni aniqlashni qo'llab-quvvatlamaydi.",
+        "mapNotLoaded": "Xarita hali yuklanmadi. Iltimos, kutib turing.",
+        "errorGeneric": "Xatolik yuz berdi",
+        "currency": "so'm",
+        "km": "km",
+        "m": "m"
+    },
+    "gps": {
+        "errorGeneric": "Joylashuvni aniqlashda xatolik yuz berdi.",
+        "errorPermissionDenied": "Joylashuvga ruxsat berilmadi. Iltimos, brauzer sozlamalaridan ruxsat bering.",
+        "errorPositionUnavailable": "Joylashuvni aniqlash imkonsiz. GPS yoqilganligini tekshiring.",
+        "errorTimeout": "Joylashuvni aniqlash vaqti tugadi. Qayta urinib ko'ring."
+    },
+    "nav": {
+        "home": "Asosiy",
+        "trips": "Safarlarim",
+        "messages": "Xabarlar",
+        "profile": "Profil"
+    },
+    "regions": {
+        "toshkent_sh": "Toshkent shahri",
+        "toshkent_v": "Toshkent viloyati",
+        "andijon": "Andijon",
+        "fargona": "Farg‘ona",
+        "namangan": "Namangan",
+        "samarqand": "Samarqand",
+        "buxoro": "Buxoro",
+        "navoiy": "Navoiy",
+        "qashqadaryo": "Qashqadaryo",
+        "surxondaryo": "Surxondaryo",
+        "jizzax": "Jizzax",
+        "sirdaryo": "Sirdaryo",
+        "xorazm": "Xorazm",
+        "qoraqalpogiston": "Qoraqalpog‘iston Respublikasi"
+    },
+    "splash": {
+        "startJourney": "Safarni boshlash"
+    },
+    "login": {
+        "title": "Tizimga kirish",
+        "phoneLabel": "Telefon raqami",
+        "phoneDescription": "Safar buyurtma qilish va hisobingizga kirish uchun telefon raqamingizni kiriting",
+        "phoneError": "Telefon raqamini to'liq kiriting.",
+        "nameSurnameTitle": "Ism va familiya",
+        "nameSurnameDescription": "Iltimos, ismingiz va familiyangizni kiriting",
+        "nameLabel": "Ism",
+        "namePlaceholder": "Ismingizni kiriting",
+        "nameError": "Ismingizni kiriting (kamida 2 ta harf).",
+        "surnameLabel": "Familiya",
+        "surnamePlaceholder": "Familiyangizni kiriting",
+        "genderLabel": "Jinsingiz",
+        "genderDescription": "Profil ma'lumotlarini to'ldirish uchun jinsingizni tanlang",
+        "genderError": "Iltimos, jinsingizni tanlang.",
+        "male": "Erkak",
+        "maleDesc": "Erkaklar uchun profil rasmi",
+        "female": "Ayol",
+        "femaleDesc": "Ayollar uchun profil rasmi",
+        "langSelectTitle": "Tilni tanlang",
+        "langSelectDescription": "Ilova interfeysi uchun qulay tilni tanlang",
+        "uzbek": "O‘zbekcha 🇺🇿",
+        "russian": "Русский 🇷🇺",
+        "english": "English 🇺🇸"
+    },
+    "home": {
+        "title": "Vijdon GO",
+        "greeting": "Assalomu alaykum!",
+        "greetingSub": "Bugun qayerga boramiz?",
+        "greetingUser": "Assalomu alaykum, {name}!",
+        "services": {
+            "taxi": "Taxi",
+            "delivery": "Dostavka, Pochta"
+        },
+        "promoBanner": "Promo Banner"
+    },
+    "taxi": {
+        "title": "Taxi",
+        "fromLabel": "Qayerdan",
+        "fromPlaceholder": "Qayerdasiz?",
+        "toLabel": "Qayerga",
+        "toPlaceholder": "Qayerga borasiz?",
+        "emptyTitle": "Manzillarni tanlang",
+        "emptyDesc": "Olib ketish va borish joyini ko'rsating. Shundan so'ng narx va marshrut paydo bo'ladi.",
+        "calcRoute": "Yo'nalish hisoblanmoqda...",
+        "priceLabel": "Narxi:",
+        "passengers": "Yo'lovchilar soni",
+        "baggage": "Bagaj kerakmi?",
+        "orderBtn": "Buyurtma berish",
+        "loadingRoute": "Yo'l hisoblanmoqda...",
+        "selectPickupFirst": "Avval qayerdan ketishingizni (Qayerdasiz?) tanlang!",
+        "waitRouteCalc": "Yo'l hali hisoblanmoqda, iltimos kuting...",
+        "addressWaitOrMap": "Iltimos, manzil aniqlanishini kuting yoki xaritadan tanlang.",
+        "selectAddressesFirst": "Iltimos, avval jo'nash va borish manzillarini to'liq tanlang!",
+        "invalidCoords": "Manzil koordinatalari xato! Iltimos, manzillarni xaritadan qayta tanlang.",
+        "tariffs": {
+            "start": "START",
+            "startDesc": "Oddiy avto",
+            "komfort": "KOMFORT",
+            "komfortDesc": "Qulay avto",
+            "biznes": "BIZNES",
+            "biznesDesc": "Premium"
+        }
+    },
+    "delivery": {
+        "title": "Dostavka",
+        "bannerTitle": "Pochta va Posylka",
+        "bannerSub": "Tez va ishonchli yetkazib berish xizmati",
+        "fromPlaceholder": "Pochta qayerdan?",
+        "toPlaceholder": "Pochta qayerga?",
+        "tariffName": "DOSTAVKA",
+        "tariffSub": "Pochta yetkazish",
+        "tariffRate": "100 so'm/km",
+        "orderBtn": "Dostavka chaqirish",
+        "loadingRoute": "Yo'l hisoblanmoqda...",
+        "selectAddressesFirst": "Iltimos, pochta olib ketish va yetkazish manzillarini tanlang!"
+    },
+    "pickup": {
+        "title": "Qayerdasiz?"
+    },
+    "dest": {
+        "title": "Qayerga borasiz?"
+    },
+    "waiting": {
+        "searchDriver": "Haydovchi qidirilmoqda...",
+        "searchDesc": "Iltimos, kuting. Sizning yo'nalishingiz bo'yicha haydovchilarga so'rov yuborildi."
+    },
+    "trip": {
+        "statusActive": "Safar davom etmoqda",
+        "statusFinished": "YETIB KELDINGIZ",
+        "statusDriverEnRoute": "HAYDOVCHI YO'LDA",
+        "statusError": "XATOLIK: YO'L TOPILMADI",
+        "driverName": "Haydovchi",
+        "carInfo": "Avtomobil",
+        "cancelBtn": "Safarni bekor qilish",
+        "kmLeft": "km qoldi",
+        "mLeft": "m qoldi"
+    },
+    "trips": {
+        "title": "Safarlarim",
+        "noTrips": "Sizda hali safarlar yo'q.",
+        "completed": "Yakunlangan",
+        "active": "Faol safar"
+    },
+    "messages": {
+        "title": "Xabarlar",
+        "supportTitle": "Qo'llab-quvvatlash xizmati",
+        "supportWelcome": "Assalomu alaykum, sizga qanday yordam bera olaman?",
+        "promoTitle": "Aksiya va chegirmalar",
+        "promoWelcome": "Yangi yil chegirmalari boshlandi!",
+        "driverOnWay": "Yo'ldaman, 5 daqiqada boraman."
+    },
+    "profile": {
+        "title": "Profil",
+        "defaultName": "Foydalanuvchi",
+        "settings": "Sozlamalar",
+        "help": "Yordam",
+        "logout": "Tizimdan chiqish"
+    },
+    "settings": {
+        "title": "Sozlamalar",
+        "language": "Til / Language",
+        "phoneUnchangeable": "Telefon raqami (O'zgartirib bo'lmaydi)",
+        "savedSuccess": "O'zgarishlar saqlandi!"
+    },
+    "call": {
+        "status": "Chaqirilmoqda..."
+    },
+    "chat": {
+        "inputPlaceholder": "Xabar yozing...",
+        "online": "Online",
+        "edit": "Tahrirlash",
+        "delete": "O'chirish",
+        "edited": "(tahrirlandi)",
+        "driverWelcome": "Assalomu alaykum! Men keldim, qayerdasiz?",
+        "confirmDelete": "Xabarni o'chirmoqchimisiz?",
+        "editPrompt": "Xabarni tahrirlash:",
+        "supportReply1": "Muammoingizni yozib qoldiring, tez orada javob beramiz.",
+        "supportReply2": "Operatorlarimiz hozir band, iltimos kuting.",
+        "supportReply3": "Xabaringiz qabul qilindi. Operator tez orada siz bilan bog'lanadi.",
+        "driverReply1": "Xo'p tushunarli.",
+        "driverReply2": "Hozir yetib boraman.",
+        "driverReply3": "Yo'ldaman.",
+        "driverReply4": "Manzilni aniqroq ayta olasizmi?"
+    }
+},
+    ru: {
+    "common": {
+        "continueBtn": "Продолжить",
+        "backBtn": "Назад",
+        "confirmBtn": "Подтвердить",
+        "cancelBtn": "Отменить",
+        "yes": "Да",
+        "no": "Нет",
+        "saveBtn": "Сохранить",
+        "finishBtn": "Завершить",
+        "selectedAddress": "Выбранный адрес",
+        "addressLoading": "Определение адреса...",
+        "addressNotFound": "Адрес не найден",
+        "selectAddress": "Выберите адрес",
+        "gpsLocating": "Определение местоположения...",
+        "gpsNotSupported": "Ваш браузер не поддерживает геолокацию.",
+        "mapNotLoaded": "Карта еще не загрузилась. Пожалуйста, подождите.",
+        "errorGeneric": "Произошла ошибка",
+        "currency": "сум",
+        "km": "км",
+        "m": "м"
+    },
+    "gps": {
+        "errorGeneric": "Произошла ошибка при определении местоположения.",
+        "errorPermissionDenied": "Доступ к местоположению запрещен. Пожалуйста, разрешите в настройках браузера.",
+        "errorPositionUnavailable": "Невозможно определить местоположение. Проверьте, включен ли GPS.",
+        "errorTimeout": "Истекло время ожидания определения местоположения. Попробуйте снова."
+    },
+    "nav": {
+        "home": "Главная",
+        "trips": "Поездки",
+        "messages": "Сообщения",
+        "profile": "Профиль"
+    },
+    "regions": {
+        "toshkent_sh": "Город Ташкент",
+        "toshkent_v": "Ташкентская область",
+        "andijon": "Андижан",
+        "fargona": "Фергана",
+        "namangan": "Наманган",
+        "samarqand": "Самарканд",
+        "buxoro": "Бухара",
+        "navoiy": "Навои",
+        "qashqadaryo": "Кашкадарья",
+        "surxondaryo": "Сурхандарья",
+        "jizzax": "Джизак",
+        "sirdaryo": "Сырдарья",
+        "xorazm": "Хорезм",
+        "qoraqalpogiston": "Республика Каракалпакстан"
+    },
+    "splash": {
+        "startJourney": "Начать поездку"
+    },
+    "login": {
+        "title": "Вход в систему",
+        "phoneLabel": "Номер телефона",
+        "phoneDescription": "Введите ваш номер телефона для заказа поездок и входа в систему",
+        "phoneError": "Введите номер телефона полностью.",
+        "nameSurnameTitle": "Имя и фамилия",
+        "nameSurnameDescription": "Пожалуйста, введите ваше имя и фамилию",
+        "nameLabel": "Имя",
+        "namePlaceholder": "Введите ваше имя",
+        "nameError": "Введите ваше имя (минимум 2 буквы).",
+        "surnameLabel": "Фамилия",
+        "surnamePlaceholder": "Введите вашу фамилию",
+        "genderLabel": "Ваш пол",
+        "genderDescription": "Выберите ваш пол для заполнения профиля",
+        "genderError": "Пожалуйста, выберите ваш пол.",
+        "male": "Мужской",
+        "maleDesc": "Фото профиля для мужчин",
+        "female": "Женский",
+        "femaleDesc": "Фото профиля для женщин",
+        "langSelectTitle": "Выберите язык",
+        "langSelectDescription": "Выберите подходящий язык для интерфейса приложения",
+        "uzbek": "O‘zbekcha 🇺🇿",
+        "russian": "Русский 🇷🇺",
+        "english": "English 🇺🇸"
+    },
+    "home": {
+        "title": "Vijdon GO",
+        "greeting": "Здравствуйте!",
+        "greetingSub": "Куда поедем сегодня?",
+        "greetingUser": "Здравствуйте, {name}!",
+        "services": {
+            "taxi": "Такси",
+            "delivery": "Доставка, Почта"
+        },
+        "promoBanner": "Промо Баннер"
+    },
+    "taxi": {
+        "title": "Такси",
+        "fromLabel": "Откуда",
+        "fromPlaceholder": "Где вы?",
+        "toLabel": "Куда",
+        "toPlaceholder": "Куда вы едете?",
+        "emptyTitle": "Выберите адреса",
+        "emptyDesc": "Укажите места посадки и высадки. После этого появятся цена и маршрут.",
+        "calcRoute": "Рассчитывается маршрут...",
+        "priceLabel": "Цена:",
+        "passengers": "Количество пассажиров",
+        "baggage": "Нужен багаж?",
+        "orderBtn": "Заказать такси",
+        "loadingRoute": "Рассчитывается маршрут...",
+        "selectPickupFirst": "Сначала выберите, откуда вы отправляетесь (Где вы?)!",
+        "waitRouteCalc": "Маршрут еще рассчитывается, пожалуйста, подождите...",
+        "addressWaitOrMap": "Пожалуйста, подождите определения адреса или выберите его на карте.",
+        "selectAddressesFirst": "Пожалуйста, сначала полностью выберите адреса отправления и назначения!",
+        "invalidCoords": "Неверные координаты адреса! Пожалуйста, выберите адреса на карте заново.",
+        "tariffs": {
+            "start": "СТАРТ",
+            "startDesc": "Обычное авто",
+            "komfort": "КОМФОРТ",
+            "komfortDesc": "Комфортное авто",
+            "biznes": "БИЗНЕС",
+            "biznesDesc": "Премиум"
+        }
+    },
+    "delivery": {
+        "title": "Доставка",
+        "bannerTitle": "Почта и Посылка",
+        "bannerSub": "Быстрая и надежная служба доставки",
+        "fromPlaceholder": "Откуда посылка?",
+        "toPlaceholder": "Куда посылка?",
+        "tariffName": "ДОСТАВКА",
+        "tariffSub": "Доставка почты",
+        "tariffRate": "100 сум/км",
+        "orderBtn": "Вызвать доставку",
+        "loadingRoute": "Рассчитывается маршрут...",
+        "selectAddressesFirst": "Пожалуйста, выберите адреса забора и доставки посылки!"
+    },
+    "pickup": {
+        "title": "Где вы находитесь?"
+    },
+    "dest": {
+        "title": "Куда вы направляетесь?"
+    },
+    "waiting": {
+        "searchDriver": "Поиск водителя...",
+        "searchDesc": "Пожалуйста, подождите. Ваш запрос отправлен водителям."
+    },
+    "trip": {
+        "statusActive": "Поездка продолжается",
+        "statusFinished": "ВЫ ПРИБЫЛИ",
+        "statusDriverEnRoute": "ВОДИТЕЛЬ В ПУТИ",
+        "statusError": "ОШИБКА: МАРШРУТ НЕ НАЙДЕН",
+        "driverName": "Водитель",
+        "carInfo": "Автомобиль",
+        "cancelBtn": "Отменить поездку",
+        "kmLeft": "км осталось",
+        "mLeft": "м осталось"
+    },
+    "trips": {
+        "title": "Мои поездки",
+        "noTrips": "У вас еще нет поездок.",
+        "completed": "Завершено",
+        "active": "Активная поездка"
+    },
+    "messages": {
+        "title": "Сообщения",
+        "supportTitle": "Служба поддержки",
+        "supportWelcome": "Здравствуйте, чем я могу вам помочь?",
+        "promoTitle": "Акции и скидки",
+        "promoWelcome": "Новогодние скидки начались!",
+        "driverOnWay": "В пути, буду через 5 минут."
+    },
+    "profile": {
+        "title": "Профиль",
+        "defaultName": "Пользователь",
+        "settings": "Настройки",
+        "help": "Помощь",
+        "logout": "Выйти из системы"
+    },
+    "settings": {
+        "title": "Настройки",
+        "language": "Язык / Language",
+        "phoneUnchangeable": "Номер телефона (Нельзя изменить)",
+        "savedSuccess": "Изменения сохранены!"
+    },
+    "call": {
+        "status": "Вызов..."
+    },
+    "chat": {
+        "inputPlaceholder": "Напишите сообщение...",
+        "online": "В сети",
+        "edit": "Редактировать",
+        "delete": "Удалить",
+        "edited": "(изменено)",
+        "driverWelcome": "Здравствуйте! Я приехал, где вы?",
+        "confirmDelete": "Вы хотите удалить сообщение?",
+        "editPrompt": "Редактировать сообщение:",
+        "supportReply1": "Оставьте вашу проблему, мы ответим в ближайшее время.",
+        "supportReply2": "Наши операторы сейчас заняты, пожалуйста, подождите.",
+        "supportReply3": "Ваше сообщение принято. Оператор свяжется с вами в ближайшее время.",
+        "driverReply1": "Хорошо, понял.",
+        "driverReply2": "Сейчас буду.",
+        "driverReply3": "Я в пути.",
+        "driverReply4": "Можете уточнить адрес?"
+    }
+},
+    en: {
+    "common": {
+        "continueBtn": "Continue",
+        "backBtn": "Back",
+        "confirmBtn": "Confirm",
+        "cancelBtn": "Cancel",
+        "yes": "Yes",
+        "no": "No",
+        "saveBtn": "Save",
+        "finishBtn": "Finish",
+        "selectedAddress": "Selected address",
+        "addressLoading": "Locating address...",
+        "addressNotFound": "Address not found",
+        "selectAddress": "Select address",
+        "gpsLocating": "Determining location...",
+        "gpsNotSupported": "Your browser does not support geolocation.",
+        "mapNotLoaded": "The map has not loaded yet. Please wait.",
+        "errorGeneric": "An error occurred",
+        "currency": "sum",
+        "km": "km",
+        "m": "m"
+    },
+    "gps": {
+        "errorGeneric": "An error occurred while determining location.",
+        "errorPermissionDenied": "Location permission denied. Please enable it in browser settings.",
+        "errorPositionUnavailable": "Unable to determine location. Check if GPS is enabled.",
+        "errorTimeout": "Location request timed out. Please try again."
+    },
+    "nav": {
+        "home": "Home",
+        "trips": "My Trips",
+        "messages": "Messages",
+        "profile": "Profile"
+    },
+    "regions": {
+        "toshkent_sh": "Tashkent City",
+        "toshkent_v": "Tashkent Region",
+        "andijon": "Andijan",
+        "fargona": "Fergana",
+        "namangan": "Namangan",
+        "samarqand": "Samarkand",
+        "buxoro": "Bukhara",
+        "navoiy": "Navoi",
+        "qashqadaryo": "Kashkadarya",
+        "surxondaryo": "Surkhandarya",
+        "jizzax": "Jizzakh",
+        "sirdaryo": "Sirdarya",
+        "xorazm": "Khorezm",
+        "qoraqalpogiston": "Republic of Karakalpakstan"
+    },
+    "splash": {
+        "startJourney": "Start Journey"
+    },
+    "login": {
+        "title": "Login",
+        "phoneLabel": "Phone number",
+        "phoneDescription": "Enter your phone number to order rides and log in",
+        "phoneError": "Enter your phone number completely.",
+        "nameSurnameTitle": "Name and Surname",
+        "nameSurnameDescription": "Please enter your first name and last name",
+        "nameLabel": "Name",
+        "namePlaceholder": "Enter your name",
+        "nameError": "Enter your name (at least 2 characters).",
+        "surnameLabel": "Surname",
+        "surnamePlaceholder": "Enter your surname",
+        "genderLabel": "Gender",
+        "genderDescription": "Select your gender to complete your profile",
+        "genderError": "Please select your gender.",
+        "male": "Male",
+        "maleDesc": "Avatar image for males",
+        "female": "Female",
+        "femaleDesc": "Avatar image for females",
+        "langSelectTitle": "Choose Language",
+        "langSelectDescription": "Choose a convenient language for the app interface",
+        "uzbek": "O‘zbekcha 🇺🇿",
+        "russian": "Русский 🇷🇺",
+        "english": "English 🇺🇸"
+    },
+    "home": {
+        "title": "Vijdon GO",
+        "greeting": "Hello!",
+        "greetingSub": "Where are we going today?",
+        "greetingUser": "Hello, {name}!",
+        "services": {
+            "taxi": "Taxi",
+            "delivery": "Delivery, Mail"
+        },
+        "promoBanner": "Promo Banner"
+    },
+    "taxi": {
+        "title": "Taxi",
+        "fromLabel": "From",
+        "fromPlaceholder": "Where are you?",
+        "toLabel": "To",
+        "toPlaceholder": "Where are you going?",
+        "emptyTitle": "Select locations",
+        "emptyDesc": "Indicate pickup and drop-off locations. Price and route will appear after.",
+        "calcRoute": "Calculating route...",
+        "priceLabel": "Price:",
+        "passengers": "Passengers",
+        "baggage": "Need baggage?",
+        "orderBtn": "Order Taxi",
+        "loadingRoute": "Calculating route...",
+        "selectPickupFirst": "Please select where you are departing from first!",
+        "waitRouteCalc": "Route is still calculating, please wait...",
+        "addressWaitOrMap": "Please wait for the address to resolve or select on map.",
+        "selectAddressesFirst": "Please select both pickup and destination locations fully first!",
+        "invalidCoords": "Invalid address coordinates! Please select locations on the map again.",
+        "tariffs": {
+            "start": "START",
+            "startDesc": "Regular car",
+            "komfort": "COMFORT",
+            "komfortDesc": "Comfortable car",
+            "biznes": "BUSINESS",
+            "biznesDesc": "Premium"
+        }
+    },
+    "delivery": {
+        "title": "Delivery",
+        "bannerTitle": "Mail and Parcel",
+        "bannerSub": "Fast and reliable delivery service",
+        "fromPlaceholder": "Mail from where?",
+        "toPlaceholder": "Mail to where?",
+        "tariffName": "DELIVERY",
+        "tariffSub": "Mail delivery",
+        "tariffRate": "100 sum/km",
+        "orderBtn": "Request Delivery",
+        "loadingRoute": "Calculating route...",
+        "selectAddressesFirst": "Please select pickup and delivery locations for the parcel!"
+    },
+    "pickup": {
+        "title": "Where are you?"
+    },
+    "dest": {
+        "title": "Where are you going?"
+    },
+    "waiting": {
+        "searchDriver": "Searching for driver...",
+        "searchDesc": "Please wait. Your request has been sent to drivers."
+    },
+    "trip": {
+        "statusActive": "Trip in progress",
+        "statusFinished": "YOU ARRIVED",
+        "statusDriverEnRoute": "DRIVER EN ROUTE",
+        "statusError": "ERROR: ROUTE NOT FOUND",
+        "driverName": "Driver",
+        "carInfo": "Car",
+        "cancelBtn": "Cancel Trip",
+        "kmLeft": "km left",
+        "mLeft": "m left"
+    },
+    "trips": {
+        "title": "My Trips",
+        "noTrips": "You have no trips yet.",
+        "completed": "Completed",
+        "active": "Active trip"
+    },
+    "messages": {
+        "title": "Messages",
+        "supportTitle": "Customer Support",
+        "supportWelcome": "Hello, how can I help you today?",
+        "promoTitle": "Deals & Discounts",
+        "promoWelcome": "New Year discounts have started!",
+        "driverOnWay": "On my way, will arrive in 5 minutes."
+    },
+    "profile": {
+        "title": "Profile",
+        "defaultName": "User",
+        "settings": "Settings",
+        "help": "Help",
+        "logout": "Log out"
+    },
+    "settings": {
+        "title": "Settings",
+        "language": "Language / Til",
+        "phoneUnchangeable": "Phone number (Cannot be changed)",
+        "savedSuccess": "Changes saved!"
+    },
+    "call": {
+        "status": "Calling..."
+    },
+    "chat": {
+        "inputPlaceholder": "Type a message...",
+        "online": "Online",
+        "edit": "Edit",
+        "delete": "Delete",
+        "edited": "(edited)",
+        "driverWelcome": "Hello! I have arrived, where are you?",
+        "confirmDelete": "Do you want to delete this message?",
+        "editPrompt": "Edit message:",
+        "supportReply1": "Please leave your issue, we will reply shortly.",
+        "supportReply2": "Our operators are busy right now, please wait.",
+        "supportReply3": "Your message is received. An operator will contact you shortly.",
+        "driverReply1": "Okay, understood.",
+        "driverReply2": "I will be there shortly.",
+        "driverReply3": "On my way.",
+        "driverReply4": "Can you specify the address?"
+    }
+}
 };
+
+async function loadTranslations() {
+    try {
+        const [uzRes, ruRes, enRes] = await Promise.all([
+            fetch('./uz.json').then(r => r.json()),
+            fetch('./ru.json').then(r => r.json()),
+            fetch('./en.json').then(r => r.json())
+        ]);
+        loadedTranslations.uz = uzRes;
+        loadedTranslations.ru = ruRes;
+        loadedTranslations.en = enRes;
+    } catch (e) {
+        console.error("Failed to load translation files", e);
+    }
+}
+
+function getValueByPath(obj, path) {
+    if (!obj || !path) return undefined;
+    return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+}
+
+function t(key, replacements = {}) {
+    let val = getValueByPath(loadedTranslations[currentLang], key);
+    if (val === undefined) {
+        val = getValueByPath(loadedTranslations['uz'], key);
+    }
+    if (val === undefined) {
+        val = getValueByPath(loadedTranslations['ru'], key);
+    }
+    if (val === undefined) {
+        val = getValueByPath(loadedTranslations['en'], key);
+    }
+    if (val === undefined) {
+        console.warn("Missing translation key: " + key);
+        return "";
+    }
+    
+    let str = String(val);
+    Object.keys(replacements).forEach(k => {
+        str = str.replace(new RegExp(`{${k}}`, 'g'), replacements[k]);
+    });
+    return str;
+}
 
 let currentLang = localStorage.getItem('vg_lang') || 'uz';
 
@@ -188,28 +654,70 @@ function setLanguage(lang) {
 function updateUITranslations() {
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
-        if (translations[currentLang] && translations[currentLang][key]) {
-            el.innerHTML = translations[currentLang][key]; // innerHTML for safe replacement in case of spans/etc
+        const translated = t(key);
+        if (translated !== "") {
+            el.innerHTML = translated;
         }
     });
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
         const key = el.getAttribute('data-i18n-placeholder');
-        if (translations[currentLang] && translations[currentLang][key]) {
-            el.placeholder = translations[currentLang][key];
+        const translated = t(key);
+        if (translated !== "") {
+            el.placeholder = translated;
         }
     });
     
     const bagStatus = document.getElementById('baggage-status');
     if (bagStatus) {
-        bagStatus.innerText = typeof needsBaggage !== "undefined" && needsBaggage ? translations[currentLang].yes : translations[currentLang].no;
+        bagStatus.innerText = typeof needsBaggage !== "undefined" && needsBaggage ? t('common.yes') : t('common.no');
     }
     
-    // Update language select dropdowns
-    const loginLang = document.getElementById('login-language');
-    if (loginLang && loginLang.value !== currentLang) loginLang.value = currentLang;
+    // Highlight login language card if it exists
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.remove('border-primary', 'bg-white', 'shadow-md');
+        btn.classList.add('border-transparent', 'bg-bgLight');
+        const checkIcon = btn.querySelector('.lang-check');
+        if (checkIcon) checkIcon.classList.add('hidden');
+    });
+    const selectedLangCard = document.getElementById(`lang-${currentLang}`);
+    if (selectedLangCard) {
+        selectedLangCard.classList.remove('border-transparent', 'bg-bgLight');
+        selectedLangCard.classList.add('border-primary', 'bg-white', 'shadow-md');
+        const checkIcon = selectedLangCard.querySelector('.lang-check');
+        if (checkIcon) checkIcon.classList.remove('hidden');
+    }
     
     const settingsLang = document.getElementById('settings-language');
     if (settingsLang && settingsLang.value !== currentLang) settingsLang.value = currentLang;
+
+    // Refresh dynamic states on language change
+    const pickupList = document.getElementById('pickup-region-list');
+    if (pickupList) renderRegions('pickup-region-list', 'pickup');
+    const destList = document.getElementById('dest-region-list');
+    if (destList) renderRegions('dest-region-list', 'dest');
+    
+    updateOrderButton();
+    updateDeliveryPriceDisplay();
+    renderProfil();
+    renderSafarlarim();
+    renderXabarlar();
+    if (typeof currentChatId !== 'undefined' && currentChatId) renderMessages();
+
+    // Update promo banner image source dynamically based on the current language
+    const promoBanner = document.getElementById('home-promo-banner');
+    if (promoBanner) {
+        let bannerSrc = 'rasmlar/banner.png';
+        if (currentLang === 'ru') {
+            bannerSrc = 'rasmlar/bannerru.png';
+        } else if (currentLang === 'en') {
+            bannerSrc = 'rasmlar/bannereng.png';
+        }
+        promoBanner.src = bannerSrc;
+        const bannerContainer = promoBanner.parentElement.parentElement;
+        if (bannerContainer) {
+            bannerContainer.style.display = '';
+        }
+    }
 }
 
 // --- Data Models ---
@@ -242,7 +750,7 @@ let currentScreen = 'splash-screen';
 let mapsInitialized = false;
 let currentChatId = null;
 let activeOrderId = null;
-let loginGender = 'male';
+let loginGender = null;
 let settingsGender = 'male';
 let paxCount = 1;
 let needsBaggage = false;
@@ -341,7 +849,15 @@ function updateDeliveryPriceDisplay() {
             requestAnimationFrame(() => {
                 previewSection.classList.remove('opacity-0', 'translate-y-10', 'pointer-events-none');
                 previewSection.classList.add('opacity-100', 'translate-y-0', 'pointer-events-auto');
-                if (delMap) delMap.container.fitToViewport();
+                if (delMap) {
+                    delMap.container.fitToViewport();
+                    setTimeout(() => {
+                        if (delMap) {
+                            delMap.container.fitToViewport();
+                            delMap.setZoom(delMap.getZoom());
+                        }
+                    }, 500);
+                }
             });
         });
     }
@@ -354,7 +870,7 @@ function updateDeliveryPriceDisplay() {
         if (orderBtn) {
             orderBtn.disabled = true;
             orderBtn.classList.add('opacity-50', 'cursor-not-allowed');
-            orderBtn.innerHTML = "<i class='fa-solid fa-box-open'></i> Yo'l hisoblanmoqda...";
+            orderBtn.innerHTML = "<i class='fa-solid fa-box-open'></i> " + t('delivery.loadingRoute');
         }
         return;
     }
@@ -364,13 +880,13 @@ function updateDeliveryPriceDisplay() {
     if (loadingState) loadingState.classList.add('hidden');
     if (contentState) contentState.classList.remove('hidden');
 
-    const distKm = (delRouteState.distance / 1000).toFixed(1) + " km";
+    const distKm = (delRouteState.distance / 1000).toFixed(1) + " " + t('common.km');
     const distEl = document.getElementById('del-distance');
     if (distEl) distEl.innerText = distKm;
 
     const price = calculateDeliveryPrice();
     if (price !== null) {
-        const priceFormatted = price.toLocaleString('ru-RU') + " so'm";
+        const priceFormatted = price.toLocaleString('ru-RU') + " " + t('common.currency');
         if (priceEl) priceEl.innerText = priceFormatted;
         delRouteState.priceText = priceFormatted;
     }
@@ -378,7 +894,7 @@ function updateDeliveryPriceDisplay() {
     if (orderBtn) {
         orderBtn.disabled = false;
         orderBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-        orderBtn.innerHTML = "<i class='fa-solid fa-box-open'></i> Dostavka chaqirish";
+        orderBtn.innerHTML = "<i class='fa-solid fa-box-open'></i> <span data-i18n='delivery.orderBtn'>" + t('delivery.orderBtn') + "</span>";
     }
 }
 
@@ -437,7 +953,7 @@ function buildDeliveryRoute() {
 
                 delRouteState.ready = true;
                 delRouteState.distance = route.distance;
-                delRouteState.distanceText = (route.distance / 1000).toFixed(0) + " km";
+                delRouteState.distanceText = (route.distance / 1000).toFixed(0) + " " + t('common.km');
 
                 updateDeliveryPriceDisplay();
 
@@ -447,6 +963,14 @@ function buildDeliveryRoute() {
                     [Math.max(lat1, lat2) + 0.1, Math.max(lng1, lng2) + 0.1]
                 ];
                 delMap.setBounds(bounds, { checkZoomRange: true, zoomMargin: 60 });
+                
+                // Force tiles to load properly
+                setTimeout(() => {
+                    if (delMap) {
+                        delMap.container.fitToViewport();
+                        delMap.setZoom(delMap.getZoom());
+                    }
+                }, 500);
             })
             .catch(err => {
                 console.error("Delivery route error:", err);
@@ -457,11 +981,11 @@ function buildDeliveryRoute() {
 
 function createDeliveryOrder() {
     if (!delPickup.latlng || !delDest.latlng || !delPickup.address || !delDest.address) {
-        alert("Iltimos, pochta olib ketish va yetkazish manzillarini tanlang!");
+        alert(t('delivery.selectAddressesFirst'));
         return;
     }
     if (!delRouteState.ready) {
-        alert("Yo'l hali hisoblanmoqda, iltimos kuting...");
+        alert(t('taxi.waitRouteCalc'));
         return;
     }
 
@@ -592,7 +1116,7 @@ function updatePriceDisplay() {
             orderBtn.disabled = true;
             orderBtn.classList.add('opacity-50', 'cursor-not-allowed');
             orderBtn.classList.remove('shadow-lg', 'shadow-yellow-500/20');
-            orderBtn.innerText = "Yo'l hisoblanmoqda...";
+            orderBtn.innerText = t('taxi.loadingRoute');
         }
         return;
     }
@@ -602,7 +1126,7 @@ function updatePriceDisplay() {
     if (loadingState) loadingState.classList.add('hidden');
     if (contentState) contentState.classList.remove('hidden');
     
-    const distanceKm = (routeState.distance / 1000).toFixed(1) + " km";
+    const distanceKm = (routeState.distance / 1000).toFixed(1) + " " + t('common.km');
     const distEl = document.getElementById('preview-distance');
     if (distEl) distEl.innerText = distanceKm;
     
@@ -611,20 +1135,20 @@ function updatePriceDisplay() {
         const tPrice = calculatePrice(tariff);
         const tPriceEl = document.getElementById('price-' + tariff);
         if(tPriceEl && tPrice !== null) {
-            tPriceEl.innerText = tPrice.toLocaleString('ru-RU') + " so'm";
+            tPriceEl.innerText = tPrice.toLocaleString('ru-RU') + " " + t('common.currency');
         }
     });
 
     const activePrice = calculatePrice();
     if(activePrice !== null) {
-        routeState.priceText = activePrice.toLocaleString('ru-RU') + " so'm";
+        routeState.priceText = activePrice.toLocaleString('ru-RU') + " " + t('common.currency');
     }
     
     if (orderBtn) {
         orderBtn.disabled = false;
         orderBtn.classList.remove('opacity-50', 'cursor-not-allowed');
         orderBtn.classList.add('shadow-lg', 'shadow-yellow-500/20');
-        orderBtn.innerText = 'Buyurtma berish';
+        orderBtn.innerText = t('taxi.orderBtn');
     }
 }
 
@@ -830,7 +1354,7 @@ const YandexTrackingEngine = {
                     const hours = Math.floor(durationMin / 60);
                     const mins = durationMin % 60;
 
-                    const distText = distanceKm + " km";
+                    const distText = distanceKm + " " + t('common.km');
 
                     // Decode polyline geometry from OSRM
                     const routeCoords = decodeOSRMPolyline(route.geometry);
@@ -938,7 +1462,7 @@ const YandexTrackingEngine = {
             .then(res => res.json())
             .then(data => {
                 if (data.code !== 'Ok' || !data.routes || data.routes.length === 0) {
-                    document.getElementById('trip-status').innerText = "XATOLIK: YO'L TOPILMADI";
+                    document.getElementById('trip-status').innerText = t('trip.statusError');
                     return;
                 }
 
@@ -1069,8 +1593,8 @@ const YandexTrackingEngine = {
                         completedLine.geometry.setCoordinates(allPoints);
                         remainingLine.geometry.setCoordinates([]);
 
-                        document.getElementById('trip-status').innerText = "YETIB KELDINGIZ";
-                        document.getElementById('trip-distance').innerText = "0 km";
+                        document.getElementById('trip-status').innerText = t('trip.statusFinished');
+                        document.getElementById('trip-distance').innerText = "0 " + t('common.km');
 
                         // Zoom to destination
                         self.tripMap.setCenter(toCoords, 15, { duration: 1000 });
@@ -1082,7 +1606,7 @@ const YandexTrackingEngine = {
             })
             .catch(err => {
                 console.error("DEBUG: Trip OSRM error:", err);
-                document.getElementById('trip-status').innerText = "XATOLIK: YO'L TOPILMADI";
+                document.getElementById('trip-status').innerText = t('trip.statusError');
             });
 
         // Final fit
@@ -1091,13 +1615,11 @@ const YandexTrackingEngine = {
 };
 
 // --- Initialization ---
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadTranslations();
     initInteractions();
-    renderRegions('pickup-region-list', 'pickup');
-    renderRegions('dest-region-list', 'dest');
-    renderProfil();
     updateUITranslations();
-    setLoginGender('male');
+    setLoginGender(null);
     navigate('splash-screen', false);
     
     YandexTrackingEngine.ensureReady().then(() => {
@@ -1248,45 +1770,104 @@ function startApp() {
             console.log("User found, navigating to home-screen");
             navigate('home-screen');
         } else {
-            console.log("No user found, navigating to login-screen");
-            navigate('login-screen');
+            console.log("No user found, navigating to login-step-1");
+            navigate('login-step-1');
         }
     } catch (e) {
         console.error("startApp error:", e);
-        navigate('login-screen');
+        navigate('login-step-1');
     }
 }
 
 // --- Login & Logout ---
 function handleStartJourney() {
     const isLoggedIn = localStorage.getItem(DB_USER);
-    const isSkipped = localStorage.getItem(DB_SKIP_ONBOARDING);
 
     if (isLoggedIn) {
-        if (isSkipped) {
-            navigate('home-screen');
-        } else {
-            navigate('pickup-region-screen');
-        }
+        navigate('home-screen');
     } else {
-        navigate('login-screen');
+        navigate('login-step-1');
     }
-}
-
-function skipOnboarding() {
-    localStorage.setItem(DB_SKIP_ONBOARDING, 'true');
-    navigate('home-screen');
 }
 
 function setLoginGender(gender) {
     loginGender = gender;
     document.querySelectorAll('.gender-btn').forEach(btn => {
-        btn.classList.remove('border-primary', 'bg-white');
+        btn.classList.remove('border-primary', 'bg-white', 'shadow-md');
         btn.classList.add('border-transparent', 'bg-bgLight');
+        const check = btn.querySelector('.gender-check');
+        if (check) check.classList.add('hidden');
     });
-    const selected = document.getElementById(`gender-${gender}`);
-    selected.classList.remove('border-transparent', 'bg-bgLight');
-    selected.classList.add('border-primary', 'bg-white');
+    if (gender) {
+        const selected = document.getElementById(`gender-${gender}`);
+        if (selected) {
+            selected.classList.remove('border-transparent', 'bg-bgLight');
+            selected.classList.add('border-primary', 'bg-white', 'shadow-md');
+            const check = selected.querySelector('.gender-check');
+            if (check) check.classList.remove('hidden');
+        }
+    }
+    const genderError = document.getElementById('login-gender-error');
+    if (genderError) genderError.classList.add('hidden');
+}
+
+function setLoginLanguage(lang) {
+    setLanguage(lang);
+}
+
+function validateStep1() {
+    const phoneInput = document.getElementById('login-phone');
+    const phoneError = document.getElementById('login-phone-error');
+    if (!phoneInput) return;
+    
+    const phone = phoneInput.value;
+    const digits = phone.replace(/[^\d]/g, '');
+    
+    if (digits.length !== 12) {
+        phoneInput.classList.add('border-red-500', 'ring-2', 'ring-red-200');
+        if (phoneError) {
+            phoneError.innerText = t('login.phoneError');
+            phoneError.classList.remove('hidden');
+        }
+        return;
+    }
+    
+    phoneInput.classList.remove('border-red-500', 'ring-2', 'ring-red-200');
+    if (phoneError) phoneError.classList.add('hidden');
+    navigate('login-step-2');
+}
+
+function validateStep2() {
+    const nameInput = document.getElementById('login-name');
+    const nameError = document.getElementById('login-name-error');
+    if (!nameInput) return;
+    
+    const name = nameInput.value.trim();
+    if (!name || name.length < 2) {
+        nameInput.classList.add('border-red-500', 'ring-2', 'ring-red-200');
+        if (nameError) {
+            nameError.innerText = t('login.nameError');
+            nameError.classList.remove('hidden');
+        }
+        return;
+    }
+    
+    nameInput.classList.remove('border-red-500', 'ring-2', 'ring-red-200');
+    if (nameError) nameError.classList.add('hidden');
+    navigate('login-step-3');
+}
+
+function validateStep3() {
+    const genderError = document.getElementById('login-gender-error');
+    if (!loginGender) {
+        if (genderError) {
+            genderError.innerText = t('login.genderError');
+            genderError.classList.remove('hidden');
+        }
+        return;
+    }
+    if (genderError) genderError.classList.add('hidden');
+    navigate('login-step-4');
 }
 
 function handleLogin() {
@@ -1304,21 +1885,21 @@ function handleLogin() {
     const phone = phoneInput.value.trim();
 
     // 1. Validation
+    const digits = phone.replace(/[^\d]/g, '');
+    if (digits.length !== 12) {
+        alert(t('login.phoneError'));
+        return;
+    }
     if (!name || name.length < 2) {
-        alert("Iltimos, ismingizni kiriting (kamida 2 ta belgi).");
+        alert(t('login.nameError'));
         return;
     }
-    if (!surname || surname.length < 2) {
-        alert("Iltimos, familiyangizni kiriting (kamida 2 ta belgi).");
+    if (!loginGender) {
+        alert(t('login.genderError'));
         return;
     }
-    
-    // Simple phone validation: starts with +998 and has 9 digits after
-    const cleanedPhone = phone.replace(/\s/g, '');
-    if (!cleanedPhone.startsWith('+998') || cleanedPhone.length !== 13) {
-        alert("Iltimos, telefon raqamingizni to'g'ri formatda kiriting (masalan: +998 90 123 45 67).");
-        return;
-    }
+
+    const cleanedPhone = '+' + digits;
 
     // 2. Save User Data
     const userData = {
@@ -1334,12 +1915,7 @@ function handleLogin() {
     console.log("User registered successfully:", userData);
 
     // 3. Navigate
-    const isSkipped = localStorage.getItem(DB_SKIP_ONBOARDING);
-    if (isSkipped === 'true') {
-        navigate('home-screen');
-    } else {
-        navigate('pickup-region-screen');
-    }
+    navigate('home-screen');
     
     // Refresh profile UI if needed
     if (typeof renderProfil === 'function') renderProfil();
@@ -1352,6 +1928,52 @@ function logout() {
 
 // --- UI Interactions ---
 function initInteractions() {
+    const phoneInput = document.getElementById('login-phone');
+    if (phoneInput) {
+        phoneInput.addEventListener('input', (e) => {
+            let val = phoneInput.value;
+            if (!val.startsWith('+')) {
+                val = '+' + val.replace(/[^\d]/g, '');
+            }
+            let digits = val.replace(/[^\d]/g, '');
+            if (!digits.startsWith('998')) {
+                digits = '998' + digits;
+            }
+            digits = digits.slice(0, 12);
+            let formatted = '+998';
+            if (digits.length > 3) {
+                formatted += ' (' + digits.substring(3, 5);
+            }
+            if (digits.length > 5) {
+                formatted += ') ' + digits.substring(5, 8);
+            }
+            if (digits.length > 8) {
+                formatted += '-' + digits.substring(8, 10);
+            }
+            if (digits.length > 10) {
+                formatted += '-' + digits.substring(10, 12);
+            }
+            phoneInput.value = formatted;
+            const phoneError = document.getElementById('login-phone-error');
+            if (digits.length === 12) {
+                phoneInput.classList.remove('border-red-500', 'ring-2', 'ring-red-200');
+                if (phoneError) phoneError.classList.add('hidden');
+            }
+        });
+
+        phoneInput.addEventListener('keydown', (e) => {
+            if (phoneInput.selectionStart <= 4 && (e.key === 'Backspace' || e.key === 'Delete')) {
+                e.preventDefault();
+            }
+        });
+        
+        phoneInput.addEventListener('focus', () => {
+            if (phoneInput.value.trim() === '' || phoneInput.value.trim() === '+998') {
+                phoneInput.value = '+998 ';
+            }
+        });
+    }
+
     // Splash Start Button
     const startBtn = document.getElementById('start-journey-btn');
     if (startBtn) {
@@ -1383,7 +2005,7 @@ function initInteractions() {
     if (bagStatus && bagStatus.parentElement && bagStatus.parentElement.parentElement) {
         bagStatus.parentElement.parentElement.addEventListener('click', () => {
             needsBaggage = !needsBaggage;
-            bagStatus.innerText = needsBaggage ? "Ha" : "Yo'q";
+            bagStatus.innerText = needsBaggage ? t('common.yes') : t('common.no');
             bagStatus.style.color = needsBaggage ? "#2D2D2D" : "#888888";
             bagStatus.style.fontWeight = needsBaggage ? "bold" : "500";
             updatePriceDisplay();
@@ -1397,7 +2019,7 @@ function renderRegions(containerId, type) {
     regionsData.forEach(r => {
         const div = document.createElement('div');
         div.className = "p-4 bg-white rounded-2xl shadow-sm border border-gray-50 flex items-center justify-between cursor-pointer active:scale-95 transition-transform hover:bg-gray-50";
-        div.innerHTML = `<span class="font-bold">${r.name}</span> <i class="fa-solid fa-chevron-right text-gray-300 text-sm"></i>`;
+        div.innerHTML = `<span class="font-bold">${t('regions.' + r.id)}</span> <i class="fa-solid fa-chevron-right text-gray-300 text-sm"></i>`;
         div.onclick = () => selectRegion(type, r);
         container.appendChild(div);
     });
@@ -1502,46 +2124,70 @@ function updateMarkerAndAddress(type, latlng) {
         selectedDest.address = '';
     }
     
-    setMarker(type, { lat, lng }, "Manzil aniqlanmoqda...");
+    setMarker(type, { lat, lng }, t('common.addressLoading'));
     
-    // Reverse geocoding real coordinates bilan ishlashi
-    // Yandex by default accepts [lat, lng] in ymaps.geocode
-    const geocodePromise = ymaps.geocode(coords, { results: 1, kind: 'house' })
-        .then(res => {
-            if (res.geoObjects.getLength() === 0) {
-                // Agar kind: 'house' bilan topolmasa, oddiy qidiramiz
-                return ymaps.geocode(coords, { results: 1 });
+    // OpenStreetMap Nominatim reverse geocoding
+    async function performGeocoding() {
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+            
+            const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`;
+            const response = await fetch(url, {
+                headers: {
+                    'Accept-Language': currentLang
+                },
+                signal: controller.signal
+            });
+            
+            clearTimeout(timeoutId);
+            
+            if (!response.ok) {
+                throw new Error("Nominatim API error");
             }
-            return res;
-        });
-        
-    const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error("Geocode Timeout")), 5000)
-    );
-
-    Promise.race([geocodePromise, timeoutPromise]).then(res => {
-        let firstGeoObject = res.geoObjects.get(0);
-        if (firstGeoObject) {
-            let addressName = firstGeoObject.getAddressLine();
-            addressName = addressName.replace("O'zbekiston, ", "").replace("Узбекистан, ", "");
             
+            const data = await response.json();
+            
+            if (data && data.address) {
+                const { house_number, road, neighbourhood, suburb, city, town, village, county } = data.address;
+                let addressParts = [];
+                
+                let localArea = neighbourhood || suburb;
+                if (localArea) addressParts.push(localArea);
+                
+                let streetInfo = "";
+                if (road) streetInfo += road;
+                if (house_number) {
+                    // Raqam bo'lsa "-uy" qo'shib yuborish
+                    const hn = house_number.trim();
+                    const suffix = /^\d+$/.test(hn) ? "-uy" : "";
+                    streetInfo += (streetInfo ? " " : "") + hn + suffix;
+                }
+                if (streetInfo) addressParts.push(streetInfo);
+                
+                let cityName = city || town || village || county;
+                if (cityName) addressParts.push(cityName);
+                
+                let addressName = addressParts.length > 0 ? addressParts.join(', ') : data.display_name;
+                
+                console.log("Selected coords:", coords);
+                console.log("Resolved address:", addressName);
+                
+                setMarker(type, { lat, lng }, addressName);
+            } else {
+                throw new Error("No address found in response");
+            }
+        } catch (err) {
+            console.warn("Geocoding failed/timed out:", err);
             console.log("Selected coords:", coords);
-            console.log("Resolved address:", addressName);
             
-            setMarker(type, { lat, lng }, addressName);
-        } else {
-            throw new Error("No address found");
+            const fallbackAddress = t('common.addressNotFound');
+            console.log("Resolved address:", fallbackAddress);
+            setMarker(type, { lat, lng }, fallbackAddress);
         }
-    }).catch(err => {
-        console.warn("Geocoding failed/timed out:", err);
-        console.log("Selected coords:", coords);
-        
-        // Random address chiqarish yo‘qolsin!
-        // Koordinatalarni manzil sifatida ko'rsatamiz
-        const fallbackAddress = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
-        console.log("Resolved address:", fallbackAddress);
-        setMarker(type, { lat, lng }, fallbackAddress);
-    });
+    }
+    
+    performGeocoding();
 }
 
 function setMarker(type, latlng, addressName) {
@@ -1641,9 +2287,9 @@ function updateTripInfo(distMeters) {
 
     if (distEl) {
         if (km >= 1) {
-            distEl.innerText = km.toFixed(1) + " km qoldi";
+            distEl.innerText = km.toFixed(1) + " " + t('trip.kmLeft');
         } else {
-            distEl.innerText = Math.round(km * 1000) + " m qoldi";
+            distEl.innerText = Math.round(km * 1000) + " " + t('trip.mLeft');
         }
     }
 }
@@ -1681,7 +2327,7 @@ function drawFallbackLine(map, lat1, lng1, lat2, lng2) {
     routeState.ready = true;
     routeState.distance = dist * 1000;
     routeState.duration = dur * 60;
-    routeState.distanceText = dist + " km";
+    routeState.distanceText = dist + " " + t('common.km');
     routeState.durationText = '';
 
     document.getElementById('preview-distance').innerText = routeState.distanceText;
@@ -1701,9 +2347,9 @@ function startTaxiBookingFlow() {
     selectedDest = { region: null, latlng: null, address: '' };
     
     const fromEl = document.getElementById('from-display');
-    if (fromEl) fromEl.innerText = translations[currentLang]?.fromPlaceholder || "Qayerdasiz?";
+    if (fromEl) fromEl.innerText = t('taxi.fromPlaceholder');
     const toEl = document.getElementById('to-display');
-    if (toEl) toEl.innerText = translations[currentLang]?.toPlaceholder || "Qayerga borasiz?";
+    if (toEl) toEl.innerText = t('taxi.toPlaceholder');
     
     // Reset route UI
     routeState.ready = false;
@@ -1723,13 +2369,37 @@ function startTaxiBookingFlow() {
     navigate('pickup-region-screen');
 }
 
+function startDeliveryFlow() {
+    window._deliveryFlowMode = 'pickup';
+    
+    // Clear previous addresses
+    delPickup = { region: null, latlng: null, address: '' };
+    delDest = { region: null, latlng: null, address: '' };
+    
+    const fromEl = document.getElementById('del-from-display');
+    if (fromEl) fromEl.innerText = t('delivery.fromPlaceholder');
+    const toEl = document.getElementById('del-to-display');
+    if (toEl) toEl.innerText = t('delivery.toPlaceholder');
+    
+    // Reset route UI
+    delRouteState.ready = false;
+    const previewSection = document.getElementById('del-route-preview');
+    if (previewSection) {
+        previewSection.classList.remove('opacity-100', 'translate-y-0', 'pointer-events-auto');
+        previewSection.classList.add('opacity-0', 'translate-y-10', 'pointer-events-none');
+        setTimeout(() => { previewSection.style.display = 'none'; }, 500);
+    }
+    
+    navigate('pickup-region-screen');
+}
+
 function startPickupFlow() {
     navigate('pickup-region-screen');
 }
 
 function startDestFlow() {
     if (!selectedPickup.latlng) {
-        alert("Avval qayerdan ketishingizni (Qayerdasiz?) tanlang!");
+        alert(t('taxi.selectPickupFirst'));
         // Optional: animate the pickup input to draw attention
         const pickupContainer = document.getElementById('from-display')?.parentElement;
         if (pickupContainer) {
@@ -1757,7 +2427,7 @@ function goBackFromDest() {
     } else if (selectedDest.latlng) {
         navigate('taxi-screen');
     } else {
-        navigate('pickup-region-screen');
+        navigate('taxi-screen');
     }
 }
 
@@ -1776,8 +2446,8 @@ function drawHomeRoute() {
 function confirmPickupLocation() {
     // Check if in delivery flow mode
     if (window._deliveryFlowMode === 'pickup') {
-        if (!selectedPickup.latlng || !selectedPickup.address || selectedPickup.address === "Manzil aniqlanmoqda...") {
-            alert("Iltimos, manzil aniqlanishini kuting yoki xaritadan tanlang.");
+        if (!selectedPickup.latlng || !selectedPickup.address || selectedPickup.address === t('common.addressLoading')) {
+            alert(t('taxi.addressWaitOrMap'));
             return;
         }
         delPickup.latlng = { ...selectedPickup.latlng };
@@ -1785,17 +2455,22 @@ function confirmPickupLocation() {
         delPickup.region = selectedPickup.region;
         const display = document.getElementById('del-from-display');
         if (display) display.innerText = delPickup.address;
-        window._deliveryFlowMode = null;
-        navigate('delivery-screen');
-        // If both addresses ready, build route
-        if (delPickup.latlng && delDest.latlng) {
-            setTimeout(() => buildDeliveryRoute(), 500);
+        
+        if (!delDest.latlng) {
+            window._deliveryFlowMode = 'dest';
+            navigate('dest-region-screen');
+        } else {
+            window._deliveryFlowMode = null;
+            navigate('delivery-screen');
+            if (delPickup.latlng && delDest.latlng) {
+                setTimeout(() => buildDeliveryRoute(), 500);
+            }
         }
         return;
     }
 
-    if (!selectedPickup.latlng || !selectedPickup.address || selectedPickup.address === "Manzil aniqlanmoqda...") {
-        alert("Iltimos, manzil aniqlanishini kuting yoki xaritadan tanlang.");
+    if (!selectedPickup.latlng || !selectedPickup.address || selectedPickup.address === t('common.addressLoading')) {
+        alert(t('taxi.addressWaitOrMap'));
         return;
     }
     const display = document.getElementById('from-display');
@@ -1819,8 +2494,8 @@ function confirmPickupLocation() {
 function confirmDestLocation() {
     // Check if in delivery flow mode
     if (window._deliveryFlowMode === 'dest') {
-        if (!selectedDest.latlng || !selectedDest.address || selectedDest.address === "Manzil aniqlanmoqda...") {
-            alert("Iltimos, manzil aniqlanishini kuting yoki xaritadan tanlang.");
+        if (!selectedDest.latlng || !selectedDest.address || selectedDest.address === t('common.addressLoading')) {
+            alert(t('taxi.addressWaitOrMap'));
             return;
         }
         delDest.latlng = { ...selectedDest.latlng };
@@ -1839,8 +2514,8 @@ function confirmDestLocation() {
         return;
     }
 
-    if (!selectedDest.latlng || !selectedDest.address || selectedDest.address === "Manzil aniqlanmoqda...") {
-        alert("Iltimos, manzil aniqlanishini kuting yoki xaritadan tanlang.");
+    if (!selectedDest.latlng || !selectedDest.address || selectedDest.address === t('common.addressLoading')) {
+        alert(t('taxi.addressWaitOrMap'));
         return;
     }
     const display = document.getElementById('to-display');
@@ -1867,7 +2542,7 @@ function confirmDestLocation() {
 
 function getCurrentLocation() {
     if (!navigator.geolocation) {
-        alert("Brauzeringiz joylashuvni aniqlashni qo'llab-quvvatlamaydi.");
+        alert(t('common.gpsNotSupported'));
         return;
     }
 
@@ -1877,13 +2552,13 @@ function getCurrentLocation() {
     const type = isPickupScreen ? 'pickup' : 'dest';
 
     if (!activeMap) {
-        alert("Xarita hali yuklanmadi. Iltimos, kutib turing.");
+        alert(t('common.mapNotLoaded'));
         return;
     }
 
     // Show loading state on the address text
     const addressEl = document.getElementById(type + '-address-text');
-    if (addressEl) addressEl.innerText = "Joylashuv aniqlanmoqda...";
+    if (addressEl) addressEl.innerText = t('common.gpsLocating');
 
     navigator.geolocation.getCurrentPosition(
         function (position) {
@@ -1898,12 +2573,12 @@ function getCurrentLocation() {
         },
         function (err) {
             console.error("Geolocation error:", err);
-            let msg = "Joylashuvni aniqlashda xatolik yuz berdi.";
-            if (err.code === 1) msg = "Joylashuvga ruxsat berilmadi. Iltimos, brauzer sozlamalaridan ruxsat bering.";
-            else if (err.code === 2) msg = "Joylashuvni aniqlash imkonsiz. GPS yoqilganligini tekshiring.";
-            else if (err.code === 3) msg = "Joylashuvni aniqlash vaqti tugadi. Qayta urinib ko'ring.";
+            let msg = t('gps.errorGeneric');
+            if (err.code === 1) msg = t('gps.errorPermissionDenied');
+            else if (err.code === 2) msg = t('gps.errorPositionUnavailable');
+            else if (err.code === 3) msg = t('gps.errorTimeout');
             alert(msg);
-            if (addressEl) addressEl.innerText = "Manzilni tanlang";
+            if (addressEl) addressEl.innerText = t('common.selectAddress');
         },
         {
             enableHighAccuracy: true,
@@ -1946,17 +2621,17 @@ function updateOrderButton() {
         btn.disabled = false;
         btn.classList.remove('opacity-50', 'cursor-not-allowed');
         btn.classList.add('shadow-lg', 'shadow-yellow-500/20');
-        btn.innerText = 'Buyurtma berish';
+        btn.innerText = t('taxi.orderBtn');
     } else if (hasAddresses && !routeState.ready) {
         btn.disabled = true;
         btn.classList.add('opacity-50', 'cursor-not-allowed');
         btn.classList.remove('shadow-lg', 'shadow-yellow-500/20');
-        btn.innerText = 'Yo\'l hisoblanmoqda...';
+        btn.innerText = t('taxi.loadingRoute');
     } else {
         btn.disabled = true;
         btn.classList.add('opacity-50', 'cursor-not-allowed');
         btn.classList.remove('shadow-lg', 'shadow-yellow-500/20');
-        btn.innerText = 'Buyurtma berish';
+        btn.innerText = t('taxi.orderBtn');
     }
 }
 
@@ -1965,12 +2640,12 @@ function createOrder() {
     console.log("createOrder triggered", {selectedPickup, selectedDest, routeState});
 
     if (!selectedPickup.latlng || !selectedDest.latlng || !selectedPickup.address || !selectedDest.address) {
-        alert("Iltimos, avval jo'nash va borish manzillarini to'liq tanlang!");
+        alert(t('taxi.selectAddressesFirst'));
         return;
     }
 
     if (!routeState.ready) {
-        alert("Yo'l hali hisoblanmoqda, iltimos kuting...");
+        alert(t('taxi.waitRouteCalc'));
         return;
     }
 
@@ -1980,7 +2655,7 @@ function createOrder() {
     const toLng = Number(selectedDest.latlng.lng);
 
     if (isNaN(fromLat) || isNaN(fromLng) || isNaN(toLat) || isNaN(toLng)) {
-        alert("Manzil koordinatalari xato! Iltimos, manzillarni xaritadan qayta tanlang.");
+        alert(t('taxi.invalidCoords'));
         return;
     }
 
@@ -2104,8 +2779,8 @@ function startTrip(order) {
     activeOrderId = order.id;
 
     // 1. UI Setup
-    document.getElementById('trip-status').innerText = "HAYDOVCHI YO'LDA";
-    document.getElementById('trip-distance').innerText = "... km";
+    document.getElementById('trip-status').innerText = t('trip.statusDriverEnRoute');
+    document.getElementById('trip-distance').innerText = "... " + t('common.km');
     if (order.price) {
         document.getElementById('trip-price-value').innerText = order.price;
     }
@@ -2122,8 +2797,9 @@ function startTrip(order) {
     }
 
     const now = new Date();
-    const months = ["yanvar", "fevral", "mart", "aprel", "may", "iyun", "iyul", "avgust", "sentabr", "oktabr", "noyabr", "dekabr"];
-    document.getElementById('trip-date').innerText = `${now.getDate()} ${months[now.getMonth()]}, ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+    const locale = currentLang === 'uz' ? 'uz-UZ' : (currentLang === 'ru' ? 'ru-RU' : 'en-US');
+    const dateStr = now.toLocaleDateString(locale, {day: 'numeric', month: 'short'}) + ', ' + now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+    document.getElementById('trip-date').innerText = dateStr;
 
     // 2. Navigation
     navigate('active-trip-screen');
@@ -2158,14 +2834,15 @@ function renderSafarlarim() {
     const allOrders = [...activeOrders, ...completedOrders].sort((a,b) => b.id - a.id);
     
     if (allOrders.length === 0) {
-        list.innerHTML = '<p class="text-center text-textSecondary mt-10">Sizda hali safarlar yo\'q.</p>';
+        list.innerHTML = `<p class="text-center text-textSecondary mt-10">${t('trips.noTrips')}</p>`;
         return;
     }
     
     allOrders.forEach(order => {
         const isCompleted = order.status === 'completed';
         const dateObj = new Date(order.date);
-        const dateStr = dateObj.toLocaleDateString('uz-UZ') + ' ' + dateObj.toLocaleTimeString('uz-UZ', {hour:'2-digit', minute:'2-digit'});
+        const locale = currentLang === 'uz' ? 'uz-UZ' : (currentLang === 'ru' ? 'ru-RU' : 'en-US');
+        const dateStr = dateObj.toLocaleDateString(locale) + ' ' + dateObj.toLocaleTimeString(locale, {hour:'2-digit', minute:'2-digit'});
         
         const card = document.createElement('div');
         card.className = "bg-white rounded-[1.5rem] p-5 shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-gray-50";
@@ -2173,7 +2850,7 @@ function renderSafarlarim() {
             <div class="flex justify-between items-center mb-4">
                 <span class="text-xs font-semibold text-textSecondary">${dateStr}</span>
                 <span class="text-[10px] font-bold px-2 py-1 rounded-md ${isCompleted ? 'bg-gray-100 text-gray-500' : 'bg-green-50 text-green-600'}">
-                    ${isCompleted ? 'Yakunlangan' : 'Faol safar'}
+                    ${isCompleted ? t('trips.completed') : t('trips.active')}
                 </span>
             </div>
             <div class="flex items-center gap-3 mb-2">
@@ -2218,7 +2895,7 @@ function renderXabarlar() {
             bg: 'bg-primary/10',
             textCol: 'text-primary',
             messages: [
-                { id: Date.now(), sender: 'them', text: "Assalomu alaykum, sizga qanday yordam bera olaman?", timestamp: new Date().toISOString() }
+                { id: Date.now(), sender: 'them', text: "Assalomu alaykum, sizga qanday yordam bera olaman?", timestamp: new Date().toISOString(), isWelcome: true }
             ]
         };
         localStorage.setItem(DB_CHATS, JSON.stringify(chats));
@@ -2233,7 +2910,7 @@ function renderXabarlar() {
             name: currentTrip.driver.name,
             avatar: 'rasmlar/avatar.png',
             messages: [
-                { id: Date.now(), sender: 'them', text: "Yo'ldaman, 5 daqiqada boraman.", timestamp: new Date().toISOString() }
+                { id: Date.now(), sender: 'them', text: "Yo'ldaman, 5 daqiqada boraman.", timestamp: new Date().toISOString(), isDriverOnWay: true }
             ]
         };
         localStorage.setItem(DB_CHATS, JSON.stringify(chats));
@@ -2248,7 +2925,7 @@ function renderXabarlar() {
             bg: 'bg-green-50',
             textCol: 'text-green-600',
             messages: [
-                { id: Date.now(), sender: 'them', text: "Yangi yil chegirmalari boshlandi!", timestamp: new Date().toISOString() }
+                { id: Date.now(), sender: 'them', text: "Yangi yil chegirmalari boshlandi!", timestamp: new Date().toISOString(), isPromo: true }
             ]
         };
         localStorage.setItem(DB_CHATS, JSON.stringify(chats));
@@ -2261,7 +2938,19 @@ function renderXabarlar() {
         return new Date(bLast.timestamp) - new Date(aLast.timestamp);
     }).forEach(chat => {
         const lastMsg = chat.messages[chat.messages.length - 1];
-        const timeStr = new Date(lastMsg.timestamp).toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' });
+        const locale = currentLang === 'uz' ? 'uz-UZ' : (currentLang === 'ru' ? 'ru-RU' : 'en-US');
+        const timeStr = new Date(lastMsg.timestamp).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
+        
+        let chatName = chat.name;
+        if (chat.id === 'support') chatName = t('messages.supportTitle');
+        else if (chat.id === 'promo') chatName = t('messages.promoTitle');
+
+        let msgText = lastMsg.text;
+        if (lastMsg.textKey) msgText = t(lastMsg.textKey);
+        else if (lastMsg.isWelcome) msgText = t('messages.supportWelcome');
+        else if (lastMsg.isPromo) msgText = t('messages.promoWelcome');
+        else if (lastMsg.isDriverOnWay) msgText = t('messages.driverOnWay');
+        else if (lastMsg.isDriverWelcome) msgText = t('chat.driverWelcome');
         
         const div = document.createElement('div');
         div.className = "p-4 border-b border-gray-50 flex items-center gap-4 bg-white active:bg-gray-50 cursor-pointer transition-colors relative";
@@ -2277,10 +2966,10 @@ function renderXabarlar() {
             </div>
             <div class="flex-1 overflow-hidden">
                 <div class="flex justify-between items-center mb-1">
-                    <h3 class="font-bold text-sm ${chat.unread ? 'text-graphite' : 'text-graphite'}">${chat.name}</h3>
+                    <h3 class="font-bold text-sm ${chat.unread ? 'text-graphite' : 'text-graphite'}">${chatName}</h3>
                     <span class="text-[10px] text-textSecondary">${timeStr}</span>
                 </div>
-                <p class="text-xs ${chat.unread ? 'text-graphite font-bold' : 'text-textSecondary'} truncate">${lastMsg.text}</p>
+                <p class="text-xs ${chat.unread ? 'text-graphite font-bold' : 'text-textSecondary'} truncate">${msgText}</p>
             </div>
         `;
         list.appendChild(div);
@@ -2291,7 +2980,7 @@ function renderProfil() {
     const userStr = localStorage.getItem(DB_USER);
     if(userStr) {
         const user = JSON.parse(userStr);
-        const name = user.name || 'Foydalanuvchi';
+        const name = user.name || t('profile.defaultName');
         const surname = user.surname || '';
         document.getElementById('profile-name').innerText = `${name} ${surname}`.trim();
         document.getElementById('profile-phone').innerText = user.phone || '+998';
@@ -2303,7 +2992,7 @@ function renderProfil() {
         // Update greeting on home screen if it exists
         const greeting = document.getElementById('home-greeting');
         if (greeting) {
-            greeting.innerText = `Assalomu alaykum, ${name}!`;
+            greeting.innerText = t('home.greetingUser', { name: name });
         }
     }
 }
@@ -2344,7 +3033,7 @@ function saveSettings() {
     const surname = document.getElementById('settings-surname').value.trim();
     
     if (!name) {
-        alert("Ismingizni kiriting!");
+        alert(t('login.nameError'));
         return;
     }
     
@@ -2357,7 +3046,7 @@ function saveSettings() {
         localStorage.setItem(DB_USER, JSON.stringify(user));
         
         renderProfil();
-        alert("O'zgarishlar saqlandi!");
+        alert(t('settings.savedSuccess'));
         navigate('profil-screen');
     }
 }
@@ -2406,14 +3095,15 @@ function showChatModal(chatId) {
             name: driverName,
             unread: false,
             messages: [
-                { id: Date.now(), sender: 'them', text: "Assalomu alaykum! Men keldim, qayerdasiz?", timestamp: new Date().toISOString() }
+                { id: Date.now(), sender: 'them', text: "Assalomu alaykum! Men keldim, qayerdasiz?", timestamp: new Date().toISOString(), isDriverWelcome: true }
             ]
         };
         chats[chatId] = chat;
         localStorage.setItem(DB_CHATS, JSON.stringify(chats));
     }
     
-    document.getElementById('chat-name').innerText = chat.name;
+    const chatTitle = chat.id === 'support' ? t('messages.supportTitle') : (chat.id === 'promo' ? t('messages.promoTitle') : chat.name);
+    document.getElementById('chat-name').innerText = chatTitle;
     modal.classList.remove('hidden');
     setTimeout(() => {
         modal.classList.remove('translate-y-full');
@@ -2432,21 +3122,29 @@ function renderMessages() {
     container.innerHTML = '';
     chat.messages.forEach(msg => {
         const isMe = msg.sender === 'me';
-        const timeStr = new Date(msg.timestamp).toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' });
+        const locale = currentLang === 'uz' ? 'uz-UZ' : (currentLang === 'ru' ? 'ru-RU' : 'en-US');
+        const timeStr = new Date(msg.timestamp).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
         
+        let msgText = msg.text;
+        if (msg.textKey) msgText = t(msg.textKey);
+        else if (msg.isWelcome) msgText = t('messages.supportWelcome');
+        else if (msg.isPromo) msgText = t('messages.promoWelcome');
+        else if (msg.isDriverOnWay) msgText = t('messages.driverOnWay');
+        else if (msg.isDriverWelcome) msgText = t('chat.driverWelcome');
+
         const div = document.createElement('div');
         div.className = `flex ${isMe ? 'self-end' : 'self-start'} max-w-[85%] group relative mb-1`;
         div.innerHTML = `
             <div class="${isMe ? 'bg-primary' : 'bg-white'} p-3 rounded-2xl ${isMe ? 'rounded-tr-sm border border-yellow-400' : 'rounded-tl-sm border border-gray-50'} shadow-sm text-sm relative">
-                <p class="whitespace-pre-wrap">${msg.text}</p>
+                <p class="whitespace-pre-wrap">${msgText}</p>
                 <div class="flex items-center justify-end gap-1 mt-1">
-                    <div class="text-[9px] ${isMe ? 'text-graphite opacity-70' : 'text-textSecondary'}">${timeStr} ${msg.edited ? '(tahrirlandi)' : ''}</div>
+                    <div class="text-[9px] ${isMe ? 'text-graphite opacity-70' : 'text-textSecondary'}">${timeStr} ${msg.edited ? t('chat.edited') : ''}</div>
                     ${isMe ? `<button onclick="toggleMessageMenu(${msg.id})" class="text-textSecondary/50 hover:text-graphite transition-colors ml-1"><i class="fa-solid fa-ellipsis-vertical text-[10px]"></i></button>` : ''}
                 </div>
                 ${isMe ? `
                 <div id="msg-menu-${msg.id}" class="hidden absolute right-0 top-full mt-1 bg-white shadow-xl border border-gray-100 rounded-xl z-20 py-1 min-w-[100px]">
-                    <button onclick="handleMessageAction('edit', ${msg.id})" class="w-full px-3 py-2 text-left text-xs text-graphite hover:bg-gray-50 flex items-center gap-2"><i class="fa-solid fa-pen text-[10px] text-textSecondary"></i> Tahrirlash</button>
-                    <button onclick="handleMessageAction('delete', ${msg.id})" class="w-full px-3 py-2 text-left text-xs text-red-500 hover:bg-red-50 flex items-center gap-2"><i class="fa-solid fa-trash text-[10px]"></i> O'chirish</button>
+                    <button onclick="handleMessageAction('edit', ${msg.id})" class="w-full px-3 py-2 text-left text-xs text-graphite hover:bg-gray-50 flex items-center gap-2"><i class="fa-solid fa-pen text-[10px] text-textSecondary"></i> ${t('chat.edit')}</button>
+                    <button onclick="handleMessageAction('delete', ${msg.id})" class="w-full px-3 py-2 text-left text-xs text-red-500 hover:bg-red-50 flex items-center gap-2"><i class="fa-solid fa-trash text-[10px]"></i> ${t('chat.delete')}</button>
                 </div>
                 ` : ''}
             </div>
@@ -2483,14 +3181,14 @@ function handleMessageAction(action, msgId) {
     if (msgIndex === -1) return;
     
     if (action === 'delete') {
-        if (confirm("Xabarni o'chirmoqchimisiz?")) {
+        if (confirm(t('chat.confirmDelete'))) {
             chat.messages.splice(msgIndex, 1);
             localStorage.setItem(DB_CHATS, JSON.stringify(chats));
             renderMessages();
             renderXabarlar();
         }
     } else if (action === 'edit') {
-        const newText = prompt("Xabarni tahrirlash:", chat.messages[msgIndex].text);
+        const newText = prompt(t('chat.editPrompt'), chat.messages[msgIndex].text);
         if (newText !== null && newText.trim() !== '') {
             chat.messages[msgIndex].text = newText.trim();
             chat.messages[msgIndex].edited = true;
@@ -2534,29 +3232,38 @@ function sendChatMessage() {
     
     // Auto replies
     if (currentChatId === 'support') {
-        const replies = [
-            "Muammoingizni yozib qoldiring, tez orada javob beramiz.",
-            "Operatorlarimiz hozir band, iltimos kuting.",
-            "Xabaringiz qabul qilindi. Operator tez orada siz bilan bog'lanadi."
+        const replyKeys = [
+            "chat.supportReply1",
+            "chat.supportReply2",
+            "chat.supportReply3"
         ];
-        setTimeout(() => addThemMessage(currentChatId, replies[Math.floor(Math.random() * replies.length)]), 1500);
+        const randomKey = replyKeys[Math.floor(Math.random() * replyKeys.length)];
+        setTimeout(() => addThemMessage(currentChatId, t(randomKey), randomKey), 1500);
     } else if (currentChatId.startsWith('driver_')) {
-        const replies = ["Xo'p tushunarli.", "Hozir yetib boraman.", "Yo'ldaman.", "Manzilni aniqroq ayta olasizmi?"];
-        setTimeout(() => addThemMessage(currentChatId, replies[Math.floor(Math.random() * replies.length)]), 2000);
+        const replyKeys = [
+            "chat.driverReply1",
+            "chat.driverReply2",
+            "chat.driverReply3",
+            "chat.driverReply4"
+        ];
+        const randomKey = replyKeys[Math.floor(Math.random() * replyKeys.length)];
+        setTimeout(() => addThemMessage(currentChatId, t(randomKey), randomKey), 2000);
     }
 }
 
-function addThemMessage(chatId, text) {
+function addThemMessage(chatId, text, textKey = null) {
     const chats = JSON.parse(localStorage.getItem(DB_CHATS) || '{}');
     const chat = chats[chatId];
     if (!chat) return;
     
-    chat.messages.push({
+    const newMsg = {
         id: Date.now(),
         sender: 'them',
         text: text,
         timestamp: new Date().toISOString()
-    });
+    };
+    if (textKey) newMsg.textKey = textKey;
+    chat.messages.push(newMsg);
     
     if (currentChatId !== chatId) {
         chat.unread = true;

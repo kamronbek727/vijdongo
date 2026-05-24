@@ -13,7 +13,10 @@ const filesToCopy = [
     'app.js',
     'style.css',
     'rasmlar',
-    'assets'
+    'assets',
+    'uz.json',
+    'ru.json',
+    'en.json'
 ];
 
 function copyRecursiveSync(src, dest) {
