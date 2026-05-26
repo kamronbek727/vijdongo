@@ -87,7 +87,7 @@
                 <span class="text-sm font-bold text-textSecondary w-10 text-right">1/4</span>
             </div>
             
-            <div class="flex-1 p-6 flex flex-col justify-between overflow-y-auto no-scrollbar">
+            <form onsubmit="event.preventDefault(); validateStep1();" class="flex-1 p-6 flex flex-col justify-between overflow-y-auto no-scrollbar">
                 <div class="flex flex-col gap-6 mt-4">
                     <div class="flex justify-center mb-2 shrink-0">
                         <img src="assets/images/logo.jpeg" alt="Logo" class="h-20 w-auto object-contain mix-blend-multiply rounded-2xl shadow-sm">
@@ -100,17 +100,17 @@
 
                     <div class="shrink-0 mt-4">
                         <label class="block text-xs font-bold text-textSecondary uppercase tracking-wider mb-2 ml-1" data-i18n="login.phoneLabel">Telefon raqami</label>
-                        <input type="tel" id="login-phone" placeholder="+998" value="+998" class="w-full bg-bgLight px-5 py-4 rounded-2xl border border-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-base font-semibold text-graphite shadow-sm">
+                        <input type="tel" id="login-phone" placeholder="+998" value="+998" enterkeyhint="done" autocomplete="tel" onkeydown="if(event.key === 'Enter') { event.preventDefault(); validateStep1(); }" class="w-full bg-bgLight px-5 py-4 rounded-2xl border border-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-base font-semibold text-graphite shadow-sm">
                         <p id="login-phone-error" class="text-xs text-red-500 font-semibold mt-2 ml-1 hidden"></p>
                     </div>
                 </div>
                 
                 <div class="py-4 shrink-0">
-                    <button onclick="validateStep1()" class="w-full bg-primary hover:bg-primaryHover text-graphite font-bold text-lg py-4 rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-yellow-500/20" style="touch-action: manipulation;" data-i18n="common.continueBtn">
+                    <button type="submit" class="w-full bg-primary hover:bg-primaryHover text-graphite font-bold text-lg py-4 rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-yellow-500/20" style="touch-action: manipulation;" data-i18n="common.continueBtn">
                         Davom etish
                     </button>
                 </div>
-            </div>
+            </form>
         </div>
 
         <!-- STEP 2: Name & Surname -->
@@ -123,7 +123,7 @@
                 <span class="text-sm font-bold text-textSecondary w-10 text-right">2/4</span>
             </div>
             
-            <div class="flex-1 p-6 flex flex-col justify-between overflow-y-auto no-scrollbar">
+            <form onsubmit="event.preventDefault(); validateStep2();" class="flex-1 p-6 flex flex-col justify-between overflow-y-auto no-scrollbar">
                 <div class="flex flex-col gap-5 mt-4">
                     <div class="text-center px-4 shrink-0">
                         <h2 class="text-2xl font-bold text-graphite" data-i18n="login.nameSurnameTitle">Ism va familiya</h2>
@@ -132,22 +132,22 @@
 
                     <div class="shrink-0 mt-4">
                         <label class="block text-xs font-bold text-textSecondary uppercase tracking-wider mb-2 ml-1" data-i18n="login.nameLabel">Ism</label>
-                        <input type="text" id="login-name" placeholder="Ismingizni kiriting" data-i18n-placeholder="login.namePlaceholder" class="w-full bg-bgLight px-5 py-4 rounded-2xl border border-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-base font-semibold text-graphite shadow-sm">
+                        <input type="text" id="login-name" placeholder="Ismingizni kiriting" data-i18n-placeholder="login.namePlaceholder" enterkeyhint="next" autocomplete="given-name" onkeydown="if(event.key === 'Enter') { event.preventDefault(); document.getElementById('login-surname').focus(); }" class="w-full bg-bgLight px-5 py-4 rounded-2xl border border-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-base font-semibold text-graphite shadow-sm">
                         <p id="login-name-error" class="text-xs text-red-500 font-semibold mt-2 ml-1 hidden"></p>
                     </div>
 
                     <div class="shrink-0">
                         <label class="block text-xs font-bold text-textSecondary uppercase tracking-wider mb-2 ml-1" data-i18n="login.surnameLabel">Familiya</label>
-                        <input type="text" id="login-surname" placeholder="Familiyangizni kiriting" data-i18n-placeholder="login.surnamePlaceholder" class="w-full bg-bgLight px-5 py-4 rounded-2xl border border-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-base font-semibold text-graphite shadow-sm">
+                        <input type="text" id="login-surname" placeholder="Familiyangizni kiriting" data-i18n-placeholder="login.surnamePlaceholder" enterkeyhint="done" autocomplete="family-name" onkeydown="if(event.key === 'Enter') { event.preventDefault(); validateStep2(); }" class="w-full bg-bgLight px-5 py-4 rounded-2xl border border-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-base font-semibold text-graphite shadow-sm">
                     </div>
                 </div>
                 
                 <div class="py-4 shrink-0">
-                    <button onclick="validateStep2()" class="w-full bg-primary hover:bg-primaryHover text-graphite font-bold text-lg py-4 rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-yellow-500/20" style="touch-action: manipulation;" data-i18n="common.continueBtn">
+                    <button type="submit" class="w-full bg-primary hover:bg-primaryHover text-graphite font-bold text-lg py-4 rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-yellow-500/20" style="touch-action: manipulation;" data-i18n="common.continueBtn">
                         Davom etish
                     </button>
                 </div>
-            </div>
+            </form>
         </div>
 
         <!-- STEP 3: Gender -->
@@ -199,7 +199,7 @@
                     <p id="login-gender-error" class="text-xs text-red-500 font-semibold mt-2 text-center hidden"></p>
                 </div>
                 
-                <div class="py-4 shrink-0">
+                <div class="py-4 shrink-0 hidden">
                     <button onclick="validateStep3()" class="w-full bg-primary hover:bg-primaryHover text-graphite font-bold text-lg py-4 rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-yellow-500/20" style="touch-action: manipulation;" data-i18n="common.continueBtn">
                         Davom etish
                     </button>
@@ -251,7 +251,7 @@
                     </div>
                 </div>
                 
-                <div class="py-4 shrink-0">
+                <div class="py-4 shrink-0 hidden">
                     <button onclick="handleLogin()" class="w-full bg-primary hover:bg-primaryHover text-graphite font-bold text-lg py-4 rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-yellow-500/20" style="touch-action: manipulation;" data-i18n="common.finishBtn">
                         Tugatish
                     </button>
@@ -347,43 +347,9 @@
                 </div>
             </div>
 
-            <div class="flex-1 overflow-y-auto no-scrollbar pb-32 pb-safe flex flex-col">
-                <!-- Location Picker Card -->
-                <div class="px-4 z-10 mt-4">
-                    <div class="bg-white rounded-3xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100 relative">
-                        <div class="flex flex-col gap-4 relative">
-                            <!-- Decor line -->
-                            <div class="absolute left-[11px] top-6 bottom-6 w-[2px] bg-gray-100 rounded-full"></div>
-                            
-                            <div class="flex gap-4 items-center relative z-10">
-                                <div class="w-6 h-6 rounded-full bg-[#FFFBE6] flex items-center justify-center shrink-0 shadow-sm border border-yellow-100">
-                                    <div class="w-2 h-2 rounded-full bg-primary"></div>
-                                </div>
-                                <div class="flex-1 border-b border-gray-100 pb-3" onclick="startPickupFlow()" style="cursor: pointer;">
-                                    <p class="text-[11px] text-textSecondary mb-0.5 font-medium uppercase tracking-wide" data-i18n="taxi.fromLabel">Qayerdan</p>
-                                    <div id="from-display" class="w-full bg-transparent font-semibold text-sm text-graphite truncate" data-i18n="taxi.fromPlaceholder">Qayerdasiz?</div>
-                                </div>
-                            </div>
-                            
-                            <div class="flex gap-4 items-center relative z-10">
-                                <div class="w-6 h-6 rounded-full bg-gray-50 flex items-center justify-center shrink-0 shadow-sm border border-gray-200">
-                                    <div class="w-2 h-2 rounded-full bg-graphite"></div>
-                                </div>
-                                <div class="flex-1 pt-1" onclick="startDestFlow()" style="cursor: pointer;">
-                                    <p class="text-[11px] text-textSecondary mb-0.5 font-medium uppercase tracking-wide" data-i18n="taxi.toLabel">Qayerga</p>
-                                    <div id="to-display" class="w-full bg-transparent font-semibold text-sm text-graphite truncate" data-i18n="taxi.toPlaceholder">Qayerga borasiz?</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-
-
-                <!-- Route Preview Section (Hidden initially) -->
-                <div id="route-preview-section" class="flex flex-col opacity-0 translate-y-10 pointer-events-none transition-all duration-700 ease-out" style="display: none;">
-                    <!-- Map Preview -->
-                    <div class="h-[350px] sm:h-[400px] mt-4 relative z-0 mx-4 rounded-[2rem] shadow-xl border border-gray-100 flex-shrink-0 transition-all duration-500 overflow-hidden" style="clip-path: inset(0 round 2rem);">
+            <div class="flex-1 overflow-y-auto no-scrollbar pb-6 pb-safe flex flex-col">
+                <!-- 1. Map Preview Container (Eng Tepada, hidden initially) -->
+                <div id="taxi-map-preview-container" class="h-[33vh] min-h-[220px] max-h-[260px] mt-2 relative z-0 mx-3 rounded-2xl shadow-md border border-gray-100 flex-shrink-0 transition-all duration-500 overflow-hidden opacity-0 translate-y-10 pointer-events-none" style="display: none; clip-path: inset(0 round 1rem);">
                     <div id="home-map" class="w-full h-full"></div>
                     <div class="absolute bottom-4 left-4 z-[400] bg-white/95 backdrop-blur-md rounded-2xl px-4 py-3 shadow-[0_8px_20px_rgba(0,0,0,0.1)] border border-gray-50 flex flex-col gap-1 hidden transition-all duration-300" id="preview-info-card">
                         
@@ -409,73 +375,107 @@
 
                     </div>
                 </div>
-                
-                
-                <!-- Tariffs Section -->
-                <div class="mt-5 px-4">
-                    <div class="grid grid-cols-3 gap-3 w-full">
-                        <!-- START -->
-                        <div id="tariff-start" onclick="selectTariff('start')" class="tariff-card bg-white border-2 border-[#FFD400] rounded-[22px] p-0 flex flex-col justify-between items-center cursor-pointer transition-all relative h-[175px] shadow-[0_2px_10px_rgba(0,0,0,0.05)] overflow-hidden">
-                            <div class="w-full flex justify-center items-center h-[95px] pt-3 relative overflow-visible">
-                                <img src="rasmlar/gentra.png" alt="Start" class="w-[95%] h-full object-contain">
-                            </div>
-                            <div class="w-full flex flex-col items-center text-center bg-white pt-[14px] px-[16px] pb-[18px] mt-auto">
-                                <span class="text-[14px] font-bold uppercase tracking-tight text-graphite leading-none" data-i18n="taxi.tariffs.start">START</span>
-                                <span class="text-[10px] text-textSecondary font-medium leading-none mt-1" data-i18n="taxi.tariffs.startDesc">Oddiy avto</span>
-                                <span id="price-start" class="text-[13.5px] font-semibold text-black mt-2 leading-none">-- so'm</span>
-                            </div>
-                        </div>
-                        
-                        <!-- KOMFORT -->
-                        <div id="tariff-komfort" onclick="selectTariff('komfort')" class="tariff-card bg-white border-2 border-transparent rounded-[22px] p-0 flex flex-col justify-between items-center cursor-pointer transition-all relative h-[175px] shadow-[0_2px_10px_rgba(0,0,0,0.05)] overflow-hidden">
-                            <div class="w-full flex justify-center items-center h-[95px] pt-3 relative overflow-visible">
-                                <img src="rasmlar/malibu.png" alt="Komfort" class="w-[95%] h-full object-contain">
-                            </div>
-                            <div class="w-full flex flex-col items-center text-center bg-white pt-[14px] px-[16px] pb-[18px] mt-auto">
-                                <span class="text-[14px] font-bold uppercase tracking-tight text-graphite leading-none" data-i18n="taxi.tariffs.komfort">KOMFORT</span>
-                                <span class="text-[10px] text-textSecondary font-medium leading-none mt-1" data-i18n="taxi.tariffs.komfortDesc">Qulay avto</span>
-                                <span id="price-komfort" class="text-[13.5px] font-semibold text-black mt-2 leading-none">-- so'm</span>
-                            </div>
-                        </div>
-                        
-                        <!-- BIZNES -->
-                        <div id="tariff-biznes" onclick="selectTariff('biznes')" class="tariff-card bg-white border-2 border-transparent rounded-[22px] p-0 flex flex-col justify-between items-center cursor-pointer transition-all relative h-[175px] shadow-[0_2px_10px_rgba(0,0,0,0.05)] overflow-hidden">
-                            <div class="w-full flex justify-center items-center h-[95px] pt-3 relative overflow-visible">
-                                <img src="rasmlar/byd.png" alt="Biznes" class="w-[95%] h-full object-contain">
-                            </div>
-                            <div class="w-full flex flex-col items-center text-center bg-white pt-[14px] px-[16px] pb-[18px] mt-auto">
-                                <span class="text-[14px] font-bold uppercase tracking-tight text-graphite leading-none" data-i18n="taxi.tariffs.biznes">BIZNES</span>
-                                <span class="text-[10px] text-textSecondary font-medium leading-none mt-1" data-i18n="taxi.tariffs.biznesDesc">Premium</span>
-                                <span id="price-biznes" class="text-[13.5px] font-semibold text-black mt-2 leading-none">-- so'm</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Options -->
-                <div class="px-4 mt-5 flex flex-col gap-3">
-                    <div class="flex justify-between items-center bg-white p-4 rounded-2xl shadow-[0_4px_15px_rgba(0,0,0,0.02)] border border-gray-50">
-                        <span class="font-semibold text-sm text-graphite" data-i18n="taxi.passengers">Yo'lovchilar soni</span>
-                        <div class="flex items-center gap-3">
-                            <button id="pax-minus" class="w-9 h-9 rounded-full bg-gray-50 shadow-sm flex items-center justify-center text-textSecondary active:bg-gray-100 transition-colors"><i class="fa-solid fa-minus text-xs"></i></button>
-                            <span id="pax-count" class="font-bold w-6 text-center text-lg text-graphite">1</span>
-                            <button id="pax-plus" class="w-9 h-9 rounded-full bg-gray-50 shadow-sm flex items-center justify-center text-textSecondary active:bg-gray-100 transition-colors"><i class="fa-solid fa-plus text-xs"></i></button>
+                <!-- 2. Location Picker Card (Below the map, always visible) -->
+                <div id="taxi-location-picker-container" class="px-3 z-10 mt-2 transition-all duration-500">
+                    <div class="bg-white rounded-2xl p-3 shadow-sm border border-gray-100 relative">
+                        <div class="flex flex-col gap-3 relative">
+                            <!-- Decor line -->
+                            <div class="absolute left-[9px] top-4.5 bottom-4.5 w-[2px] bg-gray-100 rounded-full"></div>
+                            
+                            <div class="flex gap-3 items-center relative z-10">
+                                <div class="w-5 h-5 rounded-full bg-[#FFFBE6] flex items-center justify-center shrink-0 shadow-sm border border-yellow-100">
+                                    <div class="w-1.5 h-1.5 rounded-full bg-primary"></div>
+                                </div>
+                                <div class="flex-1 border-b border-gray-100 pb-2" onclick="startPickupFlow()" style="cursor: pointer;">
+                                    <p class="text-[9px] text-textSecondary mb-0 font-bold uppercase tracking-wide" data-i18n="taxi.fromLabel">Qayerdan</p>
+                                    <div id="from-display" class="w-full bg-transparent font-semibold text-xs text-graphite truncate" data-i18n="taxi.fromPlaceholder">Qayerdasiz?</div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex gap-3 items-center relative z-10">
+                                <div class="w-5 h-5 rounded-full bg-gray-50 flex items-center justify-center shrink-0 shadow-sm border border-gray-200">
+                                    <div class="w-1.5 h-1.5 rounded-full bg-graphite"></div>
+                                </div>
+                                <div class="flex-1 pt-0.5" onclick="startDestFlow()" style="cursor: pointer;">
+                                    <p class="text-[9px] text-textSecondary mb-0 font-bold uppercase tracking-wide" data-i18n="taxi.toLabel">Qayerga</p>
+                                    <div id="to-display" class="w-full bg-transparent font-semibold text-xs text-graphite truncate" data-i18n="taxi.toPlaceholder">Qayerga borasiz?</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="flex justify-between items-center bg-white p-4 rounded-2xl shadow-[0_4px_15px_rgba(0,0,0,0.02)] border border-gray-50 cursor-pointer active:bg-gray-50 transition-colors">
-                        <span class="font-semibold text-sm text-graphite" data-i18n="taxi.baggage">Bagaj kerakmi?</span>
-                        <div class="flex items-center gap-2">
-                            <span id="baggage-status" class="text-sm font-medium text-textSecondary" data-i18n="common.no">Yo'q</span>
-                            <i class="fa-solid fa-chevron-right text-textSecondary text-xs"></i>
-                        </div>
-                    </div>
-                    
-                    <button onclick="createOrder()" id="order-btn" disabled class="w-full bg-primary active:bg-primaryHover text-graphite font-semibold text-lg py-4 rounded-2xl transition-all active:scale-[0.98] mt-3 opacity-50 cursor-not-allowed" data-i18n="taxi.orderBtn">
-                        Buyurtma berish
-                    </button>
                 </div>
+                
+                <!-- 3. Route Preview Section (Tariffs & Options, hidden initially) -->
+                <div id="route-preview-section" class="flex flex-col opacity-0 translate-y-10 pointer-events-none transition-all duration-700 ease-out" style="display: none;">
+                    <!-- Tariffs Section -->
+                    <div class="mt-2.5 px-3">
+                        <div class="grid grid-cols-3 gap-2 w-full">
+                            <!-- START -->
+                            <div id="tariff-start" onclick="selectTariff('start')" class="tariff-card bg-white border-2 border-[#FFD400] rounded-2xl p-0 flex flex-col justify-between items-center cursor-pointer transition-all relative h-[125px] shadow-sm overflow-hidden">
+                                <div class="w-full flex justify-center items-center h-[65px] pt-1.5 relative overflow-hidden">
+                                    <img src="rasmlar/gentra.png" alt="Start" class="w-[80%] h-full object-contain">
+                                </div>
+                                <div class="w-full flex flex-col items-center text-center bg-white pt-[6px] px-[8px] pb-[10px] mt-auto">
+                                    <span class="text-[11px] font-extrabold uppercase tracking-tight text-graphite leading-none" data-i18n="taxi.tariffs.start">START</span>
+                                    <span class="text-[8px] text-textSecondary font-medium leading-none mt-0.5" data-i18n="taxi.tariffs.startDesc">Oddiy avto</span>
+                                    <span id="price-start" class="text-[11.5px] font-extrabold text-black mt-1 leading-none">-- so'm</span>
+                                </div>
+                            </div>
+                            
+                            <!-- KOMFORT -->
+                            <div id="tariff-komfort" onclick="selectTariff('komfort')" class="tariff-card bg-white border-2 border-transparent rounded-2xl p-0 flex flex-col justify-between items-center cursor-pointer transition-all relative h-[125px] shadow-sm overflow-hidden">
+                                <div class="w-full flex justify-center items-center h-[65px] pt-1.5 relative overflow-hidden">
+                                    <img src="rasmlar/malibu.png" alt="Komfort" class="w-[80%] h-full object-contain">
+                                </div>
+                                <div class="w-full flex flex-col items-center text-center bg-white pt-[6px] px-[8px] pb-[10px] mt-auto">
+                                    <span class="text-[11px] font-extrabold uppercase tracking-tight text-graphite leading-none" data-i18n="taxi.tariffs.komfort">KOMFORT</span>
+                                    <span class="text-[8px] text-textSecondary font-medium leading-none mt-0.5" data-i18n="taxi.tariffs.komfortDesc">Qulay avto</span>
+                                    <span id="price-komfort" class="text-[11.5px] font-extrabold text-black mt-1 leading-none">-- so'm</span>
+                                </div>
+                            </div>
+                            
+                            <!-- BIZNES -->
+                            <div id="tariff-biznes" onclick="selectTariff('biznes')" class="tariff-card bg-white border-2 border-transparent rounded-2xl p-0 flex flex-col justify-between items-center cursor-pointer transition-all relative h-[125px] shadow-sm overflow-hidden">
+                                <div class="w-full flex justify-center items-center h-[65px] pt-1.5 relative overflow-hidden">
+                                    <img src="rasmlar/byd.png" alt="Biznes" class="w-[80%] h-full object-contain">
+                                </div>
+                                <div class="w-full flex flex-col items-center text-center bg-white pt-[6px] px-[8px] pb-[10px] mt-auto">
+                                    <span class="text-[11px] font-extrabold uppercase tracking-tight text-graphite leading-none" data-i18n="taxi.tariffs.biznes">BIZNES</span>
+                                    <span class="text-[8px] text-textSecondary font-medium leading-none mt-0.5" data-i18n="taxi.tariffs.biznesDesc">Premium</span>
+                                    <span id="price-biznes" class="text-[11.5px] font-extrabold text-black mt-1 leading-none">-- so'm</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Options -->
+                    <div class="px-3 mt-2 flex flex-col gap-2">
+                        <div class="flex justify-between items-center bg-white p-2.5 rounded-xl shadow-sm border border-gray-50">
+                            <span class="font-semibold text-[11px] text-graphite" data-i18n="taxi.passengers">Yo'lovchilar soni</span>
+                            <div class="flex items-center gap-3.5">
+                                <button id="pax-minus" class="w-7 h-7 rounded-full bg-gray-50 shadow-sm flex items-center justify-center text-textSecondary active:bg-gray-100 transition-colors"><i class="fa-solid fa-minus text-xs"></i></button>
+                                <span id="pax-count" class="font-bold w-6 text-center text-sm text-graphite">1</span>
+                                <button id="pax-plus" class="w-7 h-7 rounded-full bg-gray-50 shadow-sm flex items-center justify-center text-textSecondary active:bg-gray-100 transition-colors"><i class="fa-solid fa-plus text-xs"></i></button>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between items-center bg-white p-2.5 rounded-xl shadow-sm border border-gray-50 cursor-pointer active:bg-gray-50 transition-colors">
+                            <span class="font-semibold text-[11px] text-graphite" data-i18n="taxi.baggage">Bagaj kerakmi?</span>
+                            <div class="flex items-center gap-2">
+                                <span id="baggage-status" class="text-xs font-medium text-textSecondary" data-i18n="common.no">Yo'q</span>
+                                <i class="fa-solid fa-chevron-right text-textSecondary text-[10px]"></i>
+                            </div>
+                        </div>
+                    </div>
                 </div> <!-- End of route-preview-section -->
+            </div>
+
+            <!-- Sticky Bottom Bar (New container for sticky button) -->
+            <div id="taxi-sticky-bottom-bar" class="px-3 py-2.5 bg-white border-t border-gray-100/80 flex-shrink-0 z-20 pb-safe shadow-[0_-8px_35px_rgba(0,0,0,0.06)] opacity-0 translate-y-10 pointer-events-none transition-all duration-700 ease-out" style="display: none;">
+                <button onclick="createOrder()" id="order-btn" disabled class="w-full bg-primary active:bg-primaryHover text-graphite font-bold text-sm py-3 rounded-2xl transition-all active:scale-[0.98] opacity-50 cursor-not-allowed shadow-[0_4px_12px_rgba(0,0,0,0.02)]" data-i18n="taxi.orderBtn">
+                    Buyurtma berish
+                </button>
             </div>
 
         </div>

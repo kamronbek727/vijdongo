@@ -1058,6 +1058,8 @@ function updatePriceDisplay() {
     const contentState = document.getElementById('preview-content-state');
     const loadingState = document.getElementById('preview-loading-state');
     const previewSection = document.getElementById('route-preview-section');
+    const mapPreviewContainer = document.getElementById('taxi-map-preview-container');
+    const stickyBottomBar = document.getElementById('taxi-sticky-bottom-bar');
     const emptyState = document.getElementById('home-empty-state');
     const orderBtn = document.getElementById('order-btn');
     
@@ -1071,6 +1073,20 @@ function updatePriceDisplay() {
             previewSection.classList.add('opacity-0', 'translate-y-10', 'pointer-events-none');
             setTimeout(() => {
                 if (!selectedPickup.latlng || !selectedDest.latlng) previewSection.style.display = 'none';
+            }, 500);
+        }
+        if (mapPreviewContainer) {
+            mapPreviewContainer.classList.remove('opacity-100', 'translate-y-0', 'pointer-events-auto');
+            mapPreviewContainer.classList.add('opacity-0', 'translate-y-10', 'pointer-events-none');
+            setTimeout(() => {
+                if (!selectedPickup.latlng || !selectedDest.latlng) mapPreviewContainer.style.display = 'none';
+            }, 500);
+        }
+        if (stickyBottomBar) {
+            stickyBottomBar.classList.remove('opacity-100', 'translate-y-0', 'pointer-events-auto');
+            stickyBottomBar.classList.add('opacity-0', 'translate-y-10', 'pointer-events-none');
+            setTimeout(() => {
+                if (!selectedPickup.latlng || !selectedDest.latlng) stickyBottomBar.style.display = 'none';
             }, 500);
         }
         if (emptyState) {
@@ -1092,6 +1108,28 @@ function updatePriceDisplay() {
         setTimeout(() => {
             if (selectedPickup.latlng && selectedDest.latlng) emptyState.style.display = 'none';
         }, 500);
+    }
+    
+    // Show map container
+    if (mapPreviewContainer && mapPreviewContainer.style.display === 'none') {
+        mapPreviewContainer.style.display = 'block';
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                mapPreviewContainer.classList.remove('opacity-0', 'translate-y-10', 'pointer-events-none');
+                mapPreviewContainer.classList.add('opacity-100', 'translate-y-0', 'pointer-events-auto');
+            });
+        });
+    }
+    
+    // Show sticky bottom bar
+    if (stickyBottomBar && stickyBottomBar.style.display === 'none') {
+        stickyBottomBar.style.display = 'block';
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                stickyBottomBar.classList.remove('opacity-0', 'translate-y-10', 'pointer-events-none');
+                stickyBottomBar.classList.add('opacity-100', 'translate-y-0', 'pointer-events-auto');
+            });
+        });
     }
     
     // Show preview section
@@ -1809,10 +1847,21 @@ function setLoginGender(gender) {
     }
     const genderError = document.getElementById('login-gender-error');
     if (genderError) genderError.classList.add('hidden');
+    
+    // Automatically proceed to next step
+    if (gender) {
+        setTimeout(() => {
+            validateStep3();
+        }, 200);
+    }
 }
 
 function setLoginLanguage(lang) {
     setLanguage(lang);
+    // Automatically submit login
+    setTimeout(() => {
+        handleLogin();
+    }, 200);
 }
 
 function validateStep1() {
@@ -2358,6 +2407,18 @@ function startTaxiBookingFlow() {
         previewSection.classList.remove('opacity-100', 'translate-y-0', 'pointer-events-auto');
         previewSection.classList.add('opacity-0', 'translate-y-10', 'pointer-events-none');
         setTimeout(() => { previewSection.style.display = 'none'; }, 500);
+    }
+    const mapPreviewContainer = document.getElementById('taxi-map-preview-container');
+    if (mapPreviewContainer) {
+        mapPreviewContainer.classList.remove('opacity-100', 'translate-y-0', 'pointer-events-auto');
+        mapPreviewContainer.classList.add('opacity-0', 'translate-y-10', 'pointer-events-none');
+        setTimeout(() => { mapPreviewContainer.style.display = 'none'; }, 500);
+    }
+    const stickyBottomBar = document.getElementById('taxi-sticky-bottom-bar');
+    if (stickyBottomBar) {
+        stickyBottomBar.classList.remove('opacity-100', 'translate-y-0', 'pointer-events-auto');
+        stickyBottomBar.classList.add('opacity-0', 'translate-y-10', 'pointer-events-none');
+        setTimeout(() => { stickyBottomBar.style.display = 'none'; }, 500);
     }
     const emptyState = document.getElementById('home-empty-state');
     if (emptyState) {
