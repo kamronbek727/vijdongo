@@ -2602,12 +2602,7 @@ function confirmDestLocation() {
 }
 
 function getCurrentLocation() {
-    if (!navigator.geolocation) {
-        alert(t('common.gpsNotSupported'));
-        return;
-    }
-
-    // Determine which map screen is active
+    // 1. Determine which map screen is active
     const isPickupScreen = currentScreen === 'pickup-map-screen';
     const activeMap = isPickupScreen ? pickupMap : destMap;
     const type = isPickupScreen ? 'pickup' : 'dest';
@@ -2617,36 +2612,122 @@ function getCurrentLocation() {
         return;
     }
 
-    // Show loading state on the address text
     const addressEl = document.getElementById(type + '-address-text');
+
+    // 2. HTTPS / secure context validation
+    const isSecure = window.isSecureContext || window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (!isSecure) {
+        alert("Xavfsiz ulanish xatosi (Insecure Context): Geolokatsiya faqat HTTPS yoki localhost protokoli orqali ishlaydi. Vercel yoki production saytida HTTPS ishlatilganligiga ishonch hosil qiling.");
+        if (addressEl) addressEl.innerText = t('common.selectAddress');
+        return;
+    }
+
+    if (!navigator.geolocation) {
+        alert(t('common.gpsNotSupported'));
+        return;
+    }
+
+    // Show locating status
     if (addressEl) addressEl.innerText = t('common.gpsLocating');
 
-    navigator.geolocation.getCurrentPosition(
-        function (position) {
-            const lat = position.coords.latitude;
-            const lng = position.coords.longitude;
-            const coords = [lat, lng];
-            const latlng = { lat: lat, lng: lng };
+    // Geolocation Options
+    const geoOptions = {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 0
+    };
 
-            console.log("DEBUG: GPS location found:", lat, lng);
-            activeMap.setCenter(coords, 16, { duration: 500 });
-            updateMarkerAndAddress(type, latlng);
-        },
-        function (err) {
-            console.error("Geolocation error:", err);
-            let msg = t('gps.errorGeneric');
-            if (err.code === 1) msg = t('gps.errorPermissionDenied');
-            else if (err.code === 2) msg = t('gps.errorPositionUnavailable');
-            else if (err.code === 3) msg = t('gps.errorTimeout');
-            alert(msg);
-            if (addressEl) addressEl.innerText = t('common.selectAddress');
-        },
-        {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 60000
+    let fallbackTriggered = false;
+    let watchId = null;
+
+    // Help instructions for iOS Safari when permission is denied or blocked
+    function showiOSHelp() {
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        if (isIOS) {
+            alert("iPhone Sozlamalari:\n1. Telefoningizda: Sozlamalar (Settings) > Maxfiylik va xavfsizlik (Privacy & Security) > Joylashuv xizmatlari (Location Services) yoqilganligini tekshiring.\n2. Sozlamalar (Settings) > Safari > Joylashuv (Location) ga kirib, 'Ruxsat berish' (Allow) yoki 'So'rash' (Ask) ni tanlang.\n3. Safari brauzeriga qaytib, saytni yangilang (Refresh).");
         }
-    );
+    }
+
+    function handleSuccess(position) {
+        if (watchId) {
+            navigator.geolocation.clearWatch(watchId);
+            watchId = null;
+        }
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        const coords = [lat, lng];
+        const latlng = { lat: lat, lng: lng };
+
+        console.log("DEBUG: GPS location found:", lat, lng);
+        activeMap.setCenter(coords, 16, { duration: 500 });
+        updateMarkerAndAddress(type, latlng);
+    }
+
+    function handleError(err) {
+        // If getCurrentPosition fails, try watchPosition fallback first (only if not already tried)
+        if (!fallbackTriggered && err.code !== 1) { // Don't fallback if explicitly Denied (code 1)
+            fallbackTriggered = true;
+            console.log("DEBUG: getCurrentPosition failed/timed out. Trying watchPosition fallback...");
+            
+            // Set up watchPosition fallback
+            watchId = navigator.geolocation.watchPosition(
+                function (position) {
+                    handleSuccess(position);
+                },
+                function (fallbackErr) {
+                    if (watchId) {
+                        navigator.geolocation.clearWatch(watchId);
+                        watchId = null;
+                    }
+                    console.error("Geolocation fallback error:", fallbackErr);
+                    processFinalError(fallbackErr);
+                },
+                geoOptions
+            );
+
+            // Force a timeout for fallback watchPosition too
+            setTimeout(() => {
+                if (watchId) {
+                    navigator.geolocation.clearWatch(watchId);
+                    watchId = null;
+                    processFinalError({ code: 3, message: "WatchPosition timeout" });
+                }
+            }, 16000);
+            return;
+        }
+
+        processFinalError(err);
+    }
+
+    function processFinalError(err) {
+        console.error("Final Geolocation error:", err);
+        let msg = t('gps.errorGeneric');
+        
+        if (err.code === 1) { // PERMISSION_DENIED
+            msg = t('gps.errorPermissionDenied');
+            alert(msg);
+            showiOSHelp();
+        } else if (err.code === 2) { // POSITION_UNAVAILABLE
+            msg = t('gps.errorPositionUnavailable');
+            alert(msg);
+        } else if (err.code === 3) { // TIMEOUT
+            msg = t('gps.errorTimeout');
+            alert(msg);
+        } else {
+            alert(msg);
+        }
+
+        if (addressEl) addressEl.innerText = t('common.selectAddress');
+    }
+
+    // Call geolocation immediately on the direct user click thread
+    try {
+        navigator.geolocation.getCurrentPosition(handleSuccess, handleError, geoOptions);
+    } catch (e) {
+        console.error("getCurrentPosition sync error:", e);
+        // Instant watchPosition fallback if getCurrentPosition immediately throws
+        handleError({ code: 2, message: e.message });
+    }
 }
 
 
