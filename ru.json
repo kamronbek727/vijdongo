@@ -1,5 +1,6 @@
 {
   "common": {
+    "searchPlaceholder": "Поиск адреса...",
     "continueBtn": "Продолжить",
     "backBtn": "Назад",
     "confirmBtn": "Подтвердить",

@@ -1,5 +1,6 @@
 {
   "common": {
+    "searchPlaceholder": "Manzil qidiring...",
     "continueBtn": "Davom etish",
     "backBtn": "Ortga",
     "confirmBtn": "Tasdiqlash",

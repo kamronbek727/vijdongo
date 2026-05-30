@@ -2060,6 +2060,8 @@ function initInteractions() {
             updatePriceDisplay();
         });
     }
+    
+    initAddressSearch();
 }
 
 function renderRegions(containerId, type) {
@@ -2089,6 +2091,17 @@ function selectRegion(type, region) {
 async function initMapScreen(type, region) {
     const ready = await YandexTrackingEngine.ensureReady();
     if (!ready) return;
+
+    // Reset search inputs on entering screen
+    const searchInput = document.getElementById(`${type}-search-input`);
+    if (searchInput) searchInput.value = '';
+    const clearBtn = document.getElementById(`${type}-search-clear`);
+    if (clearBtn) clearBtn.classList.add('hidden');
+    const dropdown = document.getElementById(`${type}-search-suggestions`);
+    if (dropdown) {
+        dropdown.innerHTML = '';
+        dropdown.classList.add('hidden');
+    }
 
     // Wait for screen transition to stabilize
     requestAnimationFrame(() => {
@@ -2198,26 +2211,12 @@ function updateMarkerAndAddress(type, latlng) {
             const data = await response.json();
             
             if (data && data.address) {
-                const { house_number, road, neighbourhood, suburb, city, town, village, county } = data.address;
-                let addressParts = [];
-                
-                let localArea = neighbourhood || suburb;
-                if (localArea) addressParts.push(localArea);
-                
-                let streetInfo = "";
-                if (road) streetInfo += road;
-                if (house_number) {
-                    // Raqam bo'lsa "-uy" qo'shib yuborish
-                    const hn = house_number.trim();
-                    const suffix = /^\d+$/.test(hn) ? "-uy" : "";
-                    streetInfo += (streetInfo ? " " : "") + hn + suffix;
+                if (type === 'pickup') {
+                    selectedPickup.rawAddress = data.address;
+                } else {
+                    selectedDest.rawAddress = data.address;
                 }
-                if (streetInfo) addressParts.push(streetInfo);
-                
-                let cityName = city || town || village || county;
-                if (cityName) addressParts.push(cityName);
-                
-                let addressName = addressParts.length > 0 ? addressParts.join(', ') : data.display_name;
+                const addressName = formatUzbekAddress(data.address) || data.display_name;
                 
                 console.log("Selected coords:", coords);
                 console.log("Resolved address:", addressName);
@@ -2601,6 +2600,106 @@ function confirmDestLocation() {
     }, 400);
 }
 
+function showLocationDeniedModal(reason) {
+    // Detect if iOS (iPhone/iPad)
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    
+    const existingModal = document.getElementById('location-denied-modal');
+    if (existingModal) existingModal.remove();
+    
+    const modal = document.createElement('div');
+    modal.id = 'location-denied-modal';
+    modal.style.cssText = `
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: rgba(0,0,0,0.55);
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        padding: 0;
+        animation: fadeIn 0.2s ease;
+    `;
+    
+    let titleText = "Joylashuvga ruxsat yo'q";
+    let subtitleText = "Manzilni avtomatik aniqlash uchun ruxsat bering";
+    let instructionsHtml = "";
+
+    if (isIOS) {
+        if (reason === 'not_retrieved') {
+            titleText = "Joylashuv aniqlanmadi";
+            subtitleText = "Joylashuvga ruxsat berish uchun Safari sozlamalarini tekshiring";
+            instructionsHtml = `
+                <div style="margin-top:12px; background:#F5F5F7; border-radius:12px; padding:14px; text-align:left;">
+                    <p style="font-size:12px; font-weight:700; color:#1C1C1E; margin:0 0 6px;">📱 Safari sozlamalari:</p>
+                    <p style="font-size:12px; color:#3C3C43; margin:0 0 4px;">Joylashuvga ruxsat berish uchun Safari sozlamalarini tekshiring.</p>
+                </div>
+            `;
+        } else {
+            titleText = "Joylashuvga ruxsat berilmagan.";
+            instructionsHtml = `
+                <div style="margin-top:12px; background:#F5F5F7; border-radius:12px; padding:14px; text-align:left;">
+                    <p style="font-size:13px; font-weight:700; color:#1C1C1E; margin:0 0 8px;">iPhone:</p>
+                    <p style="font-size:12px; color:#3C3C43; margin:0 0 4px;"><b>Settings → Safari → Location → Allow</b></p>
+                    <p style="font-size:11px; color:#8E8E93; margin:0 0 8px; text-align:left;">yoki</p>
+                    <p style="font-size:12px; color:#3C3C43; margin:0;"><b>Settings → Privacy & Security → Location Services</b></p>
+                </div>
+            `;
+        }
+    } else {
+        // Android or others
+        instructionsHtml = `
+            <div style="margin-top:12px; background:#F5F5F7; border-radius:12px; padding:14px; text-align:left;">
+                <p style="font-size:12px; font-weight:700; color:#1C1C1E; margin:0 0 6px;">📱 Android uchun:</p>
+                <p style="font-size:12px; color:#3C3C43; margin:0;"><b>Sozlamalar → Ilova → Brauzer → Ruxsatlar → Joylashuv</b></p>
+            </div>
+        `;
+    }
+    
+    modal.innerHTML = `
+        <div style="
+            background: white;
+            border-radius: 24px 24px 0 0;
+            width: 100%;
+            max-width: 480px;
+            padding: 24px 20px 36px;
+            animation: slideUp 0.3s cubic-bezier(0.32,0.72,0,1);
+        ">
+            <div style="width:40px;height:4px;background:#E5E5EA;border-radius:4px;margin:0 auto 20px;"></div>
+            <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
+                <div style="width:48px;height:48px;border-radius:14px;background:#FFF3E0;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <span style="font-size:24px;">📍</span>
+                </div>
+                <div>
+                    <p style="font-size:16px;font-weight:700;color:#1C1C1E;margin:0 0 2px;">${titleText}</p>
+                    <p style="font-size:12px;color:#8E8E93;margin:0;">${subtitleText}</p>
+                </div>
+            </div>
+            ${instructionsHtml}
+            <button onclick="document.getElementById('location-denied-modal').remove()" style="
+                margin-top: 18px;
+                width: 100%;
+                background: #FFD400;
+                color: #1C1C1E;
+                font-size: 15px;
+                font-weight: 700;
+                padding: 14px;
+                border-radius: 14px;
+                border: none;
+                cursor: pointer;
+                touch-action: manipulation;
+            ">Tushunarli</button>
+        </div>
+    `;
+    
+    // Close on backdrop tap
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.remove();
+    });
+    
+    document.body.appendChild(modal);
+}
+
 function getCurrentLocation() {
     const isPickupScreen = currentScreen === 'pickup-map-screen';
     const activeMap = isPickupScreen ? pickupMap : destMap;
@@ -2611,45 +2710,66 @@ function getCurrentLocation() {
         return;
     }
 
-    const addressEl = document.getElementById(type + '-address-text');
-
     if (!navigator.geolocation) {
         alert(t('common.gpsNotSupported'));
         return;
     }
 
+    const addressEl = document.getElementById(type + '-address-text');
     if (addressEl) addressEl.innerText = t('common.gpsLocating');
 
-    navigator.geolocation.getCurrentPosition(
-        function (position) {
-            const lat = position.coords.latitude;
-            const lng = position.coords.longitude;
-            const coords = [lat, lng];
-            const latlng = { lat: lat, lng: lng };
+    // Success handler
+    function onSuccess(position) {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        console.log("GPS location found:", lat, lng);
+        activeMap.setCenter([lat, lng], 16, { duration: 500 });
+        updateMarkerAndAddress(type, { lat, lng });
+    }
 
-            console.log("DEBUG: GPS location found:", lat, lng);
-            activeMap.setCenter(coords, 16, { duration: 500 });
-            updateMarkerAndAddress(type, latlng);
-        },
-        function (err) {
-            console.error("Geolocation error:", err);
-            if (err.code === 1) { // PERMISSION_DENIED
-                alert("Siz joylashuvni aniqlashga ruxsat bermadingiz yoki bloklagansiz. Iltimos, sozlamalardan ruxsat bering.");
-            } else if (err.code === 2) { // POSITION_UNAVAILABLE
+    // Error handler
+    function onError(err) {
+        console.error("Geolocation error:", err.code, err.message);
+        if (addressEl) addressEl.innerText = t('common.selectAddress');
+        
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        
+        if (err.code === 1) { // PERMISSION_DENIED
+            showLocationDeniedModal('denied');
+        } else {
+            // POSITION_UNAVAILABLE, TIMEOUT or other errors
+            if (isIOS) {
+                showLocationDeniedModal('not_retrieved');
+            } else if (err.code === 2) {
                 alert(t('gps.errorPositionUnavailable'));
-            } else if (err.code === 3) { // TIMEOUT
+            } else if (err.code === 3) {
                 alert(t('gps.errorTimeout'));
             } else {
                 alert(t('gps.errorGeneric'));
             }
-            if (addressEl) addressEl.innerText = t('common.selectAddress');
-        },
-        {
-            enableHighAccuracy: true,
-            timeout: 15000,
-            maximumAge: 0
         }
-    );
+    }
+
+    const options = {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 0
+    };
+
+    // 1. Call getCurrentPosition immediately to prevent Safari from blocking the native prompt due to async delay.
+    navigator.geolocation.getCurrentPosition(onSuccess, onError, options);
+
+    // 2. Perform permissions check asynchronously for iPhone / Safari or other browsers
+    if (navigator.permissions && navigator.permissions.query) {
+        navigator.permissions.query({ name: 'geolocation' }).then(function(result) {
+            console.log("Permission status:", result.state);
+            if (result.state === 'denied') {
+                showLocationDeniedModal('denied');
+            }
+        }).catch(function(err) {
+            console.log("Permissions query fallback for iOS/Safari:", err);
+        });
+    }
 }
 
 
@@ -3341,6 +3461,1051 @@ function openActiveDriverChat() {
     if (activeOrderId) {
         showChatModal(`driver_${activeOrderId}`);
     }
+}
+
+// --- Address Search and Geocoding using OpenStreetMap Nominatim API ---
+
+// Persistent Search Cache with safe localStorage saving
+const DB_SEARCH_CACHE = 'vijdongo_search_cache';
+let searchCache = {};
+try {
+    const cached = localStorage.getItem(DB_SEARCH_CACHE);
+    if (cached) {
+        searchCache = JSON.parse(cached);
+    }
+} catch (e) {
+    console.error("Failed to load search cache from localStorage:", e);
+}
+
+function saveSearchCache(key, value) {
+    searchCache[key] = value;
+    try {
+        const serialized = JSON.stringify(searchCache);
+        if (serialized.length > 2 * 1024 * 1024) { // Prune if > 2MB
+            const keys = Object.keys(searchCache);
+            for (let i = 0; i < Math.min(20, keys.length); i++) {
+                delete searchCache[keys[i]];
+            }
+        }
+        localStorage.setItem(DB_SEARCH_CACHE, JSON.stringify(searchCache));
+    } catch (e) {
+        console.error("Failed to save search cache to localStorage:", e);
+        try {
+            localStorage.removeItem(DB_SEARCH_CACHE);
+            searchCache = {};
+            searchCache[key] = value;
+            localStorage.setItem(DB_SEARCH_CACHE, JSON.stringify(searchCache));
+        } catch (e2) {
+            console.error("Failed to reset localStorage search cache:", e2);
+        }
+    }
+}
+
+// Global POI Index for fuzzy search & auto-complete
+const poiIndex = [];
+
+function indexPoiItem(item) {
+    const name = item.display_name;
+    if (!name) return;
+    
+    const lat = item.lat;
+    const lon = item.lon;
+    const coordKey = `${lat.toFixed(4)}_${lon.toFixed(4)}`;
+    
+    const exists = poiIndex.some(idxItem => {
+        const idxLat = idxItem.lat;
+        const idxLon = idxItem.lon;
+        const idxKey = `${idxLat.toFixed(4)}_${idxLon.toFixed(4)}`;
+        return idxKey === coordKey;
+    });
+    
+    if (!exists) {
+        poiIndex.push({
+            name: name,
+            cleanName: cleanName(name),
+            item: item,
+            lat: lat,
+            lon: lon
+        });
+    }
+}
+
+function cleanName(str) {
+    if (!str) return '';
+    return str
+        .toLowerCase()
+        .replace(/[‘’`']/g, '')
+        .replace(/o[‘’`']?g/g, 'og')
+        .replace(/o[‘’`']/g, 'o')
+        .replace(/g[‘’`']/g, 'g')
+        .replace(/(shahri|viloyati|Respublikasi|tumani|tuman|shahar|viloyat|respublika)/gi, '')
+        .trim();
+}
+
+function matchNames(name1, name2) {
+    const c1 = cleanName(name1);
+    const c2 = cleanName(name2);
+    if (!c1 || !c2) return false;
+    return c1.includes(c2) || c2.includes(c1);
+}
+
+function isResultInRegion(item, regionId) {
+    if (!regionId) return false;
+    const addr = item.address || {};
+    const state = addr.state || '';
+    const city = addr.city || addr.town || addr.village || '';
+    const displayName = item.display_name || '';
+
+    switch (regionId) {
+        case 'toshkent_sh':
+            return (
+                matchNames(city, 'Toshkent') && 
+                !matchNames(state, 'Toshkent viloyati')
+            ) || (
+                matchNames(state, 'Toshkent') && 
+                !matchNames(state, 'Toshkent viloyati')
+            );
+        case 'toshkent_v':
+            return matchNames(state, 'Toshkent viloyati') || matchNames(displayName, 'Toshkent viloyati');
+        case 'qoraqalpogiston':
+            return (
+                matchNames(state, 'Qoraqalpog‘iston') || 
+                matchNames(state, 'Karakalpakstan') || 
+                matchNames(state, 'Каракалпакстан') || 
+                matchNames(displayName, 'Qoraqalpog‘iston') ||
+                matchNames(displayName, 'Karakalpakstan') ||
+                matchNames(city, 'Nukus')
+            );
+        default:
+            const regionObj = regionsData.find(r => r.id === regionId);
+            if (!regionObj) return false;
+            const cleanReg = cleanName(regionObj.name);
+            return (
+                cleanName(state).includes(cleanReg) || 
+                cleanName(city).includes(cleanReg) || 
+                cleanName(displayName).includes(cleanReg)
+            );
+    }
+}
+
+function getRegionSearchSuffix(region) {
+    if (!region) return '';
+    if (region.id === 'toshkent_sh') return 'Toshkent';
+    if (region.id === 'toshkent_v') return 'Toshkent viloyati';
+    if (region.id === 'qoraqalpogiston') return 'Nukus Qoraqalpogiston';
+    return region.name;
+}
+
+function getDistanceKm(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Radius of the earth in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c; // Distance in km
+}
+
+function mapPhotonPropertiesToAddress(props) {
+    return {
+        neighbourhood: props.suburb || props.locality,
+        road: props.street,
+        house_number: props.house_number,
+        city_district: props.district,
+        city: props.city,
+        town: props.town,
+        village: props.village,
+        state: props.state
+    };
+}
+
+function getResultType(item) {
+    const isPhoton = !!item.properties;
+    
+    if (isPhoton) {
+        const props = item.properties;
+        const type = props.type;
+        const osmKey = props.osm_key;
+        const osmValue = props.osm_value;
+        
+        if (type === 'house' || osmKey === 'building' || props.postcode || props.house_number) {
+            return 'uy';
+        }
+        if (type === 'street' || osmKey === 'highway') {
+            return 'kocha';
+        }
+        if (type === 'locality' || osmValue === 'suburb' || osmValue === 'neighbourhood' || osmValue === 'residential') {
+            return 'mahalla';
+        }
+        if (['school', 'kindergarten', 'college', 'university', 'hospital', 'clinic', 'pharmacy', 'bank', 'place_of_worship', 'restaurant', 'cafe'].includes(osmValue)) {
+            return osmValue;
+        }
+        if (['school', 'kindergarten', 'college', 'university', 'hospital', 'clinic', 'pharmacy', 'bank', 'place_of_worship', 'restaurant', 'cafe'].includes(osmKey)) {
+            return osmKey;
+        }
+        if (osmKey === 'shop' || osmKey === 'tourism' || osmKey === 'craft' || osmKey === 'industrial') {
+            return 'shop';
+        }
+        if (type === 'district' || type === 'county') {
+            return 'tuman';
+        }
+        if (type === 'city' || type === 'town' || type === 'village') {
+            return 'shahar';
+        }
+        if (type === 'state') {
+            return 'viloyat';
+        }
+    } else {
+        const type = item.type;
+        const cls = item.class;
+        const addr = item.address || {};
+        
+        if (cls === 'building' || type === 'house' || addr.house_number) {
+            return 'uy';
+        }
+        if (cls === 'highway' || addr.road) {
+            return 'kocha';
+        }
+        if (type === 'suburb' || type === 'neighbourhood' || type === 'residential' || type === 'locality' || addr.neighbourhood || addr.suburb) {
+            return 'mahalla';
+        }
+        if (['school', 'kindergarten', 'college', 'university', 'hospital', 'clinic', 'pharmacy', 'bank', 'place_of_worship', 'restaurant', 'cafe'].includes(type)) {
+            return type;
+        }
+        if (['school', 'kindergarten', 'college', 'university', 'hospital', 'clinic', 'pharmacy', 'bank', 'place_of_worship', 'restaurant', 'cafe'].includes(cls)) {
+            return cls;
+        }
+        if (cls === 'shop' || cls === 'tourism' || cls === 'craft' || cls === 'industrial') {
+            return 'shop';
+        }
+        if (type === 'city_district' || type === 'district' || type === 'county' || addr.city_district || addr.county) {
+            return 'tuman';
+        }
+        if (type === 'city' || type === 'town' || type === 'village' || addr.city || addr.town || addr.village) {
+            return 'shahar';
+        }
+        if (type === 'state' || type === 'province' || addr.state) {
+            return 'viloyat';
+        }
+    }
+    return 'other';
+}
+
+function getTypeIcon(type) {
+    const icons = {
+        'school': '🏫',
+        'kindergarten': '🏫',
+        'college': '🏫',
+        'university': '🏫',
+        'hospital': '🏥',
+        'clinic': '🏥',
+        'pharmacy': '🏥',
+        'bank': '🏦',
+        'place_of_worship': '🕌',
+        'shop': '🏪',
+        'marketplace': '🏪',
+        'restaurant': '🏪',
+        'cafe': '🏪',
+        'korxona': '🏪',
+        
+        'mahalla': '📍',
+        'uy': '🏠',
+        'kocha': '🛣',
+        'tashkilot': '🏛',
+        'tuman': '🗺',
+        'shahar': '🏙',
+        'viloyat': '🗺',
+        'other': '📍'
+    };
+    return icons[type] || '📍';
+}
+
+function parsePoiQuery(query) {
+    const q = query.toLowerCase();
+    
+    // Extract numbers
+    const numberMatch = q.match(/\b\d+\b/);
+    const queryNumber = numberMatch ? numberMatch[0] : null;
+    
+    let types = [];
+    
+    if (/\b(maktab|school|shkola|школа)\b/i.test(q)) {
+        types.push({ key: 'amenity', value: 'school' });
+    }
+    if (/\b(bog['‘`a]?cha|kindergarten|sad|сад|детсад)\b/i.test(q)) {
+        types.push({ key: 'amenity', value: 'kindergarten' });
+    }
+    if (/\b(kollej|college|колледж)\b/i.test(q)) {
+        types.push({ key: 'amenity', value: 'college' });
+    }
+    if (/\b(universitet|university|institut|institute|вуз|ун-t)\b/i.test(q)) {
+        types.push({ key: 'amenity', value: 'university' });
+    }
+    if (/\b(shifoxona|kasalxona|hospital|больниц)\b/i.test(q)) {
+        types.push({ key: 'amenity', value: 'hospital' });
+    }
+    if (/\b(poliklinika|clinic|поликлиник|клиник)\b/i.test(q)) {
+        types.push({ key: 'amenity', value: 'clinic' });
+    }
+    if (/\b(dorixona|pharmacy|apteka|аптек)\b/i.test(q)) {
+        types.push({ key: 'amenity', value: 'pharmacy' });
+    }
+    if (/\b(bank|банк)\b/i.test(q)) {
+        types.push({ key: 'amenity', value: 'bank' });
+    }
+    if (/\b(bozor|market|рынок|супермаркет)\b/i.test(q)) {
+        types.push({ key: 'amenity', value: 'marketplace' });
+        types.push({ key: 'shop', value: 'supermarket' });
+    }
+    if (/\b(dokon|do['‘`]kon|shop|magazin|магазин)\b/i.test(q)) {
+        types.push({ key: 'shop', value: '*' });
+    }
+    if (/\b(restoran|restaurant|ресторан)\b/i.test(q)) {
+        types.push({ key: 'amenity', value: 'restaurant' });
+    }
+    if (/\b(kafe|cafe|кафе)\b/i.test(q)) {
+        types.push({ key: 'amenity', value: 'cafe' });
+    }
+    if (/\b(masjid|mosque|mechet|мечеть)\b/i.test(q)) {
+        types.push({ key: 'amenity', value: 'place_of_worship' });
+    }
+    
+    return { queryNumber, types };
+}
+
+function levenshteinDistance(a, b) {
+    const matrix = [];
+    for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+    for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+    for (let i = 1; i <= b.length; i++) {
+        for (let j = 1; j <= a.length; j++) {
+            if (b.charAt(i - 1) === a.charAt(j - 1)) {
+                matrix[i][j] = matrix[i - 1][j - 1];
+            } else {
+                matrix[i][j] = Math.min(
+                    matrix[i - 1][j - 1] + 1, // substitution
+                    matrix[i][j - 1] + 1,     // insertion
+                    matrix[i - 1][j] + 1      // deletion
+                );
+            }
+        }
+    }
+    return matrix[b.length][a.length];
+}
+
+function fuzzyMatch(query, target) {
+    const q = cleanName(query);
+    const t = cleanName(target);
+    if (!q || !t) return 0;
+    
+    if (t.includes(q)) return 100;
+    
+    const qWords = q.split(/\s+/);
+    const tWords = t.split(/\s+/);
+    let matchedWords = 0;
+    qWords.forEach(qw => {
+        if (tWords.some(tw => tw.includes(qw) || qw.includes(tw))) {
+            matchedWords++;
+        }
+    });
+    
+    if (matchedWords > 0) {
+        return (matchedWords / qWords.length) * 80;
+    }
+    
+    if (qWords.length === 1 && tWords.length === 1) {
+        const dist = levenshteinDistance(q, t);
+        const maxLen = Math.max(q.length, t.length);
+        if (dist <= 2 && maxLen > 3) {
+            return (1 - dist / maxLen) * 50;
+        }
+    }
+    
+    return 0;
+}
+
+function isPoiQueryMatch(item, queryNumber, types) {
+    const name = item.display_name || '';
+    const itemType = getResultType(item);
+    
+    const typeMatch = types.length === 0 || types.some(t => {
+        if (t.value === 'school') {
+            return ['school', 'college', 'university'].includes(itemType);
+        }
+        if (t.value === 'hospital') {
+            return ['hospital', 'clinic'].includes(itemType);
+        }
+        return itemType === t.value || itemType === t.key;
+    });
+    
+    if (!typeMatch) return false;
+    
+    if (queryNumber) {
+        const regex = new RegExp(`\\b${queryNumber}\\b|${queryNumber}-|№${queryNumber}`);
+        return regex.test(name);
+    }
+    
+    return true;
+}
+
+function mapOverpassToStandard(element, activeRegion) {
+    const tags = element.tags || {};
+    const lat = element.lat || (element.center ? element.center.lat : null);
+    const lon = element.lon || (element.center ? element.center.lon : null);
+    
+    if (!lat || !lon) return null;
+    
+    const address = {
+        amenity: tags.name,
+        road: tags["addr:street"] || tags.street,
+        neighbourhood: tags["addr:neighbourhood"] || tags.neighbourhood || tags.suburb,
+        city: tags["addr:city"] || tags.city || tags.town || tags.village,
+        state: tags["addr:state"] || tags.state || tags.province,
+        country: "O'zbekiston"
+    };
+    
+    if (activeRegion) {
+        if (!address.state) {
+            address.state = activeRegion.name;
+        }
+        if (!address.city && activeRegion.id === 'toshkent_sh') {
+            address.city = 'Toshkent';
+        }
+    }
+    
+    const type = tags.amenity || tags.shop || 'poi';
+    const cls = tags.amenity ? 'amenity' : (tags.shop ? 'shop' : 'poi');
+    
+    let displayName = tags.name || '';
+    if (address.road) displayName += `, ${address.road}`;
+    if (address.city) displayName += `, ${address.city}`;
+    if (address.state) displayName += `, ${address.state}`;
+    
+    return {
+        lat: Number(lat),
+        lon: Number(lon),
+        display_name: displayName,
+        address: address,
+        type: type,
+        class: cls
+    };
+}
+
+async function fetchOverpass(query, activeRegion) {
+    const trimmedQuery = query.trim();
+    const { queryNumber, types } = parsePoiQuery(trimmedQuery);
+    
+    if (!activeRegion && types.length === 0) {
+        return [];
+    }
+    
+    let overpassQuery = '[out:json][timeout:15];\n(\n';
+    const locationFilter = activeRegion 
+        ? `(around:100000,${activeRegion.lat},${activeRegion.lng})`
+        : `(37.0,56.0,46.0,74.0)`;
+        
+    if (types.length > 0) {
+        types.forEach(t => {
+            const keyVal = t.value === '*' ? `[~"^${t.key}$"~"."]` : `[${t.key}=${t.value}]`;
+            
+            if (queryNumber) {
+                const numRegex = `\\b${queryNumber}\\b|${queryNumber}-|№${queryNumber}|${queryNumber}-son`;
+                overpassQuery += `  node${keyVal}["name"~"${numRegex}",i]${locationFilter};\n`;
+                overpassQuery += `  way${keyVal}["name"~"${numRegex}",i]${locationFilter};\n`;
+                overpassQuery += `  relation${keyVal}["name"~"${numRegex}",i]${locationFilter};\n`;
+            } else {
+                const nameRegex = trimmedQuery.split(/\s+/).join('|');
+                overpassQuery += `  node${keyVal}["name"~"${nameRegex}",i]${locationFilter};\n`;
+                overpassQuery += `  way${keyVal}["name"~"${nameRegex}",i]${locationFilter};\n`;
+                overpassQuery += `  relation${keyVal}["name"~"${nameRegex}",i]${locationFilter};\n`;
+            }
+        });
+    } else {
+        const nameRegex = trimmedQuery.split(/\s+/).join('|');
+        overpassQuery += `  node["name"~"${nameRegex}",i]${locationFilter};\n`;
+        overpassQuery += `  way["name"~"${nameRegex}",i]${locationFilter};\n`;
+        overpassQuery += `  relation["name"~"${nameRegex}",i]${locationFilter};\n`;
+    }
+    
+    overpassQuery += ');\nout body center;';
+    
+    try {
+        const response = await fetch('https://overpass-api.de/api/interpreter', {
+            method: 'POST',
+            body: 'data=' + encodeURIComponent(overpassQuery),
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error("Overpass API response error");
+        }
+        
+        const data = await response.json();
+        if (data && data.elements) {
+            const mapped = data.elements
+                .map(el => mapOverpassToStandard(el, activeRegion))
+                .filter(item => item !== null);
+            return mapped;
+        }
+    } catch (e) {
+        console.warn("Overpass query failed:", e);
+    }
+    return [];
+}
+
+function calculateRelevanceScore(item, query, activeRegion, rawAddr) {
+    let score = 0;
+    
+    const isPhoton = !!item.properties;
+    const displayName = isPhoton ? (item.properties.name + ", " + (item.properties.street || '')) : item.display_name;
+    const type = getResultType(item);
+    
+    const weights = {
+        'school': 5,
+        'kindergarten': 5,
+        'college': 5,
+        'university': 5,
+        'hospital': 5,
+        'clinic': 5,
+        'pharmacy': 5,
+        'bank': 5,
+        'place_of_worship': 5,
+        'shop': 4,
+        'marketplace': 4,
+        'restaurant': 4,
+        'cafe': 4,
+        'mahalla': 3,
+        'kocha': 2,
+        'uy': 1,
+        'other': 0
+    };
+    score += weights[type] || 0;
+    
+    if (activeRegion) {
+        const inRegion = isResultInRegion(item, activeRegion.id);
+        if (inRegion) {
+            score += 1000;
+            
+            let selectedCity = '';
+            if (rawAddr) {
+                selectedCity = rawAddr.city || rawAddr.town || rawAddr.village || rawAddr.hamlet || '';
+            }
+            if (!selectedCity) {
+                if (activeRegion.id === 'toshkent_sh') selectedCity = 'Toshkent';
+                else if (activeRegion.id === 'qoraqalpogiston') selectedCity = 'Nukus';
+                else if (activeRegion.id !== 'toshkent_v') {
+                    selectedCity = activeRegion.name;
+                }
+            }
+            const itemCity = item.address ? (item.address.city || item.address.town || item.address.village || item.address.hamlet || '') : '';
+            if (selectedCity && itemCity && matchNames(itemCity, selectedCity)) {
+                score += 3000;
+            }
+            
+            let selectedDistrict = '';
+            if (rawAddr) {
+                selectedDistrict = rawAddr.city_district || rawAddr.district || rawAddr.county || '';
+            }
+            const itemDistrict = item.address ? (item.address.city_district || item.address.district || item.address.county || '') : '';
+            if (selectedDistrict && itemDistrict && matchNames(itemDistrict, selectedDistrict)) {
+                score += 2000;
+            }
+        }
+    }
+    
+    const { queryNumber, types } = parsePoiQuery(query);
+    if (isPoiQueryMatch(item, queryNumber, types)) {
+        score += 5000; // POI matching boost
+    }
+    
+    if (displayName.toLowerCase().includes(query.toLowerCase())) {
+        score += 100;
+    }
+    
+    return score;
+}
+
+function formatUzbekAddress(address) {
+    if (!address) return '';
+    const parts = [];
+    
+    // 0. Obyekt nomi
+    let obyekt = address.amenity || address.school || address.hospital || address.clinic || address.pharmacy || address.bank || address.marketplace || address.shop || address.restaurant || address.cafe || address.place_of_worship || address.tourism || address.leisure || address.office || address.building;
+    if (obyekt) {
+        parts.push(obyekt.trim());
+    }
+    
+    // 1. Ko'cha
+    let street = address.road || address.street;
+    if (street) {
+        street = street.trim();
+        if (!/ko'cha/i.test(street) && !/ko`cha/i.test(street) && !/ko‘cha/i.test(street) && !/улица/i.test(street) && !/ул\./i.test(street)) {
+            street += " ko'chasi";
+        }
+        parts.push(street);
+    }
+    
+    // 2. Mahalla
+    let mahalla = address.neighbourhood || address.suburb || address.residential || address.island;
+    if (mahalla) {
+        mahalla = mahalla.trim();
+        if (!/mahalla/i.test(mahalla) && !/маҳалла/i.test(mahalla)) {
+            mahalla += " mahallasi";
+        }
+        parts.push(mahalla);
+    }
+    
+    // 3. Uy raqami
+    let houseNumber = address.house_number;
+    if (houseNumber) {
+        houseNumber = houseNumber.trim();
+        if (/^\d+[A-Za-zА-Яа-я]?$/.test(houseNumber)) {
+            houseNumber += "-uy";
+        }
+        parts.push(houseNumber);
+    }
+    
+    // 4. Tuman (district)
+    let tuman = address.city_district || address.district || address.county;
+    if (tuman) {
+        tuman = tuman.trim();
+        const cityOrTown = address.city || address.town;
+        if (cityOrTown && tuman.toLowerCase() === cityOrTown.toLowerCase()) {
+            tuman = '';
+        }
+        const state = address.state || address.region;
+        if (state && tuman.toLowerCase() === state.toLowerCase()) {
+            tuman = '';
+        }
+        
+        if (tuman) {
+            if (!/tuman/i.test(tuman) && !/туман/i.test(tuman) && !/district/i.test(tuman)) {
+                tuman += " tumani";
+            }
+            parts.push(tuman);
+        }
+    }
+    
+    // 5. Shahar (city, town, village)
+    let shahar = address.city || address.town || address.village || address.hamlet;
+    if (shahar) {
+        shahar = shahar.trim();
+        if (!/shahar/i.test(shahar) && !/город/i.test(shahar) && !/city/i.test(shahar)) {
+            shahar += " shahri";
+        }
+        parts.push(shahar);
+    }
+
+    // 6. Viloyat (state/province)
+    let viloyat = address.state || address.region;
+    if (viloyat) {
+        viloyat = viloyat.trim();
+        viloyat = viloyat.replace(/(Region|Province|область|город)/gi, '').trim();
+        viloyat = viloyat.replace(/o‘/gi, "o'").replace(/o‘/gi, "o'").replace(/g‘/gi, "g'");
+        if (viloyat.toLowerCase() === 'toshkent') {
+            const city = address.city || address.town || address.village;
+            if (city && /toshkent/i.test(city)) {
+                viloyat = "Toshkent shahri";
+            } else {
+                viloyat = "Toshkent viloyati";
+            }
+        } else if (viloyat.toLowerCase().includes('qoraqalpogiston') || viloyat.toLowerCase().includes('karakalpakstan') || viloyat.toLowerCase().includes('respublika')) {
+            viloyat = "Qoraqalpog‘iston Respublikasi";
+        } else {
+            if (!/viloyat/i.test(viloyat) && !/shahar/i.test(viloyat)) {
+                viloyat += " viloyati";
+            }
+        }
+        parts.push(viloyat);
+    }
+    
+    return parts.length > 0 ? parts.join(', ') : null;
+}
+
+function getSuggestionDisplay(item) {
+    let title = '';
+    let subtitle = '';
+    
+    const formatted = formatUzbekAddress(item.address);
+    
+    if (formatted) {
+        const parts = formatted.split(', ');
+        title = parts[0];
+        if (parts.length > 1) {
+            subtitle = parts.slice(1).join(', ');
+        }
+    } else {
+        const parts = item.display_name.split(', ');
+        title = parts[0] || '';
+        if (parts.length > 1) {
+            subtitle = parts.slice(1).join(', ');
+        }
+    }
+    
+    subtitle = subtitle.replace(/,?\s*(O'zbekiston|O‘zbekiston|Узбекистан|Uzbekistan)/i, '');
+    subtitle = subtitle.replace(/,?\s*\b\d{6}\b/g, '');
+    
+    return { title, subtitle };
+}
+
+function selectSearchSuggestion(type, lat, lng, addressName) {
+    const map = type === 'pickup' ? pickupMap : destMap;
+    if (!map) return;
+    
+    map.setCenter([lat, lng], 16);
+    
+    setMarker(type, { lat, lng }, addressName);
+    
+    const dropdown = document.getElementById(`${type}-search-suggestions`);
+    if (dropdown) dropdown.classList.add('hidden');
+    
+    const searchInput = document.getElementById(`${type}-search-input`);
+    if (searchInput) {
+        searchInput.value = addressName;
+        const clearBtn = document.getElementById(`${type}-search-clear`);
+        if (clearBtn) clearBtn.classList.remove('hidden');
+    }
+}
+
+function vgDebounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+function renderResults(results, query, suggestionsDiv, type) {
+    suggestionsDiv.innerHTML = '';
+    
+    if (results && results.length > 0) {
+        results.forEach(item => {
+            const { title, subtitle } = getSuggestionDisplay(item);
+            const fullAddress = formatUzbekAddress(item.address) || item.display_name;
+            const itemType = getResultType(item);
+            const icon = getTypeIcon(itemType);
+            
+            const div = document.createElement('div');
+            div.className = 'search-suggestion-item';
+            div.innerHTML = `
+                <div class="search-suggestion-icon" style="font-size: 16px;">
+                    ${icon}
+                </div>
+                <div class="search-suggestion-text" style="flex: 1; min-width: 0;">
+                    <span class="search-suggestion-title" style="display: block; font-weight: 700; font-size: 13.5px; color: #2D2D2D; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${title}</span>
+                    <span class="search-suggestion-subtitle" style="display: block; font-size: 11px; color: #8E8E93; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px;">${subtitle || ''}</span>
+                </div>
+            `;
+            
+            div.addEventListener('click', () => {
+                selectSearchSuggestion(type, Number(item.lat), Number(item.lon), fullAddress);
+            });
+            
+            suggestionsDiv.appendChild(div);
+        });
+        suggestionsDiv.classList.remove('hidden');
+    } else {
+        const div = document.createElement('div');
+        div.className = 'p-4 text-center text-xs text-textSecondary font-medium';
+        div.innerText = currentLang === 'uz' ? 'Manzil topilmadi' : (currentLang === 'ru' ? 'Адрес не найден' : 'Address not found');
+        suggestionsDiv.appendChild(div);
+        suggestionsDiv.classList.remove('hidden');
+    }
+}
+
+function initAddressSearch() {
+    const types = ['pickup', 'dest'];
+    
+    types.forEach(type => {
+        const input = document.getElementById(`${type}-search-input`);
+        const suggestionsDiv = document.getElementById(`${type}-search-suggestions`);
+        const clearBtn = document.getElementById(`${type}-search-clear`);
+        
+        if (!input || !suggestionsDiv) return;
+        
+        if (clearBtn) {
+            clearBtn.addEventListener('click', () => {
+                input.value = '';
+                clearBtn.classList.add('hidden');
+                suggestionsDiv.innerHTML = '';
+                suggestionsDiv.classList.add('hidden');
+                input.focus();
+            });
+        }
+        
+        const performSearch = vgDebounce(async (query) => {
+            const trimmedQuery = query.trim();
+            if (!trimmedQuery) {
+                suggestionsDiv.innerHTML = '';
+                suggestionsDiv.classList.add('hidden');
+                return;
+            }
+            
+            const activeRegion = type === 'pickup' ? selectedPickup.region : selectedDest.region;
+            const rawAddr = type === 'pickup' ? selectedPickup.rawAddress : selectedDest.rawAddress;
+            
+            const cacheKey = `${trimmedQuery}_${activeRegion ? activeRegion.id : 'no_region'}_${currentLang}`;
+            if (searchCache[cacheKey]) {
+                console.log("DEBUG: Search cache hit for:", cacheKey);
+                renderResults(searchCache[cacheKey], trimmedQuery, suggestionsDiv, type);
+                return;
+            }
+            
+            try {
+                const lang = currentLang === 'uz' ? 'uz' : (currentLang === 'ru' ? 'ru' : 'en');
+                
+                let nominatimResultsRegion = [];
+                let nominatimResultsGeneral = [];
+                let photonResultsRegion = [];
+                let photonResultsGeneral = [];
+                let overpassResults = [];
+                
+                const regionSuffix = activeRegion ? getRegionSearchSuffix(activeRegion) : '';
+                const nominatimPromises = [];
+                
+                // Stage 1: Nominatim Search
+                if (activeRegion) {
+                    const regionalUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(trimmedQuery + ', ' + regionSuffix)}&format=json&addressdetails=1&limit=15&countrycodes=uz&accept-language=${lang}`;
+                    nominatimPromises.push(
+                        fetch(regionalUrl, { headers: { 'User-Agent': 'VijdonGO-Taxi-App' } })
+                            .then(res => res.ok ? res.json() : [])
+                            .catch(err => { console.warn("Regional Nominatim fetch failed:", err); return []; })
+                    );
+                }
+                
+                const generalUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(trimmedQuery)}&format=json&addressdetails=1&limit=15&countrycodes=uz&accept-language=${lang}`;
+                nominatimPromises.push(
+                    fetch(generalUrl, { headers: { 'User-Agent': 'VijdonGO-Taxi-App' } })
+                        .then(res => res.ok ? res.json() : [])
+                        .catch(err => { console.warn("General Nominatim fetch failed:", err); return []; })
+                );
+                
+                const nominatimRes = await Promise.all(nominatimPromises);
+                if (activeRegion) {
+                    nominatimResultsRegion = nominatimRes[0] || [];
+                    nominatimResultsGeneral = nominatimRes[1] || [];
+                } else {
+                    nominatimResultsGeneral = nominatimRes[0] || [];
+                }
+                
+                let nominatimCount = nominatimResultsRegion.length + nominatimResultsGeneral.length;
+                const { queryNumber, types: parsedTypes } = parsePoiQuery(trimmedQuery);
+                
+                // Stage 2: Overpass API Fallback
+                if (nominatimCount < 5 || parsedTypes.length > 0) {
+                    overpassResults = await fetchOverpass(trimmedQuery, activeRegion);
+                }
+                
+                // Photon Fallback (if Nominatim and Overpass combined are still sparse)
+                if (nominatimCount + overpassResults.length < 3) {
+                    const photonPromises = [];
+                    if (activeRegion) {
+                        let regionalPhotonUrl = `https://photon.komoot.io/api/?q=${encodeURIComponent(trimmedQuery + ', ' + regionSuffix)}&limit=15&countrycode=uz&lang=${lang}`;
+                        if (activeRegion.lat && activeRegion.lng) {
+                            regionalPhotonUrl += `&lat=${activeRegion.lat}&lon=${activeRegion.lng}`;
+                        }
+                        photonPromises.push(
+                            fetch(regionalPhotonUrl)
+                                .then(res => res.ok ? res.json() : null)
+                                .then(data => data && data.features ? data.features : [])
+                                .catch(err => { console.warn("Regional Photon fetch failed:", err); return []; })
+                        );
+                    }
+                    
+                    let generalPhotonUrl = `https://photon.komoot.io/api/?q=${encodeURIComponent(trimmedQuery)}&limit=15&countrycode=uz&lang=${lang}`;
+                    if (activeRegion && activeRegion.lat && activeRegion.lng) {
+                        generalPhotonUrl += `&lat=${activeRegion.lat}&lon=${activeRegion.lng}`;
+                    }
+                    photonPromises.push(
+                        fetch(generalPhotonUrl)
+                            .then(res => res.ok ? res.json() : null)
+                            .then(data => data && data.features ? data.features : [])
+                            .catch(err => { console.warn("General Photon fetch failed:", err); return []; })
+                    );
+                    
+                    const photonRes = await Promise.all(photonPromises);
+                    if (activeRegion) {
+                        photonResultsRegion = photonRes[0] || [];
+                        photonResultsGeneral = photonRes[1] || [];
+                    } else {
+                        photonResultsGeneral = photonRes[0] || [];
+                    }
+                }
+                
+                const combined = [];
+                const seenCoords = new Set();
+                
+                function addUniqueItem(lat, lon, itemData) {
+                    if (isNaN(lat) || isNaN(lon)) return;
+                    const coordKey = `${lat.toFixed(4)}_${lon.toFixed(4)}`;
+                    if (seenCoords.has(coordKey)) return;
+                    seenCoords.add(coordKey);
+                    combined.push(itemData);
+                }
+                
+                // Add local matches first if fuzzy match score is high
+                if (poiIndex.length > 0) {
+                    poiIndex.forEach(entry => {
+                        const matchScore = fuzzyMatch(trimmedQuery, entry.name);
+                        if (matchScore > 30) {
+                            const itemCopy = { ...entry.item };
+                            itemCopy._localMatchScore = matchScore;
+                            addUniqueItem(itemCopy.lat, itemCopy.lon, itemCopy);
+                        }
+                    });
+                }
+                
+                nominatimResultsRegion.forEach(item => {
+                    const lat = parseFloat(item.lat);
+                    const lon = parseFloat(item.lon);
+                    addUniqueItem(lat, lon, {
+                        lat,
+                        lon,
+                        display_name: item.display_name,
+                        address: item.address,
+                        type: item.type,
+                        class: item.class
+                    });
+                });
+                
+                nominatimResultsGeneral.forEach(item => {
+                    const lat = parseFloat(item.lat);
+                    const lon = parseFloat(item.lon);
+                    addUniqueItem(lat, lon, {
+                        lat,
+                        lon,
+                        display_name: item.display_name,
+                        address: item.address,
+                        type: item.type,
+                        class: item.class
+                    });
+                });
+                
+                overpassResults.forEach(item => {
+                    addUniqueItem(item.lat, item.lon, item);
+                });
+                
+                photonResultsRegion.forEach(feature => {
+                    const coords = feature.geometry.coordinates;
+                    const lat = coords[1];
+                    const lon = coords[0];
+                    const props = feature.properties;
+                    let displayName = props.name || '';
+                    if (props.street) displayName += ', ' + props.street;
+                    if (props.city) displayName += ', ' + props.city;
+                    
+                    addUniqueItem(lat, lon, {
+                        lat,
+                        lon,
+                        display_name: displayName,
+                        address: mapPhotonPropertiesToAddress(props),
+                        properties: props
+                    });
+                });
+                
+                photonResultsGeneral.forEach(feature => {
+                    const coords = feature.geometry.coordinates;
+                    const lat = coords[1];
+                    const lon = coords[0];
+                    const props = feature.properties;
+                    let displayName = props.name || '';
+                    if (props.street) displayName += ', ' + props.street;
+                    if (props.city) displayName += ', ' + props.city;
+                    
+                    addUniqueItem(lat, lon, {
+                        lat,
+                        lon,
+                        display_name: displayName,
+                        address: mapPhotonPropertiesToAddress(props),
+                        properties: props
+                    });
+                });
+                
+                // Index all found results for future fuzzy lookup
+                combined.forEach(item => {
+                    indexPoiItem(item);
+                });
+                
+                // Score
+                combined.forEach(item => {
+                    item._score = calculateRelevanceScore(item, trimmedQuery, activeRegion, rawAddr);
+                    if (item._localMatchScore) {
+                        item._score += item._localMatchScore;
+                    }
+                });
+                
+                // Sort
+                const typeRank = {
+                    'school': 15,
+                    'kindergarten': 14,
+                    'college': 13,
+                    'university': 12,
+                    'hospital': 11,
+                    'clinic': 10,
+                    'pharmacy': 9,
+                    'bank': 8,
+                    'place_of_worship': 7,
+                    'shop': 6,
+                    'marketplace': 6,
+                    'restaurant': 6,
+                    'cafe': 6,
+                    'mahalla': 5,
+                    'kocha': 4,
+                    'uy': 3,
+                    'tashkilot': 2,
+                    'tuman': 1,
+                    'shahar': 1,
+                    'viloyat': 1
+                };
+                
+                combined.sort((a, b) => {
+                    if (b._score !== a._score) {
+                        return b._score - a._score;
+                    }
+                    const rankA = typeRank[getResultType(a)] || 0;
+                    const rankB = typeRank[getResultType(b)] || 0;
+                    return rankB - rankA;
+                });
+                
+                const finalResults = combined.slice(0, 10);
+                saveSearchCache(cacheKey, finalResults);
+                
+                renderResults(finalResults, trimmedQuery, suggestionsDiv, type);
+            } catch (err) {
+                console.error("Geocoding process failed:", err);
+            }
+        }, 300);
+        
+        input.addEventListener('input', (e) => {
+            const val = e.target.value;
+            if (val.trim()) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+            performSearch(val);
+        });
+        
+        document.addEventListener('click', (e) => {
+            if (!input.contains(e.target) && !suggestionsDiv.contains(e.target)) {
+                suggestionsDiv.classList.add('hidden');
+            }
+        });
+        
+        input.addEventListener('focus', () => {
+            if (input.value.trim() && suggestionsDiv.children.length > 0) {
+                suggestionsDiv.classList.remove('hidden');
+            }
+        });
+    });
 }
 
 

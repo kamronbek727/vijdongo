@@ -507,10 +507,24 @@
             </div>
             
             <!-- Top Controls -->
-            <div class="absolute top-0 left-0 p-4 z-20 pt-safe pointer-events-none">
-                <button onclick="navigate('pickup-region-screen')" class="w-12 h-12 bg-white rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.15)] flex items-center justify-center text-graphite pointer-events-auto hover:bg-gray-50 transition-transform active:scale-90 border border-gray-100">
+            <div class="absolute top-0 left-0 right-0 p-4 z-50 pt-safe pointer-events-none flex gap-2 items-start">
+                <button onclick="navigate('pickup-region-screen')" class="w-12 h-12 bg-white rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.15)] flex items-center justify-center text-graphite pointer-events-auto hover:bg-gray-50 transition-transform active:scale-90 border border-gray-100 shrink-0">
                     <i class="fa-solid fa-arrow-left text-lg"></i>
                 </button>
+                <div class="flex-1 relative flex flex-col pointer-events-auto">
+                    <!-- Search input field wrapper -->
+                    <div class="bg-white rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.15)] flex items-center px-4 py-3 gap-2 border border-gray-100/50 transition-all duration-300 focus-within:ring-2 focus-within:ring-primary">
+                        <i class="fa-solid fa-magnifying-glass text-gray-400 text-sm shrink-0"></i>
+                        <input id="pickup-search-input" data-i18n-placeholder="common.searchPlaceholder" type="text" placeholder="Manzil qidiring..." class="w-full bg-transparent text-sm text-graphite outline-none border-none placeholder-gray-400 font-semibold" autocomplete="off" />
+                        <button id="pickup-search-clear" class="hidden text-gray-400 hover:text-graphite shrink-0 transition-colors">
+                            <i class="fa-solid fa-circle-xmark"></i>
+                        </button>
+                    </div>
+                    <!-- Suggestions Dropdown -->
+                    <div id="pickup-search-suggestions" class="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.12)] border border-gray-100/80 max-h-[250px] overflow-y-auto z-[60] hidden no-scrollbar transition-all duration-300">
+                        <!-- Items injected dynamically -->
+                    </div>
+                </div>
             </div>
             
             <!-- Floating Map Controls -->
@@ -560,10 +574,24 @@
             </div>
             
             <!-- Top Controls -->
-            <div class="absolute top-0 left-0 p-4 z-20 pt-safe pointer-events-none">
-                <button onclick="navigate('dest-region-screen')" class="w-12 h-12 bg-white rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.15)] flex items-center justify-center text-graphite pointer-events-auto hover:bg-gray-50 transition-transform active:scale-90 border border-gray-100">
+            <div class="absolute top-0 left-0 right-0 p-4 z-50 pt-safe pointer-events-none flex gap-2 items-start">
+                <button onclick="navigate('dest-region-screen')" class="w-12 h-12 bg-white rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.15)] flex items-center justify-center text-graphite pointer-events-auto hover:bg-gray-50 transition-transform active:scale-90 border border-gray-100 shrink-0">
                     <i class="fa-solid fa-arrow-left text-lg"></i>
                 </button>
+                <div class="flex-1 relative flex flex-col pointer-events-auto">
+                    <!-- Search input field wrapper -->
+                    <div class="bg-white rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.15)] flex items-center px-4 py-3 gap-2 border border-gray-100/50 transition-all duration-300 focus-within:ring-2 focus-within:ring-primary">
+                        <i class="fa-solid fa-magnifying-glass text-gray-400 text-sm shrink-0"></i>
+                        <input id="dest-search-input" data-i18n-placeholder="common.searchPlaceholder" type="text" placeholder="Manzil qidiring..." class="w-full bg-transparent text-sm text-graphite outline-none border-none placeholder-gray-400 font-semibold" autocomplete="off" />
+                        <button id="dest-search-clear" class="hidden text-gray-400 hover:text-graphite shrink-0 transition-colors">
+                            <i class="fa-solid fa-circle-xmark"></i>
+                        </button>
+                    </div>
+                    <!-- Suggestions Dropdown -->
+                    <div id="dest-search-suggestions" class="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.12)] border border-gray-100/80 max-h-[250px] overflow-y-auto z-[60] hidden no-scrollbar transition-all duration-300">
+                        <!-- Items injected dynamically -->
+                    </div>
+                </div>
             </div>
             
             <!-- Floating Map Controls -->

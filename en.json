@@ -1,5 +1,6 @@
 {
   "common": {
+    "searchPlaceholder": "Search address...",
     "continueBtn": "Continue",
     "backBtn": "Back",
     "confirmBtn": "Confirm",
