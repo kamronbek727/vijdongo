@@ -2645,14 +2645,22 @@ function showLocationDeniedModal(reason) {
                 </div>
             `;
         } else {
-            titleText = "Joylashuvga ruxsat berilmagan.";
+            titleText = "Joylashuvga ruxsat berilmagan";
+            subtitleText = "Ruxsatni yoqish uchun quyidagilarni bajaring:";
             instructionsHtml = `
                 <div style="margin-top:12px; background:#F5F5F7; border-radius:12px; padding:14px; text-align:left;">
-                    <p style="font-size:13px; font-weight:700; color:#1C1C1E; margin:0 0 8px;">iPhone:</p>
-                    <p style="font-size:12px; color:#3C3C43; margin:0 0 4px;"><b>Settings → Safari → Location → Allow</b></p>
-                    <p style="font-size:11px; color:#8E8E93; margin:0 0 8px; text-align:left;">yoki</p>
-                    <p style="font-size:12px; color:#3C3C43; margin:0;"><b>Settings → Privacy & Security → Location Services</b></p>
+                    <p style="font-size:13px; font-weight:700; color:#1C1C1E; margin:0 0 10px;">📱 1-usul (tezkor):</p>
+                    <p style="font-size:12px; color:#3C3C43; margin:0 0 4px;">Safari manzil satrida <b>"AA"</b> tugmasini bosing</p>
+                    <p style="font-size:12px; color:#3C3C43; margin:0 0 4px;">→ <b>Website Settings</b></p>
+                    <p style="font-size:12px; color:#3C3C43; margin:0 0 0;">→ <b>Location → Allow</b></p>
                 </div>
+                <div style="margin-top:8px; background:#F5F5F7; border-radius:12px; padding:14px; text-align:left;">
+                    <p style="font-size:13px; font-weight:700; color:#1C1C1E; margin:0 0 10px;">⚙️ 2-usul:</p>
+                    <p style="font-size:12px; color:#3C3C43; margin:0 0 4px;"><b>Settings → Privacy & Security</b></p>
+                    <p style="font-size:12px; color:#3C3C43; margin:0 0 4px;">→ <b>Location Services → Safari Websites</b></p>
+                    <p style="font-size:12px; color:#3C3C43; margin:0;">→ <b>"While Using" yoki "Ask"</b> tanlang</p>
+                </div>
+                <p style="font-size:11px; color:#8E8E93; margin:12px 0 0; text-align:center;">Shundan keyin sahifani yangilang ↻</p>
             `;
         }
     } else {
