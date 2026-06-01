@@ -2710,75 +2710,59 @@ function showLocationDeniedModal(reason) {
 }
 
 function getCurrentLocation() {
-    const isPickupScreen = currentScreen === 'pickup-map-screen';
-    const activeMap = isPickupScreen ? pickupMap : destMap;
-    const type = isPickupScreen ? 'pickup' : 'dest';
-
-    if (!activeMap) {
-        console.warn("Map not loaded yet.");
-        return;
-    }
-
     if (!navigator.geolocation) {
         console.error("GPS not supported by this browser.");
         return;
     }
 
+    const isPickupScreen = currentScreen === 'pickup-map-screen';
+    const type = isPickupScreen ? 'pickup' : 'dest';
     const addressEl = document.getElementById(type + '-address-text');
     if (addressEl) addressEl.innerText = t('common.gpsLocating');
 
-    // Success handler
-    function onSuccess(position) {
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
-        console.log("GPS location found:", lat, lng);
-        activeMap.setCenter([lat, lng], 16, { duration: 500 });
-        updateMarkerAndAddress(type, { lat, lng });
-    }
+    // CRITICAL: Call getCurrentPosition IMMEDIATELY — no checks before this line!
+    // iOS Safari requires this to be called synchronously within the user gesture context.
+    // Any blocking check (like activeMap) before this line will prevent the native popup.
+    navigator.geolocation.getCurrentPosition(
+        function onSuccess(position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            console.log("GPS location found:", lat, lng);
 
-    // Error handler
-    function onError(err) {
-        console.error("Geolocation error:", err.code, err.message);
-        if (addressEl) addressEl.innerText = t('common.selectAddress');
-        
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-        
-        if (err.code === 1) { // PERMISSION_DENIED
-            showLocationDeniedModal('denied');
-        } else {
-            // POSITION_UNAVAILABLE, TIMEOUT or other errors
-            if (isIOS) {
-                showLocationDeniedModal('not_retrieved');
-            } else if (err.code === 2) {
-                alert(t('gps.errorPositionUnavailable'));
-            } else if (err.code === 3) {
-                alert(t('gps.errorTimeout'));
-            } else {
-                alert(t('gps.errorGeneric'));
+            // Get map reference INSIDE callback — by this time map should be ready
+            const map = isPickupScreen ? pickupMap : destMap;
+            if (map) {
+                map.setCenter([lat, lng], 16, { duration: 500 });
             }
-        }
-    }
+            updateMarkerAndAddress(type, { lat, lng });
+        },
+        function onError(err) {
+            console.error("Geolocation error:", err.code, err.message);
+            if (addressEl) addressEl.innerText = t('common.selectAddress');
 
-    const options = {
-        enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 0
-    };
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
-    // 1. Call getCurrentPosition immediately to prevent Safari from blocking the native prompt due to async delay.
-    navigator.geolocation.getCurrentPosition(onSuccess, onError, options);
-
-    // 2. Perform permissions check asynchronously for iPhone / Safari or other browsers
-    if (navigator.permissions && navigator.permissions.query) {
-        navigator.permissions.query({ name: 'geolocation' }).then(function(result) {
-            console.log("Permission status:", result.state);
-            if (result.state === 'denied' && !document.getElementById('location-denied-modal')) {
+            if (err.code === 1) { // PERMISSION_DENIED
                 showLocationDeniedModal('denied');
+            } else {
+                // POSITION_UNAVAILABLE, TIMEOUT or other errors
+                if (isIOS) {
+                    showLocationDeniedModal('not_retrieved');
+                } else if (err.code === 2) {
+                    alert(t('gps.errorPositionUnavailable'));
+                } else if (err.code === 3) {
+                    alert(t('gps.errorTimeout'));
+                } else {
+                    alert(t('gps.errorGeneric'));
+                }
             }
-        }).catch(function(err) {
-            console.log("Permissions query fallback for iOS/Safari:", err);
-        });
-    }
+        },
+        {
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 0
+        }
+    );
 }
 
 
