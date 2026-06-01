@@ -2060,15 +2060,8 @@ function initInteractions() {
             updatePriceDisplay();
         });
     }
-    // GPS Location Buttons
-    const pickupGpsBtn = document.getElementById('pickup-gps-btn');
-    if (pickupGpsBtn) {
-        pickupGpsBtn.addEventListener('click', getCurrentLocation);
-    }
-    const destGpsBtn = document.getElementById('dest-gps-btn');
-    if (destGpsBtn) {
-        destGpsBtn.addEventListener('click', getCurrentLocation);
-    }
+    // GPS Location Buttons are handled via inline onclick in index.html to ensure
+    // robust iOS Safari/WebView user gesture context.
 
     initAddressSearch();
 }
@@ -2719,57 +2712,97 @@ function showLocationDeniedModal(reason) {
     document.body.appendChild(modal);
 }
 
+let isLocating = false;
+
 function getCurrentLocation() {
+    if (isLocating) {
+        console.log("Already locating, ignoring click request.");
+        return;
+    }
+
     if (!navigator.geolocation) {
         console.error("GPS not supported by this browser.");
+        alert(t('common.gpsNotSupported') || "Your browser does not support geolocation.");
         return;
     }
 
     const isPickupScreen = currentScreen === 'pickup-map-screen';
     const type = isPickupScreen ? 'pickup' : 'dest';
     const addressEl = document.getElementById(type + '-address-text');
-    if (addressEl) addressEl.innerText = t('common.gpsLocating');
+    if (addressEl) addressEl.innerText = t('common.gpsLocating') || "Locating...";
+
+    isLocating = true;
+
+    // Helper function to handle geolocation success
+    function onSuccess(position) {
+        isLocating = false;
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        console.log("GPS location found:", lat, lng);
+
+        // Get map reference INSIDE callback — by this time map should be ready
+        const map = isPickupScreen ? pickupMap : destMap;
+        if (map) {
+            map.setCenter([lat, lng], 16, { duration: 500 });
+        }
+        updateMarkerAndAddress(type, { lat, lng });
+    }
+
+    // Helper function to handle geolocation error and perform fallback
+    function onError(err) {
+        console.error("Geolocation error (first attempt):", err.code, err.message);
+        
+        // If it failed due to timeout or position unavailable, fallback to low accuracy
+        if (err.code === 2 || err.code === 3) {
+            console.log("Retrying with enableHighAccuracy: false...");
+            navigator.geolocation.getCurrentPosition(
+                onSuccess,
+                function onFallbackError(fallbackErr) {
+                    isLocating = false;
+                    console.error("Fallback Geolocation error:", fallbackErr.code, fallbackErr.message);
+                    if (addressEl) addressEl.innerText = t('common.selectAddress');
+                    handleFinalError(fallbackErr);
+                },
+                {
+                    enableHighAccuracy: false,
+                    timeout: 10000,
+                    maximumAge: 60000 // allow up to 1 minute cached location for fallback
+                }
+            );
+        } else {
+            isLocating = false;
+            if (addressEl) addressEl.innerText = t('common.selectAddress');
+            handleFinalError(err);
+        }
+    }
+
+    function handleFinalError(err) {
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+        if (err.code === 1) { // PERMISSION_DENIED
+            showLocationDeniedModal('denied');
+        } else {
+            // POSITION_UNAVAILABLE, TIMEOUT or other errors
+            if (isIOS) {
+                showLocationDeniedModal('not_retrieved');
+            } else if (err.code === 2) {
+                alert(t('gps.errorPositionUnavailable') || "Location unavailable.");
+            } else if (err.code === 3) {
+                alert(t('gps.errorTimeout') || "Location request timed out.");
+            } else {
+                alert(t('gps.errorGeneric') || "Unable to retrieve location.");
+            }
+        }
+    }
 
     // CRITICAL: Call getCurrentPosition IMMEDIATELY — no checks before this line!
     // iOS Safari requires this to be called synchronously within the user gesture context.
-    // Any blocking check (like activeMap) before this line will prevent the native popup.
     navigator.geolocation.getCurrentPosition(
-        function onSuccess(position) {
-            const lat = position.coords.latitude;
-            const lng = position.coords.longitude;
-            console.log("GPS location found:", lat, lng);
-
-            // Get map reference INSIDE callback — by this time map should be ready
-            const map = isPickupScreen ? pickupMap : destMap;
-            if (map) {
-                map.setCenter([lat, lng], 16, { duration: 500 });
-            }
-            updateMarkerAndAddress(type, { lat, lng });
-        },
-        function onError(err) {
-            console.error("Geolocation error:", err.code, err.message);
-            if (addressEl) addressEl.innerText = t('common.selectAddress');
-
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-
-            if (err.code === 1) { // PERMISSION_DENIED
-                showLocationDeniedModal('denied');
-            } else {
-                // POSITION_UNAVAILABLE, TIMEOUT or other errors
-                if (isIOS) {
-                    showLocationDeniedModal('not_retrieved');
-                } else if (err.code === 2) {
-                    alert(t('gps.errorPositionUnavailable'));
-                } else if (err.code === 3) {
-                    alert(t('gps.errorTimeout'));
-                } else {
-                    alert(t('gps.errorGeneric'));
-                }
-            }
-        },
+        onSuccess,
+        onError,
         {
             enableHighAccuracy: true,
-            timeout: 15000,
+            timeout: 8000, // 8 seconds before trying fallback
             maximumAge: 0
         }
     );
