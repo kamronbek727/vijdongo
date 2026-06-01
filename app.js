@@ -2060,7 +2060,16 @@ function initInteractions() {
             updatePriceDisplay();
         });
     }
-    
+    // GPS Location Buttons
+    const pickupGpsBtn = document.getElementById('pickup-gps-btn');
+    if (pickupGpsBtn) {
+        pickupGpsBtn.addEventListener('click', getCurrentLocation);
+    }
+    const destGpsBtn = document.getElementById('dest-gps-btn');
+    if (destGpsBtn) {
+        destGpsBtn.addEventListener('click', getCurrentLocation);
+    }
+
     initAddressSearch();
 }
 
