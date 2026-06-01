@@ -2640,11 +2640,11 @@ function showLocationDeniedModal(reason) {
             subtitleText = "Joylashuvga ruxsat berish uchun quyidagi amallarni bajaring";
             instructionsHtml = `
                 <div style="margin-top:12px; background:#F5F5F7; border-radius:12px; padding:14px; text-align:left;">
-                    <p style="font-size:13px; font-weight:700; color:#1C1C1E; margin:0 0 10px;">📱 Tezkor yo'l:</p>
-                    <p style="font-size:12px; color:#3C3C43; margin:0 0 4px;">1. Safari manzil satridagi <b>「AA」</b> tugmasini bosing</p>
-                    <p style="font-size:12px; color:#3C3C43; margin:0 0 4px;">2. <b>Website Settings</b> ni tanlang</p>
-                    <p style="font-size:12px; color:#3C3C43; margin:0 0 4px;">3. <b>Location → Allow</b> qiling</p>
-                    <p style="font-size:12px; color:#3C3C43; margin:0;">4. Sahifani yangilang va qayta urinib ko'ring</p>
+                    <p style="font-size:13px; font-weight:700; color:#1C1C1E; margin:0 0 10px;">⚡ Tezkor yechim:</p>
+                    <p style="font-size:12px; color:#3C3C43; margin:0 0 6px; line-height: 1.4;">1. Safari pastki/tepa qismidagi <b>「aA」</b> yoki <b>「AA」</b> tugmasini bosing</p>
+                    <p style="font-size:12px; color:#3C3C43; margin:0 0 6px; line-height: 1.4;">2. <b>Website Settings</b> (Veb-sayt sozlamalari) bo'limiga kiring</p>
+                    <p style="font-size:12px; color:#3C3C43; margin:0 0 6px; line-height: 1.4;">3. <b>Location</b> (Joylashuv) ustiga bosib <b>Allow</b> (Ruxsat berish) ni tanlang</p>
+                    <p style="font-size:12px; color:#3C3C43; margin:0; line-height: 1.4;">4. Sahifani yangilang va qayta urinib ko'ring</p>
                 </div>
             `;
         } else {
@@ -2652,15 +2652,16 @@ function showLocationDeniedModal(reason) {
             subtitleText = "Ruxsat berish uchun quyidagi amallarni bajaring";
             instructionsHtml = `
                 <div style="margin-top:12px; background:#F5F5F7; border-radius:12px; padding:14px; text-align:left;">
-                    <p style="font-size:13px; font-weight:700; color:#1C1C1E; margin:0 0 10px;">⚡ Tezkor yo'l:</p>
-                    <p style="font-size:12px; color:#3C3C43; margin:0 0 4px;">1. Safari manzil satridagi <b>「AA」</b> tugmasini bosing</p>
-                    <p style="font-size:12px; color:#3C3C43; margin:0 0 4px;">2. <b>Website Settings</b> ni tanlang</p>
-                    <p style="font-size:12px; color:#3C3C43; margin:0 0 4px;">3. <b>Location → Allow</b> qiling</p>
-                    <p style="font-size:12px; color:#3C3C43; margin:0 0 0;">4. Sahifani yangilang va qayta urinib ko'ring</p>
+                    <p style="font-size:13px; font-weight:700; color:#1C1C1E; margin:0 0 10px;">⚡ Tezkor yechim (Safari):</p>
+                    <p style="font-size:12px; color:#3C3C43; margin:0 0 6px; line-height: 1.4;">1. Safari manzil satridagi <b>「aA」</b> yoki <b>「AA」</b> tugmasini bosing</p>
+                    <p style="font-size:12px; color:#3C3C43; margin:0 0 6px; line-height: 1.4;">2. <b>Website Settings</b> (Veb-sayt sozlamalari) bo'limiga kiring</p>
+                    <p style="font-size:12px; color:#3C3C43; margin:0 0 6px; line-height: 1.4;">3. <b>Location</b> (Joylashuv) bo'limini <b>Allow</b> (Ruxsat berish) yoki <b>Ask</b> (So'rash) qiling</p>
+                    <p style="font-size:12px; color:#3C3C43; margin:0 0 0; line-height: 1.4;">4. Sahifani yangilang va qayta urinib ko'ring</p>
                 </div>
                 <div style="margin-top:8px; background:#F5F5F7; border-radius:12px; padding:14px; text-align:left;">
-                    <p style="font-size:13px; font-weight:700; color:#1C1C1E; margin:0 0 10px;">⚙️ Yoki sozlamalar orqali:</p>
-                    <p style="font-size:12px; color:#3C3C43; margin:0 0 4px;"><b>Settings → Privacy & Security → Location Services → Safari Websites → Allow</b></p>
+                    <p style="font-size:13px; font-weight:700; color:#1C1C1E; margin:0 0 10px;">⚙️ Telefon sozlamalari orqali:</p>
+                    <p style="font-size:12px; color:#3C3C43; margin:0 0 4px; line-height: 1.4;"><b>Settings → Privacy & Security → Location Services → Safari Websites → Allow</b></p>
+                    <p style="font-size:11px; color:#8E8E93; margin:0; line-height: 1.4;">(Sozlamalar → Maxfiylik va xavfsizlik → Joylashuv xizmatlari → Safari → Ruxsat berish)</p>
                 </div>
             `;
         }
