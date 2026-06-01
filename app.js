@@ -2706,12 +2706,12 @@ function getCurrentLocation() {
     const type = isPickupScreen ? 'pickup' : 'dest';
 
     if (!activeMap) {
-        alert(t('common.mapNotLoaded'));
+        console.warn("Map not loaded yet.");
         return;
     }
 
     if (!navigator.geolocation) {
-        alert(t('common.gpsNotSupported'));
+        console.error("GPS not supported by this browser.");
         return;
     }
 
@@ -2763,7 +2763,7 @@ function getCurrentLocation() {
     if (navigator.permissions && navigator.permissions.query) {
         navigator.permissions.query({ name: 'geolocation' }).then(function(result) {
             console.log("Permission status:", result.state);
-            if (result.state === 'denied') {
+            if (result.state === 'denied' && !document.getElementById('location-denied-modal')) {
                 showLocationDeniedModal('denied');
             }
         }).catch(function(err) {
