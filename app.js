@@ -2714,14 +2714,101 @@ function showLocationDeniedModal(reason) {
 
 let isLocating = false;
 
+// Helper to show on-screen debug logs for iPhone Safari / iOS debugging
+function logDebugToScreen(message, type = 'info') {
+    console.log(`[GPS-Debug] ${message}`);
+    
+    // Create debug panel if it doesn't exist
+    let debugPanel = document.getElementById('gps-debug-panel');
+    if (!debugPanel) {
+        debugPanel = document.createElement('div');
+        debugPanel.id = 'gps-debug-panel';
+        debugPanel.style.cssText = `
+            position: fixed;
+            top: 70px;
+            left: 16px;
+            right: 16px;
+            background: rgba(30, 30, 30, 0.96);
+            color: #00FF00;
+            font-family: monospace;
+            font-size: 11px;
+            padding: 12px;
+            border-radius: 12px;
+            z-index: 99999;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.45);
+            border: 1px solid #444;
+            max-height: 250px;
+            overflow-y: auto;
+            pointer-events: auto;
+        `;
+        
+        // Add a close button
+        const closeBtn = document.createElement('button');
+        closeBtn.innerText = "❌ Yopish";
+        closeBtn.style.cssText = `
+            float: right;
+            background: #FF3B30;
+            color: white;
+            border: none;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        `;
+        closeBtn.onclick = () => debugPanel.remove();
+        debugPanel.appendChild(closeBtn);
+        
+        // Add a header
+        const header = document.createElement('div');
+        header.innerText = "📱 iOS Geolocation Live Debugger";
+        header.style.cssText = `
+            font-weight: bold;
+            color: #FFD400;
+            border-bottom: 1px solid #444;
+            padding-bottom: 6px;
+            margin-bottom: 6px;
+            font-size: 12px;
+        `;
+        debugPanel.appendChild(header);
+        
+        // Logs container
+        const logsContainer = document.createElement('div');
+        logsContainer.id = 'gps-debug-logs';
+        debugPanel.appendChild(logsContainer);
+        
+        document.body.appendChild(debugPanel);
+    }
+    
+    const logsContainer = document.getElementById('gps-debug-logs');
+    if (logsContainer) {
+        const logItem = document.createElement('div');
+        logItem.style.marginBottom = "5px";
+        logItem.style.lineHeight = "1.3";
+        let prefix = "ℹ️ ";
+        if (type === 'success') { logItem.style.color = '#34C759'; prefix = "✅ "; }
+        else if (type === 'error') { logItem.style.color = '#FF3B30'; prefix = "❌ "; }
+        else if (type === 'warning') { logItem.style.color = '#FF9500'; prefix = "⚠️ "; }
+        
+        const timestamp = new Date().toLocaleTimeString();
+        logItem.innerHTML = `[${timestamp}] ${prefix}${message}`;
+        logsContainer.appendChild(logItem);
+        
+        // Scroll to bottom
+        debugPanel.scrollTop = debugPanel.scrollHeight;
+    }
+}
+
 function getCurrentLocation() {
+    logDebugToScreen("GPS tugmasi bosildi (User Gesture tasdiqlandi).");
+
     if (isLocating) {
-        console.log("Already locating, ignoring click request.");
+        logDebugToScreen("Already locating, ignoring duplicate click.", "warning");
         return;
     }
 
     if (!navigator.geolocation) {
-        console.error("GPS not supported by this browser.");
+        logDebugToScreen("navigator.geolocation topilmadi! Brauzer xizmatni qo'llab-quvvatlamaydi.", "error");
         alert(t('common.gpsNotSupported') || "Your browser does not support geolocation.");
         return;
     }
@@ -2731,35 +2818,65 @@ function getCurrentLocation() {
     const addressEl = document.getElementById(type + '-address-text');
     if (addressEl) addressEl.innerText = t('common.gpsLocating') || "Locating...";
 
+    // 1. Verify Secure Context (HTTPS is mandatory for iOS Safari Geolocation)
+    const isSecure = window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    logDebugToScreen(`Protokol xavfsizligi: ${window.location.protocol} (${isSecure ? 'XAVFSIZ/HTTPS' : 'XAVFSIZ EMAS/HTTP!'})`, isSecure ? 'success' : 'error');
+
+    if (!isSecure) {
+        logDebugToScreen("iOS Safari xavfsiz bo'lmagan HTTP orqali Geolocation ruxsatini BERMAYDI!", "error");
+    }
+
     isLocating = true;
 
-    // Helper function to handle geolocation success
+    // 2. Query Permissions API for status (prompt, granted, denied) and display it on the screen
+    if (navigator.permissions && navigator.permissions.query) {
+        logDebugToScreen("Permissions API qo'llab-quvvatlanadi. Holat so'ralmoqda...");
+        navigator.permissions.query({ name: 'geolocation' })
+            .then(function(permissionStatus) {
+                logDebugToScreen(`Permission holati (API): "${permissionStatus.state}"`, permissionStatus.state === 'granted' ? 'success' : (permissionStatus.state === 'denied' ? 'error' : 'warning'));
+                
+                // Track state changes dynamically
+                permissionStatus.onchange = function() {
+                    logDebugToScreen(`Permission holati o'zgardi (API): "${this.state}"`, this.state === 'granted' ? 'success' : (this.state === 'denied' ? 'error' : 'warning'));
+                };
+            })
+            .catch(function(err) {
+                logDebugToScreen(`Permissions.query xatoligi: ${err.message}`, "warning");
+            });
+    } else {
+        logDebugToScreen("Permissions API ushbu brauzerda mavjud emas (iOS Safari 16 dan oldingi versiyalar).", "warning");
+    }
+
+    // Geolocation success callback
     function onSuccess(position) {
         isLocating = false;
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
-        console.log("GPS location found:", lat, lng);
+        const accuracy = position.coords.accuracy;
+        logDebugToScreen(`Koordinatalar olindi: Lat=${lat}, Lng=${lng} (Aniqlik=${Math.round(accuracy)}m)`, "success");
 
-        // Get map reference INSIDE callback — by this time map should be ready
         const map = isPickupScreen ? pickupMap : destMap;
         if (map) {
             map.setCenter([lat, lng], 16, { duration: 500 });
+            logDebugToScreen("Xarita markazi muvaffaqiyatli yangilandi.", "success");
+        } else {
+            logDebugToScreen("Xarita topilmadi (Map element is null).", "warning");
         }
         updateMarkerAndAddress(type, { lat, lng });
     }
 
-    // Helper function to handle geolocation error and perform fallback
+    // Geolocation error callback
     function onError(err) {
-        console.error("Geolocation error (first attempt):", err.code, err.message);
+        logDebugToScreen(`Geolocation xatoligi (Birinchi urinish): Code=${err.code} - Message="${err.message}"`, "error");
         
-        // If it failed due to timeout or position unavailable, fallback to low accuracy
+        // If timeout or position unavailable, fall back to low accuracy
         if (err.code === 2 || err.code === 3) {
-            console.log("Retrying with enableHighAccuracy: false...");
+            logDebugToScreen("Kuchsiz signal yoki timeout. enableHighAccuracy: false bilan qayta urinilmoqda...", "warning");
             navigator.geolocation.getCurrentPosition(
                 onSuccess,
                 function onFallbackError(fallbackErr) {
                     isLocating = false;
-                    console.error("Fallback Geolocation error:", fallbackErr.code, fallbackErr.message);
+                    logDebugToScreen(`Fallback Geolocation xatoligi: Code=${fallbackErr.code} - Message="${fallbackErr.message}"`, "error");
                     if (addressEl) addressEl.innerText = t('common.selectAddress');
                     handleFinalError(fallbackErr);
                 },
@@ -2780,10 +2897,12 @@ function getCurrentLocation() {
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
         if (err.code === 1) { // PERMISSION_DENIED
+            logDebugToScreen("Foydalanuvchi joylashuvga ruxsat bermadi (PERMISSION_DENIED).", "error");
             showLocationDeniedModal('denied');
         } else {
             // POSITION_UNAVAILABLE, TIMEOUT or other errors
             if (isIOS) {
+                logDebugToScreen("Joylashuv aniqlanmadi (iOS maxsus xatoligi).", "error");
                 showLocationDeniedModal('not_retrieved');
             } else if (err.code === 2) {
                 alert(t('gps.errorPositionUnavailable') || "Location unavailable.");
@@ -2795,14 +2914,16 @@ function getCurrentLocation() {
         }
     }
 
-    // CRITICAL: Call getCurrentPosition IMMEDIATELY — no checks before this line!
-    // iOS Safari requires this to be called synchronously within the user gesture context.
+    logDebugToScreen("navigator.geolocation.getCurrentPosition chaqirilmoqda (enableHighAccuracy=true)...");
+    
+    // CRITICAL: Call getCurrentPosition IMMEDIATELY inside user gesture context
+    // Any async delay before this will crash the iOS Safari gesture chain!
     navigator.geolocation.getCurrentPosition(
         onSuccess,
         onError,
         {
             enableHighAccuracy: true,
-            timeout: 8000, // 8 seconds before trying fallback
+            timeout: 8000,
             maximumAge: 0
         }
     );
