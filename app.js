@@ -2188,37 +2188,18 @@ function updateMarkerAndAddress(type, latlng) {
         selectedDest.address = '';
     }
     
-    setMarker(type, { lat, lng }, t('common.addressLoading'));
+    setMarker(type, { lat, lng }, t('common.addressLoading') || "Manzil aniqlanmoqda...");
     
-    // OpenStreetMap Nominatim reverse geocoding
     async function performGeocoding() {
         try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 5000);
+            const { addressName, addressObj } = await yandexReverseGeocode(lat, lng);
             
-            const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`;
-            const response = await fetch(url, {
-                headers: {
-                    'Accept-Language': currentLang
-                },
-                signal: controller.signal
-            });
-            
-            clearTimeout(timeoutId);
-            
-            if (!response.ok) {
-                throw new Error("Nominatim API error");
-            }
-            
-            const data = await response.json();
-            
-            if (data && data.address) {
+            if (addressName) {
                 if (type === 'pickup') {
-                    selectedPickup.rawAddress = data.address;
+                    selectedPickup.rawAddress = addressObj;
                 } else {
-                    selectedDest.rawAddress = data.address;
+                    selectedDest.rawAddress = addressObj;
                 }
-                const addressName = formatUzbekAddress(data.address) || data.display_name;
                 
                 console.log("Selected coords:", coords);
                 console.log("Resolved address:", addressName);
@@ -2231,7 +2212,7 @@ function updateMarkerAndAddress(type, latlng) {
             console.warn("Geocoding failed/timed out:", err);
             console.log("Selected coords:", coords);
             
-            const fallbackAddress = t('common.addressNotFound');
+            const fallbackAddress = t('common.addressNotFound') || "Manzil topilmadi";
             console.log("Resolved address:", fallbackAddress);
             setMarker(type, { lat, lng }, fallbackAddress);
         }
@@ -2714,89 +2695,9 @@ function showLocationDeniedModal(reason) {
 
 let isLocating = false;
 
-// Helper to show on-screen debug logs for iPhone Safari / iOS debugging
+// Helper to print debug logs to the browser console (strictly no UI overlays in production)
 function logDebugToScreen(message, type = 'info') {
-    console.log(`[GPS-Debug] ${message}`);
-    
-    // Create debug panel if it doesn't exist
-    let debugPanel = document.getElementById('gps-debug-panel');
-    if (!debugPanel) {
-        debugPanel = document.createElement('div');
-        debugPanel.id = 'gps-debug-panel';
-        debugPanel.style.cssText = `
-            position: fixed;
-            top: 70px;
-            left: 16px;
-            right: 16px;
-            background: rgba(30, 30, 30, 0.96);
-            color: #00FF00;
-            font-family: monospace;
-            font-size: 11px;
-            padding: 12px;
-            border-radius: 12px;
-            z-index: 99999;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.45);
-            border: 1px solid #444;
-            max-height: 250px;
-            overflow-y: auto;
-            pointer-events: auto;
-        `;
-        
-        // Add a close button
-        const closeBtn = document.createElement('button');
-        closeBtn.innerText = "❌ Yopish";
-        closeBtn.style.cssText = `
-            float: right;
-            background: #FF3B30;
-            color: white;
-            border: none;
-            padding: 3px 8px;
-            border-radius: 6px;
-            font-size: 10px;
-            cursor: pointer;
-            font-weight: bold;
-        `;
-        closeBtn.onclick = () => debugPanel.remove();
-        debugPanel.appendChild(closeBtn);
-        
-        // Add a header
-        const header = document.createElement('div');
-        header.innerText = "📱 iOS Geolocation Live Debugger";
-        header.style.cssText = `
-            font-weight: bold;
-            color: #FFD400;
-            border-bottom: 1px solid #444;
-            padding-bottom: 6px;
-            margin-bottom: 6px;
-            font-size: 12px;
-        `;
-        debugPanel.appendChild(header);
-        
-        // Logs container
-        const logsContainer = document.createElement('div');
-        logsContainer.id = 'gps-debug-logs';
-        debugPanel.appendChild(logsContainer);
-        
-        document.body.appendChild(debugPanel);
-    }
-    
-    const logsContainer = document.getElementById('gps-debug-logs');
-    if (logsContainer) {
-        const logItem = document.createElement('div');
-        logItem.style.marginBottom = "5px";
-        logItem.style.lineHeight = "1.3";
-        let prefix = "ℹ️ ";
-        if (type === 'success') { logItem.style.color = '#34C759'; prefix = "✅ "; }
-        else if (type === 'error') { logItem.style.color = '#FF3B30'; prefix = "❌ "; }
-        else if (type === 'warning') { logItem.style.color = '#FF9500'; prefix = "⚠️ "; }
-        
-        const timestamp = new Date().toLocaleTimeString();
-        logItem.innerHTML = `[${timestamp}] ${prefix}${message}`;
-        logsContainer.appendChild(logItem);
-        
-        // Scroll to bottom
-        debugPanel.scrollTop = debugPanel.scrollHeight;
-    }
+    console.log(`[GPS-Debug] [${type.toUpperCase()}] ${message}`);
 }
 
 function getCurrentLocation() {
@@ -3658,33 +3559,144 @@ function saveSearchCache(key, value) {
     }
 }
 
-// Global POI Index for fuzzy search & auto-complete
-const poiIndex = [];
+// --- Yandex Geocoder Integration ---
 
-function indexPoiItem(item) {
-    const name = item.display_name;
-    if (!name) return;
+async function yandexSearch(query, activeRegion) {
+    if (typeof ymaps === 'undefined' || !ymaps.geocode) {
+        console.warn("Yandex Maps API is not ready yet. Waiting...");
+        for (let i = 0; i < 10; i++) {
+            await new Promise(r => setTimeout(r, 100));
+            if (typeof ymaps !== 'undefined' && ymaps.geocode) break;
+        }
+        if (typeof ymaps === 'undefined' || !ymaps.geocode) {
+            return [];
+        }
+    }
     
-    const lat = item.lat;
-    const lon = item.lon;
-    const coordKey = `${lat.toFixed(4)}_${lon.toFixed(4)}`;
+    let options = {
+        results: 30
+    };
     
-    const exists = poiIndex.some(idxItem => {
-        const idxLat = idxItem.lat;
-        const idxLon = idxItem.lon;
-        const idxKey = `${idxLat.toFixed(4)}_${idxLon.toFixed(4)}`;
-        return idxKey === coordKey;
+    if (activeRegion && activeRegion.lat && activeRegion.lng) {
+        const lat = Number(activeRegion.lat);
+        const lng = Number(activeRegion.lng);
+        // Prioritize search within a bounding box around the active region
+        options.boundedBy = [
+            [lat - 0.45, lng - 0.45],
+            [lat + 0.45, lng + 0.45]
+        ];
+        options.strictBounds = false; // Prioritize but don't restrict completely
+    }
+    
+    try {
+        const res = await ymaps.geocode(query, options);
+        const results = [];
+        res.geoObjects.each(function (geoObject) {
+            const coords = geoObject.geometry.getCoordinates();
+            const meta = geoObject.properties.get('metaDataProperty.GeocoderMetaData');
+            const components = meta ? (meta.Address ? meta.Address.Components : []) : [];
+            const addressObj = parseYandexComponents(components, geoObject);
+            const addressName = formatUzbekAddress(addressObj) || geoObject.properties.get('text') || '';
+            
+            results.push({
+                lat: coords[0],
+                lon: coords[1],
+                display_name: addressName,
+                address: addressObj,
+                yandexKind: meta ? meta.kind : 'other',
+                yandexText: meta ? (meta.Address ? meta.Address.formatted_address : '') : ''
+            });
+        });
+        return results;
+    } catch (err) {
+        console.error("Yandex forward geocoding failed:", err);
+        return [];
+    }
+}
+
+async function yandexReverseGeocode(lat, lng) {
+    if (typeof ymaps === 'undefined' || !ymaps.geocode) {
+        console.warn("Yandex Maps API is not ready yet. Waiting...");
+        for (let i = 0; i < 10; i++) {
+            await new Promise(r => setTimeout(r, 100));
+            if (typeof ymaps !== 'undefined' && ymaps.geocode) break;
+        }
+        if (typeof ymaps === 'undefined' || !ymaps.geocode) {
+            return { addressName: '', addressObj: null };
+        }
+    }
+    
+    try {
+        const res = await ymaps.geocode([lat, lng], { results: 1 });
+        const geoObject = res.geoObjects.get(0);
+        if (!geoObject) {
+            return { addressName: '', addressObj: null };
+        }
+        
+        const meta = geoObject.properties.get('metaDataProperty.GeocoderMetaData');
+        const components = meta ? (meta.Address ? meta.Address.Components : []) : [];
+        const addressObj = parseYandexComponents(components, geoObject);
+        const addressName = formatUzbekAddress(addressObj) || geoObject.properties.get('text') || '';
+        
+        return { addressName, addressObj };
+    } catch (err) {
+        console.error("Yandex reverse geocoding failed:", err);
+        return { addressName: '', addressObj: null };
+    }
+}
+
+function parseYandexComponents(components, geoObject) {
+    const addr = {
+        province: '',
+        area: '',
+        locality: '',
+        district: '',
+        street: '',
+        house: '',
+        amenity: ''
+    };
+    
+    components.forEach(comp => {
+        switch (comp.kind) {
+            case 'province':
+                addr.province = comp.name;
+                break;
+            case 'area':
+                addr.area = comp.name;
+                break;
+            case 'locality':
+                addr.locality = comp.name;
+                break;
+            case 'district':
+                addr.district = comp.name;
+                break;
+            case 'street':
+                addr.street = comp.name;
+                break;
+            case 'house':
+                addr.house = comp.name;
+                break;
+        }
     });
     
-    if (!exists) {
-        poiIndex.push({
-            name: name,
-            cleanName: cleanName(name),
-            item: item,
-            lat: lat,
-            lon: lon
-        });
+    const name = geoObject.properties.get('name') || '';
+    const kind = geoObject.properties.get('metaDataProperty.GeocoderMetaData.kind') || '';
+    
+    // Check if geoObject has a name that is a POI
+    const addressKinds = ['house', 'street', 'locality', 'district', 'area', 'province', 'country'];
+    if (name && !addressKinds.includes(kind)) {
+        addr.amenity = name;
     }
+    
+    return {
+        amenity: addr.amenity,
+        road: addr.street,
+        neighbourhood: addr.district,
+        house_number: addr.house,
+        city_district: addr.area,
+        city: addr.locality,
+        state: addr.province
+    };
 }
 
 function cleanName(str) {
@@ -3706,147 +3718,71 @@ function matchNames(name1, name2) {
     return c1.includes(c2) || c2.includes(c1);
 }
 
-function isResultInRegion(item, regionId) {
-    if (!regionId) return false;
-    const addr = item.address || {};
-    const state = addr.state || '';
-    const city = addr.city || addr.town || addr.village || '';
-    const displayName = item.display_name || '';
-
-    switch (regionId) {
-        case 'toshkent_sh':
-            return (
-                matchNames(city, 'Toshkent') && 
-                !matchNames(state, 'Toshkent viloyati')
-            ) || (
-                matchNames(state, 'Toshkent') && 
-                !matchNames(state, 'Toshkent viloyati')
-            );
-        case 'toshkent_v':
-            return matchNames(state, 'Toshkent viloyati') || matchNames(displayName, 'Toshkent viloyati');
-        case 'qoraqalpogiston':
-            return (
-                matchNames(state, 'Qoraqalpog‘iston') || 
-                matchNames(state, 'Karakalpakstan') || 
-                matchNames(state, 'Каракалпакстан') || 
-                matchNames(displayName, 'Qoraqalpog‘iston') ||
-                matchNames(displayName, 'Karakalpakstan') ||
-                matchNames(city, 'Nukus')
-            );
-        default:
-            const regionObj = regionsData.find(r => r.id === regionId);
-            if (!regionObj) return false;
-            const cleanReg = cleanName(regionObj.name);
-            return (
-                cleanName(state).includes(cleanReg) || 
-                cleanName(city).includes(cleanReg) || 
-                cleanName(displayName).includes(cleanReg)
-            );
-    }
-}
-
-function getRegionSearchSuffix(region) {
-    if (!region) return '';
-    if (region.id === 'toshkent_sh') return 'Toshkent';
-    if (region.id === 'toshkent_v') return 'Toshkent viloyati';
-    if (region.id === 'qoraqalpogiston') return 'Nukus Qoraqalpogiston';
-    return region.name;
-}
-
-function getDistanceKm(lat1, lon1, lat2, lon2) {
-    const R = 6371; // Radius of the earth in km
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = 
-        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-        Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c; // Distance in km
-}
-
-function mapPhotonPropertiesToAddress(props) {
-    return {
-        neighbourhood: props.suburb || props.locality,
-        road: props.street,
-        house_number: props.house_number,
-        city_district: props.district,
-        city: props.city,
-        town: props.town,
-        village: props.village,
-        state: props.state
-    };
-}
-
-function getResultType(item) {
-    const isPhoton = !!item.properties;
+function isYandexResultInRegion(item, activeRegion) {
+    if (!activeRegion) return false;
     
-    if (isPhoton) {
-        const props = item.properties;
-        const type = props.type;
-        const osmKey = props.osm_key;
-        const osmValue = props.osm_value;
-        
-        if (type === 'house' || osmKey === 'building' || props.postcode || props.house_number) {
-            return 'uy';
-        }
-        if (type === 'street' || osmKey === 'highway') {
-            return 'kocha';
-        }
-        if (type === 'locality' || osmValue === 'suburb' || osmValue === 'neighbourhood' || osmValue === 'residential') {
-            return 'mahalla';
-        }
-        if (['school', 'kindergarten', 'college', 'university', 'hospital', 'clinic', 'pharmacy', 'bank', 'place_of_worship', 'restaurant', 'cafe'].includes(osmValue)) {
-            return osmValue;
-        }
-        if (['school', 'kindergarten', 'college', 'university', 'hospital', 'clinic', 'pharmacy', 'bank', 'place_of_worship', 'restaurant', 'cafe'].includes(osmKey)) {
-            return osmKey;
-        }
-        if (osmKey === 'shop' || osmKey === 'tourism' || osmKey === 'craft' || osmKey === 'industrial') {
-            return 'shop';
-        }
-        if (type === 'district' || type === 'county') {
-            return 'tuman';
-        }
-        if (type === 'city' || type === 'town' || type === 'village') {
-            return 'shahar';
-        }
-        if (type === 'state') {
-            return 'viloyat';
-        }
-    } else {
-        const type = item.type;
-        const cls = item.class;
-        const addr = item.address || {};
-        
-        if (cls === 'building' || type === 'house' || addr.house_number) {
-            return 'uy';
-        }
-        if (cls === 'highway' || addr.road) {
-            return 'kocha';
-        }
-        if (type === 'suburb' || type === 'neighbourhood' || type === 'residential' || type === 'locality' || addr.neighbourhood || addr.suburb) {
-            return 'mahalla';
-        }
-        if (['school', 'kindergarten', 'college', 'university', 'hospital', 'clinic', 'pharmacy', 'bank', 'place_of_worship', 'restaurant', 'cafe'].includes(type)) {
-            return type;
-        }
-        if (['school', 'kindergarten', 'college', 'university', 'hospital', 'clinic', 'pharmacy', 'bank', 'place_of_worship', 'restaurant', 'cafe'].includes(cls)) {
-            return cls;
-        }
-        if (cls === 'shop' || cls === 'tourism' || cls === 'craft' || cls === 'industrial') {
-            return 'shop';
-        }
-        if (type === 'city_district' || type === 'district' || type === 'county' || addr.city_district || addr.county) {
-            return 'tuman';
-        }
-        if (type === 'city' || type === 'town' || type === 'village' || addr.city || addr.town || addr.village) {
-            return 'shahar';
-        }
-        if (type === 'state' || type === 'province' || addr.state) {
-            return 'viloyat';
-        }
+    const cleanReg = cleanName(activeRegion.name);
+    
+    const province = cleanName(item.address.state || '');
+    const locality = cleanName(item.address.city || '');
+    const area = cleanName(item.address.city_district || '');
+    const district = cleanName(item.address.neighbourhood || '');
+    
+    if (activeRegion.id === 'toshkent_sh') {
+        return (province.includes('toshkent') && !province.includes('viloyat')) || locality.includes('toshkent');
     }
+    if (activeRegion.id === 'toshkent_v') {
+        return province.includes('toshkent viloyat') || province.includes('toshkent region');
+    }
+    if (activeRegion.id === 'qoraqalpogiston') {
+        return province.includes('qoraqalpog') || province.includes('karakalpak');
+    }
+    
+    return province.includes(cleanReg) || locality.includes(cleanReg) || area.includes(cleanReg) || district.includes(cleanReg);
+}
+
+function getYandexResultType(item) {
+    const kind = item.yandexKind;
+    const name = (item.address.amenity || '').toLowerCase();
+    
+    if (name.includes('maktab') || name.includes('school') || name.includes('shkola') || name.includes('лицей') || name.includes('litsey')) {
+        return 'school';
+    }
+    if (name.includes('bogcha') || name.includes('bog\'cha') || name.includes('kindergarten') || name.includes('sad') || name.includes('ясли')) {
+        return 'kindergarten';
+    }
+    if (name.includes('kasalxona') || name.includes('shifoxona') || name.includes('hospital') || name.includes('poliklinika') || name.includes('clinic') || name.includes('bolnitsa') || name.includes('shifoxonasi')) {
+        return 'hospital';
+    }
+    if (name.includes('dorixona') || name.includes('pharmacy') || name.includes('apteka')) {
+        return 'pharmacy';
+    }
+    if (name.includes('bank')) {
+        return 'bank';
+    }
+    if (name.includes('masjid') || name.includes('mosque')) {
+        return 'place_of_worship';
+    }
+    if (name.includes('supermarket') || name.includes('korzinka') || name.includes('makro') || name.includes('do\'kon') || name.includes('dokon') || name.includes('shop') || name.includes('magazin') || name.includes('bozor')) {
+        return 'shop';
+    }
+    if (name.includes('kafe') || name.includes('cafe') || name.includes('choyxona')) {
+        return 'cafe';
+    }
+    if (name.includes('restoran') || name.includes('restaurant')) {
+        return 'restaurant';
+    }
+    if (name.includes('universitet') || name.includes('institut') || name.includes('university') || name.includes('institute') || name.includes('tashkilot') || name.includes('organi')) {
+        return 'tashkilot';
+    }
+    
+    if (kind === 'house') return 'uy';
+    if (kind === 'street') return 'kocha';
+    if (kind === 'district') return 'mahalla';
+    if (kind === 'locality') return 'shahar';
+    if (kind === 'area') return 'tuman';
+    if (kind === 'province') return 'viloyat';
+    
     return 'other';
 }
 
@@ -3865,12 +3801,11 @@ function getTypeIcon(type) {
         'marketplace': '🏪',
         'restaurant': '🏪',
         'cafe': '🏪',
-        'korxona': '🏪',
+        'tashkilot': '🏛',
         
         'mahalla': '📍',
         'uy': '🏠',
         'kocha': '🛣',
-        'tashkilot': '🏛',
         'tuman': '🗺',
         'shahar': '🏙',
         'viloyat': '🗺',
@@ -3879,389 +3814,13 @@ function getTypeIcon(type) {
     return icons[type] || '📍';
 }
 
-function parsePoiQuery(query) {
-    const q = query.toLowerCase();
-    
-    // Extract numbers
-    const numberMatch = q.match(/\b\d+\b/);
-    const queryNumber = numberMatch ? numberMatch[0] : null;
-    
-    let types = [];
-    
-    if (/\b(maktab|school|shkola|школа)\b/i.test(q)) {
-        types.push({ key: 'amenity', value: 'school' });
-    }
-    if (/\b(bog['‘`a]?cha|kindergarten|sad|сад|детсад)\b/i.test(q)) {
-        types.push({ key: 'amenity', value: 'kindergarten' });
-    }
-    if (/\b(kollej|college|колледж)\b/i.test(q)) {
-        types.push({ key: 'amenity', value: 'college' });
-    }
-    if (/\b(universitet|university|institut|institute|вуз|ун-t)\b/i.test(q)) {
-        types.push({ key: 'amenity', value: 'university' });
-    }
-    if (/\b(shifoxona|kasalxona|hospital|больниц)\b/i.test(q)) {
-        types.push({ key: 'amenity', value: 'hospital' });
-    }
-    if (/\b(poliklinika|clinic|поликлиник|клиник)\b/i.test(q)) {
-        types.push({ key: 'amenity', value: 'clinic' });
-    }
-    if (/\b(dorixona|pharmacy|apteka|аптек)\b/i.test(q)) {
-        types.push({ key: 'amenity', value: 'pharmacy' });
-    }
-    if (/\b(bank|банк)\b/i.test(q)) {
-        types.push({ key: 'amenity', value: 'bank' });
-    }
-    if (/\b(bozor|market|рынок|супермаркет)\b/i.test(q)) {
-        types.push({ key: 'amenity', value: 'marketplace' });
-        types.push({ key: 'shop', value: 'supermarket' });
-    }
-    if (/\b(dokon|do['‘`]kon|shop|magazin|магазин)\b/i.test(q)) {
-        types.push({ key: 'shop', value: '*' });
-    }
-    if (/\b(restoran|restaurant|ресторан)\b/i.test(q)) {
-        types.push({ key: 'amenity', value: 'restaurant' });
-    }
-    if (/\b(kafe|cafe|кафе)\b/i.test(q)) {
-        types.push({ key: 'amenity', value: 'cafe' });
-    }
-    if (/\b(masjid|mosque|mechet|мечеть)\b/i.test(q)) {
-        types.push({ key: 'amenity', value: 'place_of_worship' });
-    }
-    
-    return { queryNumber, types };
-}
-
-function levenshteinDistance(a, b) {
-    const matrix = [];
-    for (let i = 0; i <= b.length; i++) matrix[i] = [i];
-    for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
-    for (let i = 1; i <= b.length; i++) {
-        for (let j = 1; j <= a.length; j++) {
-            if (b.charAt(i - 1) === a.charAt(j - 1)) {
-                matrix[i][j] = matrix[i - 1][j - 1];
-            } else {
-                matrix[i][j] = Math.min(
-                    matrix[i - 1][j - 1] + 1, // substitution
-                    matrix[i][j - 1] + 1,     // insertion
-                    matrix[i - 1][j] + 1      // deletion
-                );
-            }
-        }
-    }
-    return matrix[b.length][a.length];
-}
-
-function fuzzyMatch(query, target) {
-    const q = cleanName(query);
-    const t = cleanName(target);
-    if (!q || !t) return 0;
-    
-    if (t.includes(q)) return 100;
-    
-    const qWords = q.split(/\s+/);
-    const tWords = t.split(/\s+/);
-    let matchedWords = 0;
-    qWords.forEach(qw => {
-        if (tWords.some(tw => tw.includes(qw) || qw.includes(tw))) {
-            matchedWords++;
-        }
-    });
-    
-    if (matchedWords > 0) {
-        return (matchedWords / qWords.length) * 80;
-    }
-    
-    if (qWords.length === 1 && tWords.length === 1) {
-        const dist = levenshteinDistance(q, t);
-        const maxLen = Math.max(q.length, t.length);
-        if (dist <= 2 && maxLen > 3) {
-            return (1 - dist / maxLen) * 50;
-        }
-    }
-    
-    return 0;
-}
-
-function isPoiQueryMatch(item, queryNumber, types) {
-    const name = item.display_name || '';
-    const itemType = getResultType(item);
-    
-    const typeMatch = types.length === 0 || types.some(t => {
-        if (t.value === 'school') {
-            return ['school', 'college', 'university'].includes(itemType);
-        }
-        if (t.value === 'hospital') {
-            return ['hospital', 'clinic'].includes(itemType);
-        }
-        return itemType === t.value || itemType === t.key;
-    });
-    
-    if (!typeMatch) return false;
-    
-    if (queryNumber) {
-        const regex = new RegExp(`\\b${queryNumber}\\b|${queryNumber}-|№${queryNumber}`);
-        return regex.test(name);
-    }
-    
-    return true;
-}
-
-function mapOverpassToStandard(element, activeRegion) {
-    const tags = element.tags || {};
-    const lat = element.lat || (element.center ? element.center.lat : null);
-    const lon = element.lon || (element.center ? element.center.lon : null);
-    
-    if (!lat || !lon) return null;
-    
-    const address = {
-        amenity: tags.name,
-        road: tags["addr:street"] || tags.street,
-        neighbourhood: tags["addr:neighbourhood"] || tags.neighbourhood || tags.suburb,
-        city: tags["addr:city"] || tags.city || tags.town || tags.village,
-        state: tags["addr:state"] || tags.state || tags.province,
-        country: "O'zbekiston"
-    };
-    
-    if (activeRegion) {
-        if (!address.state) {
-            address.state = activeRegion.name;
-        }
-        if (!address.city && activeRegion.id === 'toshkent_sh') {
-            address.city = 'Toshkent';
-        }
-    }
-    
-    const type = tags.amenity || tags.shop || 'poi';
-    const cls = tags.amenity ? 'amenity' : (tags.shop ? 'shop' : 'poi');
-    
-    let displayName = tags.name || '';
-    if (address.road) displayName += `, ${address.road}`;
-    if (address.city) displayName += `, ${address.city}`;
-    if (address.state) displayName += `, ${address.state}`;
-    
-    return {
-        lat: Number(lat),
-        lon: Number(lon),
-        display_name: displayName,
-        address: address,
-        type: type,
-        class: cls
-    };
-}
-
-async function fetchOverpass(query, activeRegion) {
-    const trimmedQuery = query.trim();
-    const { queryNumber, types } = parsePoiQuery(trimmedQuery);
-    
-    if (!activeRegion && types.length === 0) {
-        return [];
-    }
-    
-    let overpassQuery = '[out:json][timeout:15];\n(\n';
-    const locationFilter = activeRegion 
-        ? `(around:100000,${activeRegion.lat},${activeRegion.lng})`
-        : `(37.0,56.0,46.0,74.0)`;
-        
-    if (types.length > 0) {
-        types.forEach(t => {
-            const keyVal = t.value === '*' ? `[~"^${t.key}$"~"."]` : `[${t.key}=${t.value}]`;
-            
-            if (queryNumber) {
-                const numRegex = `\\b${queryNumber}\\b|${queryNumber}-|№${queryNumber}|${queryNumber}-son`;
-                overpassQuery += `  node${keyVal}["name"~"${numRegex}",i]${locationFilter};\n`;
-                overpassQuery += `  way${keyVal}["name"~"${numRegex}",i]${locationFilter};\n`;
-                overpassQuery += `  relation${keyVal}["name"~"${numRegex}",i]${locationFilter};\n`;
-            } else {
-                const nameRegex = trimmedQuery.split(/\s+/).join('|');
-                overpassQuery += `  node${keyVal}["name"~"${nameRegex}",i]${locationFilter};\n`;
-                overpassQuery += `  way${keyVal}["name"~"${nameRegex}",i]${locationFilter};\n`;
-                overpassQuery += `  relation${keyVal}["name"~"${nameRegex}",i]${locationFilter};\n`;
-            }
-        });
-    } else {
-        const nameRegex = trimmedQuery.split(/\s+/).join('|');
-        overpassQuery += `  node["name"~"${nameRegex}",i]${locationFilter};\n`;
-        overpassQuery += `  way["name"~"${nameRegex}",i]${locationFilter};\n`;
-        overpassQuery += `  relation["name"~"${nameRegex}",i]${locationFilter};\n`;
-    }
-    
-    overpassQuery += ');\nout body center;';
-    
-    try {
-        const response = await fetch('https://overpass-api.de/api/interpreter', {
-            method: 'POST',
-            body: 'data=' + encodeURIComponent(overpassQuery),
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
-        });
-        
-        if (!response.ok) {
-            throw new Error("Overpass API response error");
-        }
-        
-        const data = await response.json();
-        if (data && data.elements) {
-            const mapped = data.elements
-                .map(el => mapOverpassToStandard(el, activeRegion))
-                .filter(item => item !== null);
-            return mapped;
-        }
-    } catch (e) {
-        console.warn("Overpass query failed:", e);
-    }
-    return [];
-}
-
-function calculateRelevanceScore(item, query, activeRegion, rawAddr) {
-    let score = 0;
-    
-    const isPhoton = !!item.properties;
-    const displayName = isPhoton ? (item.properties.name + ", " + (item.properties.street || '')) : item.display_name;
-    const type = getResultType(item);
-    
-    const weights = {
-        'school': 5,
-        'kindergarten': 5,
-        'college': 5,
-        'university': 5,
-        'hospital': 5,
-        'clinic': 5,
-        'pharmacy': 5,
-        'bank': 5,
-        'place_of_worship': 5,
-        'shop': 4,
-        'marketplace': 4,
-        'restaurant': 4,
-        'cafe': 4,
-        'mahalla': 3,
-        'kocha': 2,
-        'uy': 1,
-        'other': 0
-    };
-    score += weights[type] || 0;
-    
-    if (activeRegion) {
-        const inRegion = isResultInRegion(item, activeRegion.id);
-        if (inRegion) {
-            score += 1000;
-            
-            let selectedCity = '';
-            if (rawAddr) {
-                selectedCity = rawAddr.city || rawAddr.town || rawAddr.village || rawAddr.hamlet || '';
-            }
-            if (!selectedCity) {
-                if (activeRegion.id === 'toshkent_sh') selectedCity = 'Toshkent';
-                else if (activeRegion.id === 'qoraqalpogiston') selectedCity = 'Nukus';
-                else if (activeRegion.id !== 'toshkent_v') {
-                    selectedCity = activeRegion.name;
-                }
-            }
-            const itemCity = item.address ? (item.address.city || item.address.town || item.address.village || item.address.hamlet || '') : '';
-            if (selectedCity && itemCity && matchNames(itemCity, selectedCity)) {
-                score += 3000;
-            }
-            
-            let selectedDistrict = '';
-            if (rawAddr) {
-                selectedDistrict = rawAddr.city_district || rawAddr.district || rawAddr.county || '';
-            }
-            const itemDistrict = item.address ? (item.address.city_district || item.address.district || item.address.county || '') : '';
-            if (selectedDistrict && itemDistrict && matchNames(itemDistrict, selectedDistrict)) {
-                score += 2000;
-            }
-        }
-    }
-    
-    const { queryNumber, types } = parsePoiQuery(query);
-    if (isPoiQueryMatch(item, queryNumber, types)) {
-        score += 5000; // POI matching boost
-    }
-    
-    if (displayName.toLowerCase().includes(query.toLowerCase())) {
-        score += 100;
-    }
-    
-    return score;
-}
-
 function formatUzbekAddress(address) {
     if (!address) return '';
     const parts = [];
     
-    // 0. Obyekt nomi
-    let obyekt = address.amenity || address.school || address.hospital || address.clinic || address.pharmacy || address.bank || address.marketplace || address.shop || address.restaurant || address.cafe || address.place_of_worship || address.tourism || address.leisure || address.office || address.building;
-    if (obyekt) {
-        parts.push(obyekt.trim());
-    }
-    
-    // 1. Ko'cha
-    let street = address.road || address.street;
-    if (street) {
-        street = street.trim();
-        if (!/ko'cha/i.test(street) && !/ko`cha/i.test(street) && !/ko‘cha/i.test(street) && !/улица/i.test(street) && !/ул\./i.test(street)) {
-            street += " ko'chasi";
-        }
-        parts.push(street);
-    }
-    
-    // 2. Mahalla
-    let mahalla = address.neighbourhood || address.suburb || address.residential || address.island;
-    if (mahalla) {
-        mahalla = mahalla.trim();
-        if (!/mahalla/i.test(mahalla) && !/маҳалла/i.test(mahalla)) {
-            mahalla += " mahallasi";
-        }
-        parts.push(mahalla);
-    }
-    
-    // 3. Uy raqami
-    let houseNumber = address.house_number;
-    if (houseNumber) {
-        houseNumber = houseNumber.trim();
-        if (/^\d+[A-Za-zА-Яа-я]?$/.test(houseNumber)) {
-            houseNumber += "-uy";
-        }
-        parts.push(houseNumber);
-    }
-    
-    // 4. Tuman (district)
-    let tuman = address.city_district || address.district || address.county;
-    if (tuman) {
-        tuman = tuman.trim();
-        const cityOrTown = address.city || address.town;
-        if (cityOrTown && tuman.toLowerCase() === cityOrTown.toLowerCase()) {
-            tuman = '';
-        }
-        const state = address.state || address.region;
-        if (state && tuman.toLowerCase() === state.toLowerCase()) {
-            tuman = '';
-        }
-        
-        if (tuman) {
-            if (!/tuman/i.test(tuman) && !/туман/i.test(tuman) && !/district/i.test(tuman)) {
-                tuman += " tumani";
-            }
-            parts.push(tuman);
-        }
-    }
-    
-    // 5. Shahar (city, town, village)
-    let shahar = address.city || address.town || address.village || address.hamlet;
-    if (shahar) {
-        shahar = shahar.trim();
-        if (!/shahar/i.test(shahar) && !/город/i.test(shahar) && !/city/i.test(shahar)) {
-            shahar += " shahri";
-        }
-        parts.push(shahar);
-    }
-
-    // 6. Viloyat (state/province)
-    let viloyat = address.state || address.region;
+    let viloyat = address.state || address.region || '';
     if (viloyat) {
-        viloyat = viloyat.trim();
-        viloyat = viloyat.replace(/(Region|Province|область|город)/gi, '').trim();
+        viloyat = viloyat.trim().replace(/(Region|Province|область|город)/gi, '').trim();
         viloyat = viloyat.replace(/o‘/gi, "o'").replace(/o‘/gi, "o'").replace(/g‘/gi, "g'");
         if (viloyat.toLowerCase() === 'toshkent') {
             const city = address.city || address.town || address.village;
@@ -4277,7 +3836,69 @@ function formatUzbekAddress(address) {
                 viloyat += " viloyati";
             }
         }
-        parts.push(viloyat);
+    }
+    
+    let shahar = address.city || address.town || address.village || address.hamlet || '';
+    if (shahar) {
+        shahar = shahar.trim();
+        if (!/shahar/i.test(shahar) && !/город/i.test(shahar) && !/city/i.test(shahar) && !/tuman/i.test(shahar)) {
+            shahar += " shahri";
+        }
+    }
+    
+    let tuman = address.city_district || address.district || address.county || '';
+    if (tuman) {
+        tuman = tuman.trim();
+        if (shahar && tuman.toLowerCase() === shahar.toLowerCase().replace(" shahri", "")) {
+            tuman = '';
+        }
+        if (viloyat && tuman.toLowerCase() === viloyat.toLowerCase().replace(" viloyati", "")) {
+            tuman = '';
+        }
+        if (tuman) {
+            if (!/tuman/i.test(tuman) && !/туман/i.test(tuman) && !/district/i.test(tuman) && !/shahar/i.test(tuman)) {
+                tuman += " tumani";
+            }
+        }
+    }
+    
+    let mahalla = address.neighbourhood || address.suburb || address.residential || address.island || '';
+    if (mahalla) {
+        mahalla = mahalla.trim();
+        if (!/mahalla/i.test(mahalla) && !/маҳалла/i.test(mahalla) && !/tuman/i.test(mahalla) && !/shahar/i.test(mahalla)) {
+            mahalla += " mahallasi";
+        }
+    }
+    
+    let street = address.road || address.street || '';
+    if (street) {
+        street = street.trim();
+        if (!/ko'cha/i.test(street) && !/ko`cha/i.test(street) && !/ko‘cha/i.test(street) && !/уlice/i.test(street) && !/улица/i.test(street) && !/ул\./i.test(street)) {
+            street += " ko'chasi";
+        }
+    }
+    
+    let houseNumber = address.house_number || '';
+    if (houseNumber) {
+        houseNumber = houseNumber.trim();
+        if (/^\d+[A-Za-zА-Яа-я]?$/.test(houseNumber)) {
+            houseNumber += "-uy";
+        }
+    }
+    
+    if (viloyat) parts.push(viloyat);
+    if (tuman && tuman !== viloyat) parts.push(tuman);
+    if (shahar && shahar !== viloyat && shahar !== tuman) parts.push(shahar);
+    if (mahalla) parts.push(mahalla);
+    if (street) parts.push(street);
+    if (houseNumber) parts.push(houseNumber);
+    
+    let obyekt = address.amenity || address.school || address.hospital || address.clinic || address.pharmacy || address.bank || address.marketplace || address.shop || address.restaurant || address.cafe || address.place_of_worship || address.tourism || address.leisure || address.office || address.building;
+    if (obyekt) {
+        obyekt = obyekt.trim();
+        if (parts.length === 0 || !parts[0].toLowerCase().includes(obyekt.toLowerCase())) {
+            parts.unshift(obyekt);
+        }
     }
     
     return parts.length > 0 ? parts.join(', ') : null;
@@ -4287,19 +3908,90 @@ function getSuggestionDisplay(item) {
     let title = '';
     let subtitle = '';
     
-    const formatted = formatUzbekAddress(item.address);
+    const addr = item.address || {};
+    const subParts = [];
     
-    if (formatted) {
-        const parts = formatted.split(', ');
-        title = parts[0];
-        if (parts.length > 1) {
-            subtitle = parts.slice(1).join(', ');
+    let viloyat = addr.state || '';
+    let shahar = addr.city || '';
+    let tuman = addr.city_district || '';
+    let mahalla = addr.neighbourhood || '';
+    let street = addr.road || '';
+    let houseNumber = addr.house_number || '';
+    
+    if (viloyat) {
+        const cleanVil = viloyat.trim().replace(/(Region|Province|область|город)/gi, '').trim().replace(/o‘/gi, "o'").replace(/g‘/gi, "g'");
+        if (cleanVil.toLowerCase() === 'toshkent') {
+            viloyat = shahar && /toshkent/i.test(shahar) ? "Toshkent shahri" : "Toshkent viloyati";
+        } else if (cleanVil.toLowerCase().includes('qoraqalpogiston') || cleanVil.toLowerCase().includes('karakalpakstan')) {
+            viloyat = "Qoraqalpog‘iston Respublikasi";
+        } else if (!/viloyat/i.test(cleanVil) && !/shahar/i.test(cleanVil)) {
+            viloyat = cleanVil + " viloyati";
         }
+    }
+    
+    if (shahar && !/shahar/i.test(shahar) && !/город/i.test(shahar) && !/city/i.test(shahar) && !/tuman/i.test(shahar)) {
+        shahar = shahar.trim() + " shahri";
+    }
+    
+    if (tuman) {
+        const cleanTum = tuman.trim();
+        if (shahar && cleanTum.toLowerCase() === shahar.toLowerCase().replace(" shahri", "")) {
+            tuman = '';
+        } else if (viloyat && cleanTum.toLowerCase() === viloyat.toLowerCase().replace(" viloyati", "")) {
+            tuman = '';
+        } else if (!/tuman/i.test(cleanTum) && !/туман/i.test(cleanTum) && !/shahar/i.test(cleanTum)) {
+            tuman = cleanTum + " tumani";
+        }
+    }
+    
+    if (mahalla && !/mahalla/i.test(mahalla) && !/маҳалла/i.test(mahalla) && !/tuman/i.test(mahalla) && !/shahar/i.test(mahalla)) {
+        mahalla = mahalla.trim() + " mahallasi";
+    }
+    
+    if (street && !/ko'cha/i.test(street) && !/ko`cha/i.test(street) && !/ko‘cha/i.test(street) && !/улица/i.test(street) && !/ул\./i.test(street)) {
+        street = street.trim() + " ko'chasi";
+    }
+    
+    if (houseNumber && /^\d+[A-Za-zА-Яа-я]?$/.test(houseNumber.trim())) {
+        houseNumber = houseNumber.trim() + "-uy";
+    }
+    
+    // Choose title & subtitle dynamically
+    if (addr.amenity) {
+        title = addr.amenity.trim();
+        if (viloyat) subParts.push(viloyat);
+        if (tuman && tuman !== viloyat) subParts.push(tuman);
+        if (shahar && shahar !== viloyat && shahar !== tuman) subParts.push(shahar);
+        if (mahalla) subParts.push(mahalla);
+        if (street) subParts.push(street);
+        if (houseNumber) subParts.push(houseNumber);
+        subtitle = subParts.join(', ');
+    } else if (street) {
+        title = street + (houseNumber ? ', ' + houseNumber : '');
+        if (viloyat) subParts.push(viloyat);
+        if (tuman && tuman !== viloyat) subParts.push(tuman);
+        if (shahar && shahar !== viloyat && shahar !== tuman) subParts.push(shahar);
+        if (mahalla) subParts.push(mahalla);
+        subtitle = subParts.join(', ');
+    } else if (mahalla) {
+        title = mahalla;
+        if (viloyat) subParts.push(viloyat);
+        if (tuman && tuman !== viloyat) subParts.push(tuman);
+        if (shahar && shahar !== viloyat && shahar !== tuman) subParts.push(shahar);
+        subtitle = subParts.join(', ');
+    } else if (shahar) {
+        title = shahar;
+        if (viloyat && viloyat !== shahar) subParts.push(viloyat);
+        if (tuman && tuman !== viloyat && tuman !== shahar) subParts.push(tuman);
+        subtitle = subParts.join(', ');
+    } else if (viloyat) {
+        title = viloyat;
+        subtitle = "O'zbekiston";
     } else {
-        const parts = item.display_name.split(', ');
-        title = parts[0] || '';
-        if (parts.length > 1) {
-            subtitle = parts.slice(1).join(', ');
+        const partsAll = item.display_name.split(', ');
+        title = partsAll[0] || '';
+        if (partsAll.length > 1) {
+            subtitle = partsAll.slice(1).join(', ');
         }
     }
     
@@ -4347,7 +4039,7 @@ function renderResults(results, query, suggestionsDiv, type) {
         results.forEach(item => {
             const { title, subtitle } = getSuggestionDisplay(item);
             const fullAddress = formatUzbekAddress(item.address) || item.display_name;
-            const itemType = getResultType(item);
+            const itemType = getYandexResultType(item);
             const icon = getTypeIcon(itemType);
             
             const div = document.createElement('div');
@@ -4407,7 +4099,6 @@ function initAddressSearch() {
             }
             
             const activeRegion = type === 'pickup' ? selectedPickup.region : selectedDest.region;
-            const rawAddr = type === 'pickup' ? selectedPickup.rawAddress : selectedDest.rawAddress;
             
             const cacheKey = `${trimmedQuery}_${activeRegion ? activeRegion.id : 'no_region'}_${currentLang}`;
             if (searchCache[cacheKey]) {
@@ -4417,219 +4108,54 @@ function initAddressSearch() {
             }
             
             try {
-                const lang = currentLang === 'uz' ? 'uz' : (currentLang === 'ru' ? 'ru' : 'en');
+                let combined = await yandexSearch(trimmedQuery, activeRegion);
                 
-                let nominatimResultsRegion = [];
-                let nominatimResultsGeneral = [];
-                let photonResultsRegion = [];
-                let photonResultsGeneral = [];
-                let overpassResults = [];
-                
-                const regionSuffix = activeRegion ? getRegionSearchSuffix(activeRegion) : '';
-                const nominatimPromises = [];
-                
-                // Stage 1: Nominatim Search
-                if (activeRegion) {
-                    const regionalUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(trimmedQuery + ', ' + regionSuffix)}&format=json&addressdetails=1&limit=15&countrycodes=uz&accept-language=${lang}`;
-                    nominatimPromises.push(
-                        fetch(regionalUrl, { headers: { 'User-Agent': 'VijdonGO-Taxi-App' } })
-                            .then(res => res.ok ? res.json() : [])
-                            .catch(err => { console.warn("Regional Nominatim fetch failed:", err); return []; })
-                    );
-                }
-                
-                const generalUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(trimmedQuery)}&format=json&addressdetails=1&limit=15&countrycodes=uz&accept-language=${lang}`;
-                nominatimPromises.push(
-                    fetch(generalUrl, { headers: { 'User-Agent': 'VijdonGO-Taxi-App' } })
-                        .then(res => res.ok ? res.json() : [])
-                        .catch(err => { console.warn("General Nominatim fetch failed:", err); return []; })
-                );
-                
-                const nominatimRes = await Promise.all(nominatimPromises);
-                if (activeRegion) {
-                    nominatimResultsRegion = nominatimRes[0] || [];
-                    nominatimResultsGeneral = nominatimRes[1] || [];
-                } else {
-                    nominatimResultsGeneral = nominatimRes[0] || [];
-                }
-                
-                let nominatimCount = nominatimResultsRegion.length + nominatimResultsGeneral.length;
-                const { queryNumber, types: parsedTypes } = parsePoiQuery(trimmedQuery);
-                
-                // Stage 2: Overpass API Fallback
-                if (nominatimCount < 5 || parsedTypes.length > 0) {
-                    overpassResults = await fetchOverpass(trimmedQuery, activeRegion);
-                }
-                
-                // Photon Fallback (if Nominatim and Overpass combined are still sparse)
-                if (nominatimCount + overpassResults.length < 3) {
-                    const photonPromises = [];
-                    if (activeRegion) {
-                        let regionalPhotonUrl = `https://photon.komoot.io/api/?q=${encodeURIComponent(trimmedQuery + ', ' + regionSuffix)}&limit=15&countrycode=uz&lang=${lang}`;
-                        if (activeRegion.lat && activeRegion.lng) {
-                            regionalPhotonUrl += `&lat=${activeRegion.lat}&lon=${activeRegion.lng}`;
-                        }
-                        photonPromises.push(
-                            fetch(regionalPhotonUrl)
-                                .then(res => res.ok ? res.json() : null)
-                                .then(data => data && data.features ? data.features : [])
-                                .catch(err => { console.warn("Regional Photon fetch failed:", err); return []; })
-                        );
-                    }
-                    
-                    let generalPhotonUrl = `https://photon.komoot.io/api/?q=${encodeURIComponent(trimmedQuery)}&limit=15&countrycode=uz&lang=${lang}`;
-                    if (activeRegion && activeRegion.lat && activeRegion.lng) {
-                        generalPhotonUrl += `&lat=${activeRegion.lat}&lon=${activeRegion.lng}`;
-                    }
-                    photonPromises.push(
-                        fetch(generalPhotonUrl)
-                            .then(res => res.ok ? res.json() : null)
-                            .then(data => data && data.features ? data.features : [])
-                            .catch(err => { console.warn("General Photon fetch failed:", err); return []; })
-                    );
-                    
-                    const photonRes = await Promise.all(photonPromises);
-                    if (activeRegion) {
-                        photonResultsRegion = photonRes[0] || [];
-                        photonResultsGeneral = photonRes[1] || [];
-                    } else {
-                        photonResultsGeneral = photonRes[0] || [];
-                    }
-                }
-                
-                const combined = [];
-                const seenCoords = new Set();
-                
-                function addUniqueItem(lat, lon, itemData) {
-                    if (isNaN(lat) || isNaN(lon)) return;
-                    const coordKey = `${lat.toFixed(4)}_${lon.toFixed(4)}`;
-                    if (seenCoords.has(coordKey)) return;
-                    seenCoords.add(coordKey);
-                    combined.push(itemData);
-                }
-                
-                // Add local matches first if fuzzy match score is high
-                if (poiIndex.length > 0) {
-                    poiIndex.forEach(entry => {
-                        const matchScore = fuzzyMatch(trimmedQuery, entry.name);
-                        if (matchScore > 30) {
-                            const itemCopy = { ...entry.item };
-                            itemCopy._localMatchScore = matchScore;
-                            addUniqueItem(itemCopy.lat, itemCopy.lon, itemCopy);
-                        }
-                    });
-                }
-                
-                nominatimResultsRegion.forEach(item => {
-                    const lat = parseFloat(item.lat);
-                    const lon = parseFloat(item.lon);
-                    addUniqueItem(lat, lon, {
-                        lat,
-                        lon,
-                        display_name: item.display_name,
-                        address: item.address,
-                        type: item.type,
-                        class: item.class
-                    });
-                });
-                
-                nominatimResultsGeneral.forEach(item => {
-                    const lat = parseFloat(item.lat);
-                    const lon = parseFloat(item.lon);
-                    addUniqueItem(lat, lon, {
-                        lat,
-                        lon,
-                        display_name: item.display_name,
-                        address: item.address,
-                        type: item.type,
-                        class: item.class
-                    });
-                });
-                
-                overpassResults.forEach(item => {
-                    addUniqueItem(item.lat, item.lon, item);
-                });
-                
-                photonResultsRegion.forEach(feature => {
-                    const coords = feature.geometry.coordinates;
-                    const lat = coords[1];
-                    const lon = coords[0];
-                    const props = feature.properties;
-                    let displayName = props.name || '';
-                    if (props.street) displayName += ', ' + props.street;
-                    if (props.city) displayName += ', ' + props.city;
-                    
-                    addUniqueItem(lat, lon, {
-                        lat,
-                        lon,
-                        display_name: displayName,
-                        address: mapPhotonPropertiesToAddress(props),
-                        properties: props
-                    });
-                });
-                
-                photonResultsGeneral.forEach(feature => {
-                    const coords = feature.geometry.coordinates;
-                    const lat = coords[1];
-                    const lon = coords[0];
-                    const props = feature.properties;
-                    let displayName = props.name || '';
-                    if (props.street) displayName += ', ' + props.street;
-                    if (props.city) displayName += ', ' + props.city;
-                    
-                    addUniqueItem(lat, lon, {
-                        lat,
-                        lon,
-                        display_name: displayName,
-                        address: mapPhotonPropertiesToAddress(props),
-                        properties: props
-                    });
-                });
-                
-                // Index all found results for future fuzzy lookup
+                // Score results
                 combined.forEach(item => {
-                    indexPoiItem(item);
-                });
-                
-                // Score
-                combined.forEach(item => {
-                    item._score = calculateRelevanceScore(item, trimmedQuery, activeRegion, rawAddr);
-                    if (item._localMatchScore) {
-                        item._score += item._localMatchScore;
+                    let score = 0;
+                    const itemType = getYandexResultType(item);
+                    
+                    const weights = {
+                        'school': 1500,
+                        'kindergarten': 1400,
+                        'college': 1300,
+                        'university': 1200,
+                        'hospital': 1100,
+                        'clinic': 1000,
+                        'pharmacy': 900,
+                        'bank': 800,
+                        'place_of_worship': 700,
+                        'shop': 600,
+                        'marketplace': 600,
+                        'restaurant': 600,
+                        'cafe': 600,
+                        'mahalla': 500,
+                        'kocha': 400,
+                        'uy': 300,
+                        'tashkilot': 200,
+                        'tuman': 100,
+                        'shahar': 100,
+                        'viloyat': 100
+                    };
+                    score += weights[itemType] || 0;
+                    
+                    // Exact name match boost
+                    if (item.display_name.toLowerCase().includes(trimmedQuery.toLowerCase())) {
+                        score += 2000;
                     }
+                    
+                    item._score = score;
                 });
                 
-                // Sort
-                const typeRank = {
-                    'school': 15,
-                    'kindergarten': 14,
-                    'college': 13,
-                    'university': 12,
-                    'hospital': 11,
-                    'clinic': 10,
-                    'pharmacy': 9,
-                    'bank': 8,
-                    'place_of_worship': 7,
-                    'shop': 6,
-                    'marketplace': 6,
-                    'restaurant': 6,
-                    'cafe': 6,
-                    'mahalla': 5,
-                    'kocha': 4,
-                    'uy': 3,
-                    'tashkilot': 2,
-                    'tuman': 1,
-                    'shahar': 1,
-                    'viloyat': 1
-                };
-                
+                // Sort by region priority first, then by score
                 combined.sort((a, b) => {
-                    if (b._score !== a._score) {
-                        return b._score - a._score;
+                    const aInRegion = isYandexResultInRegion(a, activeRegion) ? 1 : 0;
+                    const bInRegion = isYandexResultInRegion(b, activeRegion) ? 1 : 0;
+                    
+                    if (aInRegion !== bInRegion) {
+                        return bInRegion - aInRegion; // region matches first!
                     }
-                    const rankA = typeRank[getResultType(a)] || 0;
-                    const rankB = typeRank[getResultType(b)] || 0;
-                    return rankB - rankA;
+                    return b._score - a._score;
                 });
                 
                 const finalResults = combined.slice(0, 10);
