@@ -3573,7 +3573,7 @@ async function yandexSearch(query, activeRegion) {
         }
     }
     
-    // Standardize query to improve Geocoder's chance of finding POIs/landmarks/streets
+    // Standardize query
     let searchQuery = query;
     if (activeRegion && activeRegion.name) {
         const cleanReg = activeRegion.name.replace(/(shahri|viloyati|Respublikasi|tumani)/gi, '').trim();
@@ -3584,24 +3584,13 @@ async function yandexSearch(query, activeRegion) {
 
     let results = [];
     
-    // 1. Try JS API ymaps.geocode
     try {
-        let options = {
-            results: 30,
-            provider: 'yandex#map' // Forces use of map toponym geocoder, avoids services/search/v2 400 Bad Request
-        };
-        if (activeRegion && activeRegion.lat && activeRegion.lng) {
-            const lat = Number(activeRegion.lat);
-            const lng = Number(activeRegion.lng);
-            options.boundedBy = [
-                [lat - 0.45, lng - 0.45],
-                [lat + 0.45, lng + 0.45]
-            ];
-            options.strictBounds = false;
-        }
+        const result = await ymaps.geocode(searchQuery, {
+            results: 20,
+            provider: 'yandex#map'
+        });
         
-        const res = await ymaps.geocode(searchQuery, options);
-        res.geoObjects.each(function (geoObject) {
+        result.geoObjects.each(function (geoObject) {
             const coords = geoObject.geometry.getCoordinates();
             const meta = geoObject.properties.get('metaDataProperty.GeocoderMetaData');
             const components = meta ? (meta.Address ? meta.Address.Components : []) : [];
@@ -3618,54 +3607,7 @@ async function yandexSearch(query, activeRegion) {
             });
         });
     } catch (err) {
-        console.warn("JS API Geocoding warning:", err);
-    }
-    
-    // 2. If results are empty or to ensure POI/landmark lookup with the Geocoder API key
-    if (results.length === 0) {
-        try {
-            const geocoderKey = "6a675aca-ee2b-4d68-89bc-c659641e46e9";
-            let url = `https://geocode-maps.yandex.ru/1.x/?apikey=${geocoderKey}&geocode=${encodeURIComponent(searchQuery)}&format=json&lang=uz_UZ&results=30`;
-            if (activeRegion && activeRegion.lat && activeRegion.lng) {
-                const lat = Number(activeRegion.lat);
-                const lng = Number(activeRegion.lng);
-                url += `&bbox=${lng - 0.45},${lat - 0.45}~${lng + 0.45},${lat + 0.45}&rspn=0`;
-            }
-            
-            const response = await fetch(url);
-            if (response.ok) {
-                const data = await response.json();
-                const members = data.response?.GeoObjectCollection?.featureMember || [];
-                members.forEach(member => {
-                    const geoObject = member.GeoObject;
-                    const pos = geoObject?.Point?.pos || '';
-                    if (!pos) return;
-                    
-                    const posParts = pos.split(' ');
-                    const lon = Number(posParts[0]);
-                    const lat = Number(posParts[1]);
-                    
-                    const meta = geoObject.metaDataProperty?.GeocoderMetaData;
-                    const components = meta?.Address?.Components || [];
-                    const addressObj = parseYandexHTTPComponents(components, geoObject);
-                    const addressName = formatUzbekAddress(addressObj) || meta?.Address?.formatted_address || geoObject.name || '';
-                    
-                    // Avoid duplicate results
-                    if (!results.some(r => Math.abs(r.lat - lat) < 0.0001 && Math.abs(r.lon - lon) < 0.0001)) {
-                        results.push({
-                            lat: lat,
-                            lon: lon,
-                            display_name: addressName,
-                            address: addressObj,
-                            yandexKind: meta ? meta.kind : 'other',
-                            yandexText: meta?.Address?.formatted_address || ''
-                        });
-                    }
-                });
-            }
-        } catch (httpErr) {
-            console.error("HTTP Geocoder API error:", httpErr);
-        }
+        console.error("Yandex Geocoding error:", err);
     }
     
     return results;
@@ -3683,43 +3625,22 @@ async function yandexReverseGeocode(lat, lng) {
         }
     }
     
-    // 1. Try JS API ymaps.geocode
     try {
-        const res = await ymaps.geocode([lat, lng], { results: 1, provider: 'yandex#map' });
-        const geoObject = res.geoObjects.get(0);
+        const result = await ymaps.geocode([lat, lng], { results: 1, provider: 'yandex#map' });
+        const geoObject = result.geoObjects.get(0);
         if (geoObject) {
             const meta = geoObject.properties.get('metaDataProperty.GeocoderMetaData');
             const components = meta ? (meta.Address ? meta.Address.Components : []) : [];
             const addressObj = parseYandexComponents(components, geoObject);
-            const addressName = formatUzbekAddress(addressObj) || geoObject.properties.get('text') || '';
-            if (addressName) {
-                return { addressName, addressObj };
-            }
+            const formatted = formatUzbekAddress(addressObj);
+            
+            return {
+                addressName: formatted || geoObject.properties.get('text') || '',
+                addressObj: addressObj
+            };
         }
     } catch (err) {
-        console.warn("JS API Reverse Geocoding warning:", err);
-    }
-    
-    // 2. Fallback to HTTP Geocoder API
-    try {
-        const geocoderKey = "6a675aca-ee2b-4d68-89bc-c659641e46e9";
-        // HTTP geocoder expects longitude,latitude order
-        const url = `https://geocode-maps.yandex.ru/1.x/?apikey=${geocoderKey}&geocode=${lng},${lat}&format=json&lang=uz_UZ&results=1`;
-        const response = await fetch(url);
-        if (response.ok) {
-            const data = await response.json();
-            const member = data.response?.GeoObjectCollection?.featureMember?.[0];
-            const geoObject = member?.GeoObject;
-            if (geoObject) {
-                const meta = geoObject.metaDataProperty?.GeocoderMetaData;
-                const components = meta?.Address?.Components || [];
-                const addressObj = parseYandexHTTPComponents(components, geoObject);
-                const addressName = formatUzbekAddress(addressObj) || meta?.Address?.formatted_address || geoObject.name || '';
-                return { addressName, addressObj };
-            }
-        }
-    } catch (httpErr) {
-        console.error("HTTP Reverse Geocoder error:", httpErr);
+        console.error("Yandex Reverse Geocoding error:", err);
     }
     
     return { addressName: '', addressObj: null };
