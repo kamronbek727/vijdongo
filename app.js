@@ -2190,35 +2190,11 @@ function updateMarkerAndAddress(type, latlng) {
     
     setMarker(type, { lat, lng }, t('common.addressLoading') || "Manzil aniqlanmoqda...");
     
-    async function performGeocoding() {
-        try {
-            const { addressName, addressObj } = await yandexReverseGeocode(lat, lng);
-            
-            if (addressName) {
-                if (type === 'pickup') {
-                    selectedPickup.rawAddress = addressObj;
-                } else {
-                    selectedDest.rawAddress = addressObj;
-                }
-                
-                console.log("Selected coords:", coords);
-                console.log("Resolved address:", addressName);
-                
-                setMarker(type, { lat, lng }, addressName);
-            } else {
-                throw new Error("No address found in response");
-            }
-        } catch (err) {
-            console.warn("Geocoding failed/timed out:", err);
-            console.log("Selected coords:", coords);
-            
-            const fallbackAddress = t('common.addressNotFound') || "Manzil topilmadi";
-            console.log("Resolved address:", fallbackAddress);
-            setMarker(type, { lat, lng }, fallbackAddress);
-        }
-    }
-    
-    performGeocoding();
+    // Geocoding API vaqtinchalik o'chirilgan (403 xatosi sabali)
+    // Foydalanuvchi tanlagan koordinatalarni darhol saqlash
+    const displayName = `Tanlangan nuqta (${lat.toFixed(5)}, ${lng.toFixed(5)})`;
+    console.log("Selected coords:", lat, lng);
+    setMarker(type, { lat, lng }, displayName);
 }
 
 function setMarker(type, latlng, addressName) {
@@ -4164,64 +4140,10 @@ function initAddressSearch() {
                 return;
             }
             
-            try {
-                let combined = await yandexSearch(trimmedQuery, activeRegion);
-                
-                // Score results
-                combined.forEach(item => {
-                    let score = 0;
-                    const itemType = getYandexResultType(item);
-                    
-                    const weights = {
-                        'school': 1500,
-                        'kindergarten': 1400,
-                        'college': 1300,
-                        'university': 1200,
-                        'hospital': 1100,
-                        'clinic': 1000,
-                        'pharmacy': 900,
-                        'bank': 800,
-                        'place_of_worship': 700,
-                        'shop': 600,
-                        'marketplace': 600,
-                        'restaurant': 600,
-                        'cafe': 600,
-                        'mahalla': 500,
-                        'kocha': 400,
-                        'uy': 300,
-                        'tashkilot': 200,
-                        'tuman': 100,
-                        'shahar': 100,
-                        'viloyat': 100
-                    };
-                    score += weights[itemType] || 0;
-                    
-                    // Exact name match boost
-                    if (item.display_name.toLowerCase().includes(trimmedQuery.toLowerCase())) {
-                        score += 2000;
-                    }
-                    
-                    item._score = score;
-                });
-                
-                // Sort by region priority first, then by score
-                combined.sort((a, b) => {
-                    const aInRegion = isYandexResultInRegion(a, activeRegion) ? 1 : 0;
-                    const bInRegion = isYandexResultInRegion(b, activeRegion) ? 1 : 0;
-                    
-                    if (aInRegion !== bInRegion) {
-                        return bInRegion - aInRegion; // region matches first!
-                    }
-                    return b._score - a._score;
-                });
-                
-                const finalResults = combined.slice(0, 10);
-                saveSearchCache(cacheKey, finalResults);
-                
-                renderResults(finalResults, trimmedQuery, suggestionsDiv, type);
-            } catch (err) {
-                console.error("Geocoding process failed:", err);
-            }
+            // Qidiruv API vaqtinchalik o'chirilgan (403 xatosi sabali)
+            // Foydalanuvchi xaritadan nuqta tanlashi kerak
+            suggestionsDiv.innerHTML = '';
+            suggestionsDiv.classList.add('hidden');
         }, 300);
         
         input.addEventListener('input', (e) => {
