@@ -1,0 +1,196 @@
+/* Custom Scrollbar hide */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+/* Modern Viewport Height Fix */
+:root {
+    --vh: 1vh;
+}
+
+/* Safe area padding for mobile notches */
+.pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.pt-safe {
+    padding-top: env(safe-area-inset-top, 0px);
+}
+.pl-safe {
+    padding-left: env(safe-area-inset-left, 0px);
+}
+.pr-safe {
+    padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* Viewport height utility */
+.h-screen-dynamic {
+    height: 100vh;
+    height: 100dvh;
+}
+
+/* Leaflet Map overrides to clean up UI */
+.leaflet-control-container .leaflet-routing-container {
+    display: none !important;
+}
+.leaflet-control-zoom {
+    display: none !important;
+}
+.leaflet-control-attribution {
+    display: none !important;
+}
+
+/* Base styles for screens - hidden by default to prevent flash */
+.screen {
+    will-change: transform;
+    visibility: hidden;
+    overflow-x: hidden;
+}
+
+/* Splash screen starts visible */
+#splash-screen {
+    visibility: visible;
+}
+
+/* Remove tap highlight on mobile and focus outlines */
+*, html, body, div, button, a {
+    -webkit-tap-highlight-color: transparent !important;
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+html, body {
+    overscroll-behavior-y: none;
+    overscroll-behavior-x: none;
+    overflow-x: hidden;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+}
+button:focus, a:focus, input:focus, select:focus, textarea:focus {
+    outline: none !important;
+}
+
+/* Fix for mobile keyboard pushing content */
+@media screen and (max-height: 450px) {
+    .hide-on-keyboard {
+        display: none !important;
+    }
+}
+
+/* Taxi Marker */
+.car-marker-wrapper {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.car-marker-wrapper img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.25));
+}
+
+/* Yandex Map Container Fixes */
+#home-map, #trip-map, #pickup-map-container, #dest-map-container {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 300px;
+    background-color: transparent !important;
+    position: relative;
+    overflow: visible !important;
+    visibility: visible !important;
+}
+
+/* Force ALL internal Yandex layers to be visible (version-agnostic selectors) */
+[class*="ymaps"][class*="-map"],
+[class*="ymaps"][class*="-inner-panes"],
+[class*="ymaps"][class*="-events-pane"],
+[class*="ymaps"][class*="-ground-pane"],
+[class*="ymaps"][class*="-overlay"],
+[class*="ymaps"][class*="-svg"],
+[class*="ymaps"][class*="-route"] {
+    background-color: transparent !important;
+    visibility: visible !important;
+}
+
+/* Ensure route SVG paths render visibly */
+[class*="ymaps"] svg,
+[class*="ymaps"] svg path,
+[class*="ymaps"] svg polyline {
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Ensure parents have height */
+.screen {
+    height: 100vh;
+    height: 100dvh;
+}
+
+/* Address Search Suggestions styles */
+.search-suggestion-item {
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    background-color: #ffffff;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    border-bottom: 1px solid #f9f9f9;
+}
+.search-suggestion-item:last-child {
+    border-bottom: none;
+}
+.search-suggestion-item:hover, .search-suggestion-item:active {
+    background-color: #f5f5f7;
+}
+.search-suggestion-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #f2f2f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #8e8e93;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+.search-suggestion-text {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.search-suggestion-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2D2D2D;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+.search-suggestion-subtitle {
+    font-size: 11px;
+    color: #8e8e93;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    margin-top: 1px;
+}
+
+/* Location Denied Modal Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}

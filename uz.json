@@ -1,0 +1,200 @@
+{
+  "common": {
+    "searchPlaceholder": "Manzil qidiring...",
+    "continueBtn": "Davom etish",
+    "backBtn": "Ortga",
+    "confirmBtn": "Tasdiqlash",
+    "cancelBtn": "Bekor qilish",
+    "yes": "Ha",
+    "no": "Yo'q",
+    "saveBtn": "Saqlash",
+    "finishBtn": "Tugatish",
+    "selectedAddress": "Tanlangan manzil",
+    "addressLoading": "Manzil aniqlanmoqda...",
+    "addressNotFound": "Manzil topilmadi",
+    "selectAddress": "Manzilni tanlang",
+    "gpsLocating": "Joylashuv aniqlanmoqda...",
+    "gpsNotSupported": "Brauzeringiz joylashuvni aniqlashni qo'llab-quvvatlamaydi.",
+    "mapNotLoaded": "Xarita hali yuklanmadi. Iltimos, kutib turing.",
+    "errorGeneric": "Xatolik yuz berdi",
+    "currency": "so'm",
+    "km": "km",
+    "m": "m"
+  },
+  "gps": {
+    "errorGeneric": "Joylashuvni aniqlashda xatolik yuz berdi.",
+    "errorPermissionDenied": "Joylashuvga ruxsat berilmadi. Iltimos, brauzer sozlamalaridan ruxsat bering.",
+    "errorPositionUnavailable": "Joylashuvni aniqlash imkonsiz. GPS yoqilganligini tekshiring.",
+    "errorTimeout": "Joylashuvni aniqlash vaqti tugadi. Qayta urinib ko'ring."
+  },
+  "nav": {
+    "home": "Asosiy",
+    "trips": "Safarlarim",
+    "messages": "Xabarlar",
+    "profile": "Profil"
+  },
+  "regions": {
+    "toshkent_sh": "Toshkent shahri",
+    "toshkent_v": "Toshkent viloyati",
+    "andijon": "Andijon",
+    "fargona": "Farg‘ona",
+    "namangan": "Namangan",
+    "samarqand": "Samarqand",
+    "buxoro": "Buxoro",
+    "navoiy": "Navoiy",
+    "qashqadaryo": "Qashqadaryo",
+    "surxondaryo": "Surxondaryo",
+    "jizzax": "Jizzax",
+    "sirdaryo": "Sirdaryo",
+    "xorazm": "Xorazm",
+    "qoraqalpogiston": "Qoraqalpog‘iston Respublikasi"
+  },
+  "splash": {
+    "startJourney": "Safarni boshlash"
+  },
+  "login": {
+    "title": "Tizimga kirish",
+    "phoneLabel": "Telefon raqami",
+    "phoneDescription": "Safar buyurtma qilish va hisobingizga kirish uchun telefon raqamingizni kiriting",
+    "phoneError": "Telefon raqamini to'liq kiriting.",
+    "nameSurnameTitle": "Ism va familiya",
+    "nameSurnameDescription": "Iltimos, ismingiz va familiyangizni kiriting",
+    "nameLabel": "Ism",
+    "namePlaceholder": "Ismingizni kiriting",
+    "nameError": "Ismingizni kiriting (kamida 2 ta harf).",
+    "surnameLabel": "Familiya",
+    "surnamePlaceholder": "Familiyangizni kiriting",
+    "genderLabel": "Jinsingiz",
+    "genderDescription": "Profil ma'lumotlarini to'ldirish uchun jinsingizni tanlang",
+    "genderError": "Iltimos, jinsingizni tanlang.",
+    "male": "Erkak",
+    "maleDesc": "Erkaklar uchun profil rasmi",
+    "female": "Ayol",
+    "femaleDesc": "Ayollar uchun profil rasmi",
+    "langSelectTitle": "Tilni tanlang",
+    "langSelectDescription": "Ilova interfeysi uchun qulay tilni tanlang",
+    "uzbek": "O‘zbekcha 🇺🇿",
+    "russian": "Русский 🇷🇺",
+    "english": "English 🇺🇸"
+  },
+  "home": {
+    "title": "Vijdon GO",
+    "greeting": "Assalomu alaykum!",
+    "greetingSub": "Bugun qayerga boramiz?",
+    "greetingUser": "Assalomu alaykum, {name}!",
+    "services": {
+      "taxi": "Taxi",
+      "delivery": "Dostavka, Pochta"
+    },
+    "promoBanner": "Promo Banner"
+  },
+  "taxi": {
+    "title": "Taxi",
+    "fromLabel": "Qayerdan",
+    "fromPlaceholder": "Qayerdasiz?",
+    "toLabel": "Qayerga",
+    "toPlaceholder": "Qayerga borasiz?",
+    "emptyTitle": "Manzillarni tanlang",
+    "emptyDesc": "Olib ketish va borish joyini ko'rsating. Shundan so'ng narx va marshrut paydo bo'ladi.",
+    "calcRoute": "Yo'nalish hisoblanmoqda...",
+    "priceLabel": "Narxi:",
+    "passengers": "Yo'lovchilar soni",
+    "baggage": "Bagaj kerakmi?",
+    "orderBtn": "Buyurtma berish",
+    "loadingRoute": "Yo'l hisoblanmoqda...",
+    "selectPickupFirst": "Avval qayerdan ketishingizni (Qayerdasiz?) tanlang!",
+    "waitRouteCalc": "Yo'l hali hisoblanmoqda, iltimos kuting...",
+    "addressWaitOrMap": "Iltimos, manzil aniqlanishini kuting yoki xaritadan tanlang.",
+    "selectAddressesFirst": "Iltimos, avval jo'nash va borish manzillarini to'liq tanlang!",
+    "invalidCoords": "Manzil koordinatalari xato! Iltimos, manzillarni xaritadan qayta tanlang.",
+    "tariffs": {
+      "start": "START",
+      "startDesc": "Oddiy avto",
+      "komfort": "KOMFORT",
+      "komfortDesc": "Qulay avto",
+      "biznes": "BIZNES",
+      "biznesDesc": "Premium"
+    }
+  },
+  "delivery": {
+    "title": "Dostavka",
+    "bannerTitle": "Pochta va Posylka",
+    "bannerSub": "Tez va ishonchli yetkazib berish xizmati",
+    "fromPlaceholder": "Pochta qayerdan?",
+    "toPlaceholder": "Pochta qayerga?",
+    "tariffName": "DOSTAVKA",
+    "tariffSub": "Pochta yetkazish",
+    "tariffRate": "100 so'm/km",
+    "orderBtn": "Dostavka chaqirish",
+    "loadingRoute": "Yo'l hisoblanmoqda...",
+    "selectAddressesFirst": "Iltimos, pochta olib ketish va yetkazish manzillarini tanlang!"
+  },
+  "pickup": {
+    "title": "Qayerdasiz?"
+  },
+  "dest": {
+    "title": "Qayerga borasiz?"
+  },
+  "waiting": {
+    "searchDriver": "Haydovchi qidirilmoqda...",
+    "searchDesc": "Iltimos, kuting. Sizning yo'nalishingiz bo'yicha haydovchilarga so'rov yuborildi."
+  },
+  "trip": {
+    "statusActive": "Safar davom etmoqda",
+    "statusFinished": "YETIB KELDINGIZ",
+    "statusDriverEnRoute": "HAYDOVCHI YO'LDA",
+    "statusError": "XATOLIK: YO'L TOPILMADI",
+    "driverName": "Haydovchi",
+    "carInfo": "Avtomobil",
+    "cancelBtn": "Safarni bekor qilish",
+    "kmLeft": "km qoldi",
+    "mLeft": "m qoldi"
+  },
+  "trips": {
+    "title": "Safarlarim",
+    "noTrips": "Sizda hali safarlar yo'q.",
+    "completed": "Yakunlangan",
+    "active": "Faol safar"
+  },
+  "messages": {
+    "title": "Xabarlar",
+    "supportTitle": "Qo'llab-quvvatlash xizmati",
+    "supportWelcome": "Assalomu alaykum, sizga qanday yordam bera olaman?",
+    "promoTitle": "Aksiya va chegirmalar",
+    "promoWelcome": "Yangi yil chegirmalari boshlandi!",
+    "driverOnWay": "Yo'ldaman, 5 daqiqada boraman."
+  },
+  "profile": {
+    "title": "Profil",
+    "defaultName": "Foydalanuvchi",
+    "settings": "Sozlamalar",
+    "help": "Yordam",
+    "logout": "Tizimdan chiqish"
+  },
+  "settings": {
+    "title": "Sozlamalar",
+    "language": "Til / Language",
+    "phoneUnchangeable": "Telefon raqami (O'zgartirib bo'lmaydi)",
+    "savedSuccess": "O'zgarishlar saqlandi!"
+  },
+  "call": {
+    "status": "Chaqirilmoqda..."
+  },
+  "chat": {
+    "inputPlaceholder": "Xabar yozing...",
+    "online": "Online",
+    "edit": "Tahrirlash",
+    "delete": "O'chirish",
+    "edited": "(tahrirlandi)",
+    "driverWelcome": "Assalomu alaykum! Men keldim, qayerdasiz?",
+    "confirmDelete": "Xabarni o'chirmoqchimisiz?",
+    "editPrompt": "Xabarni tahrirlash:",
+    "supportReply1": "Muammoingizni yozib qoldiring, tez orada javob beramiz.",
+    "supportReply2": "Operatorlarimiz hozir band, iltimos kuting.",
+    "supportReply3": "Xabaringiz qabul qilindi. Operator tez orada siz bilan bog'lanadi.",
+    "driverReply1": "Xo'p tushunarli.",
+    "driverReply2": "Hozir yetib boraman.",
+    "driverReply3": "Yo'ldaman.",
+    "driverReply4": "Manzilni aniqroq ayta olasizmi?"
+  }
+}

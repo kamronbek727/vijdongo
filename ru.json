@@ -1,0 +1,200 @@
+{
+  "common": {
+    "searchPlaceholder": "Поиск адреса...",
+    "continueBtn": "Продолжить",
+    "backBtn": "Назад",
+    "confirmBtn": "Подтвердить",
+    "cancelBtn": "Отменить",
+    "yes": "Да",
+    "no": "Нет",
+    "saveBtn": "Сохранить",
+    "finishBtn": "Завершить",
+    "selectedAddress": "Выбранный адрес",
+    "addressLoading": "Определение адреса...",
+    "addressNotFound": "Адрес не найден",
+    "selectAddress": "Выберите адрес",
+    "gpsLocating": "Определение местоположения...",
+    "gpsNotSupported": "Ваш браузер не поддерживает геолокацию.",
+    "mapNotLoaded": "Карта еще не загрузилась. Пожалуйста, подождите.",
+    "errorGeneric": "Произошла ошибка",
+    "currency": "сум",
+    "km": "км",
+    "m": "м"
+  },
+  "gps": {
+    "errorGeneric": "Произошла ошибка при определении местоположения.",
+    "errorPermissionDenied": "Доступ к местоположению запрещен. Пожалуйста, разрешите в настройках браузера.",
+    "errorPositionUnavailable": "Невозможно определить местоположение. Проверьте, включен ли GPS.",
+    "errorTimeout": "Истекло время ожидания определения местоположения. Попробуйте снова."
+  },
+  "nav": {
+    "home": "Главная",
+    "trips": "Поездки",
+    "messages": "Сообщения",
+    "profile": "Профиль"
+  },
+  "regions": {
+    "toshkent_sh": "Город Ташкент",
+    "toshkent_v": "Ташкентская область",
+    "andijon": "Андижан",
+    "fargona": "Фергана",
+    "namangan": "Наманган",
+    "samarqand": "Самарканд",
+    "buxoro": "Бухара",
+    "navoiy": "Навои",
+    "qashqadaryo": "Кашкадарья",
+    "surxondaryo": "Сурхандарья",
+    "jizzax": "Джизак",
+    "sirdaryo": "Сырдарья",
+    "xorazm": "Хорезм",
+    "qoraqalpogiston": "Республика Каракалпакстан"
+  },
+  "splash": {
+    "startJourney": "Начать поездку"
+  },
+  "login": {
+    "title": "Вход в систему",
+    "phoneLabel": "Номер телефона",
+    "phoneDescription": "Введите ваш номер телефона для заказа поездок и входа в систему",
+    "phoneError": "Введите номер телефона полностью.",
+    "nameSurnameTitle": "Имя и фамилия",
+    "nameSurnameDescription": "Пожалуйста, введите ваше имя и фамилию",
+    "nameLabel": "Имя",
+    "namePlaceholder": "Введите ваше имя",
+    "nameError": "Введите ваше имя (минимум 2 буквы).",
+    "surnameLabel": "Фамилия",
+    "surnamePlaceholder": "Введите вашу фамилию",
+    "genderLabel": "Ваш пол",
+    "genderDescription": "Выберите ваш пол для заполнения профиля",
+    "genderError": "Пожалуйста, выберите ваш пол.",
+    "male": "Мужской",
+    "maleDesc": "Фото профиля для мужчин",
+    "female": "Женский",
+    "femaleDesc": "Фото профиля для женщин",
+    "langSelectTitle": "Выберите язык",
+    "langSelectDescription": "Выберите подходящий язык для интерфейса приложения",
+    "uzbek": "O‘zbekcha 🇺🇿",
+    "russian": "Русский 🇷🇺",
+    "english": "English 🇺🇸"
+  },
+  "home": {
+    "title": "Vijdon GO",
+    "greeting": "Здравствуйте!",
+    "greetingSub": "Куда поедем сегодня?",
+    "greetingUser": "Здравствуйте, {name}!",
+    "services": {
+      "taxi": "Такси",
+      "delivery": "Доставка, Почта"
+    },
+    "promoBanner": "Промо Баннер"
+  },
+  "taxi": {
+    "title": "Такси",
+    "fromLabel": "Откуда",
+    "fromPlaceholder": "Где вы?",
+    "toLabel": "Куда",
+    "toPlaceholder": "Куда вы едете?",
+    "emptyTitle": "Выберите адреса",
+    "emptyDesc": "Укажите места посадки и высадки. После этого появятся цена и маршрут.",
+    "calcRoute": "Рассчитывается маршрут...",
+    "priceLabel": "Цена:",
+    "passengers": "Количество пассажиров",
+    "baggage": "Нужен багаж?",
+    "orderBtn": "Заказать такси",
+    "loadingRoute": "Рассчитывается маршрут...",
+    "selectPickupFirst": "Сначала выберите, откуда вы отправляетесь (Где вы?)!",
+    "waitRouteCalc": "Маршрут еще рассчитывается, пожалуйста, подождите...",
+    "addressWaitOrMap": "Пожалуйста, подождите определения адреса или выберите его на карте.",
+    "selectAddressesFirst": "Пожалуйста, сначала полностью выберите адреса отправления и назначения!",
+    "invalidCoords": "Неверные координаты адреса! Пожалуйста, выберите адреса на карте заново.",
+    "tariffs": {
+      "start": "СТАРТ",
+      "startDesc": "Обычное авто",
+      "komfort": "КОМФОРТ",
+      "komfortDesc": "Комфортное авто",
+      "biznes": "БИЗНЕС",
+      "biznesDesc": "Премиум"
+    }
+  },
+  "delivery": {
+    "title": "Доставка",
+    "bannerTitle": "Почта и Посылка",
+    "bannerSub": "Быстрая и надежная служба доставки",
+    "fromPlaceholder": "Откуда посылка?",
+    "toPlaceholder": "Куда посылка?",
+    "tariffName": "ДОСТАВКА",
+    "tariffSub": "Доставка почты",
+    "tariffRate": "100 сум/км",
+    "orderBtn": "Вызвать доставку",
+    "loadingRoute": "Рассчитывается маршрут...",
+    "selectAddressesFirst": "Пожалуйста, выберите адреса забора и доставки посылки!"
+  },
+  "pickup": {
+    "title": "Где вы находитесь?"
+  },
+  "dest": {
+    "title": "Куда вы направляетесь?"
+  },
+  "waiting": {
+    "searchDriver": "Поиск водителя...",
+    "searchDesc": "Пожалуйста, подождите. Ваш запрос отправлен водителям."
+  },
+  "trip": {
+    "statusActive": "Поездка продолжается",
+    "statusFinished": "ВЫ ПРИБЫЛИ",
+    "statusDriverEnRoute": "ВОДИТЕЛЬ В ПУТИ",
+    "statusError": "ОШИБКА: МАРШРУТ НЕ НАЙДЕН",
+    "driverName": "Водитель",
+    "carInfo": "Автомобиль",
+    "cancelBtn": "Отменить поездку",
+    "kmLeft": "км осталось",
+    "mLeft": "м осталось"
+  },
+  "trips": {
+    "title": "Мои поездки",
+    "noTrips": "У вас еще нет поездок.",
+    "completed": "Завершено",
+    "active": "Активная поездка"
+  },
+  "messages": {
+    "title": "Сообщения",
+    "supportTitle": "Служба поддержки",
+    "supportWelcome": "Здравствуйте, чем я могу вам помочь?",
+    "promoTitle": "Акции и скидки",
+    "promoWelcome": "Новогодние скидки начались!",
+    "driverOnWay": "В пути, буду через 5 минут."
+  },
+  "profile": {
+    "title": "Профиль",
+    "defaultName": "Пользователь",
+    "settings": "Настройки",
+    "help": "Помощь",
+    "logout": "Выйти из системы"
+  },
+  "settings": {
+    "title": "Настройки",
+    "language": "Язык / Language",
+    "phoneUnchangeable": "Номер телефона (Нельзя изменить)",
+    "savedSuccess": "Изменения сохранены!"
+  },
+  "call": {
+    "status": "Вызов..."
+  },
+  "chat": {
+    "inputPlaceholder": "Напишите сообщение...",
+    "online": "В сети",
+    "edit": "Редактировать",
+    "delete": "Удалить",
+    "edited": "(изменено)",
+    "driverWelcome": "Здравствуйте! Я приехал, где вы?",
+    "confirmDelete": "Вы хотите удалить сообщение?",
+    "editPrompt": "Редактировать сообщение:",
+    "supportReply1": "Оставьте вашу проблему, мы ответим в ближайшее время.",
+    "supportReply2": "Наши операторы сейчас заняты, пожалуйста, подождите.",
+    "supportReply3": "Ваше сообщение принято. Оператор свяжется с вами в ближайшее время.",
+    "driverReply1": "Хорошо, понял.",
+    "driverReply2": "Сейчас буду.",
+    "driverReply3": "Я в пути.",
+    "driverReply4": "Можете уточнить адрес?"
+  }
+}

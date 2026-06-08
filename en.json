@@ -1,0 +1,200 @@
+{
+  "common": {
+    "searchPlaceholder": "Search address...",
+    "continueBtn": "Continue",
+    "backBtn": "Back",
+    "confirmBtn": "Confirm",
+    "cancelBtn": "Cancel",
+    "yes": "Yes",
+    "no": "No",
+    "saveBtn": "Save",
+    "finishBtn": "Finish",
+    "selectedAddress": "Selected address",
+    "addressLoading": "Locating address...",
+    "addressNotFound": "Address not found",
+    "selectAddress": "Select address",
+    "gpsLocating": "Determining location...",
+    "gpsNotSupported": "Your browser does not support geolocation.",
+    "mapNotLoaded": "The map has not loaded yet. Please wait.",
+    "errorGeneric": "An error occurred",
+    "currency": "sum",
+    "km": "km",
+    "m": "m"
+  },
+  "gps": {
+    "errorGeneric": "An error occurred while determining location.",
+    "errorPermissionDenied": "Location permission denied. Please enable it in browser settings.",
+    "errorPositionUnavailable": "Unable to determine location. Check if GPS is enabled.",
+    "errorTimeout": "Location request timed out. Please try again."
+  },
+  "nav": {
+    "home": "Home",
+    "trips": "My Trips",
+    "messages": "Messages",
+    "profile": "Profile"
+  },
+  "regions": {
+    "toshkent_sh": "Tashkent City",
+    "toshkent_v": "Tashkent Region",
+    "andijon": "Andijan",
+    "fargona": "Fergana",
+    "namangan": "Namangan",
+    "samarqand": "Samarkand",
+    "buxoro": "Bukhara",
+    "navoiy": "Navoi",
+    "qashqadaryo": "Kashkadarya",
+    "surxondaryo": "Surkhandarya",
+    "jizzax": "Jizzakh",
+    "sirdaryo": "Sirdarya",
+    "xorazm": "Khorezm",
+    "qoraqalpogiston": "Republic of Karakalpakstan"
+  },
+  "splash": {
+    "startJourney": "Start Journey"
+  },
+  "login": {
+    "title": "Login",
+    "phoneLabel": "Phone number",
+    "phoneDescription": "Enter your phone number to order rides and log in",
+    "phoneError": "Enter your phone number completely.",
+    "nameSurnameTitle": "Name and Surname",
+    "nameSurnameDescription": "Please enter your first name and last name",
+    "nameLabel": "Name",
+    "namePlaceholder": "Enter your name",
+    "nameError": "Enter your name (at least 2 characters).",
+    "surnameLabel": "Surname",
+    "surnamePlaceholder": "Enter your surname",
+    "genderLabel": "Gender",
+    "genderDescription": "Select your gender to complete your profile",
+    "genderError": "Please select your gender.",
+    "male": "Male",
+    "maleDesc": "Avatar image for males",
+    "female": "Female",
+    "femaleDesc": "Avatar image for females",
+    "langSelectTitle": "Choose Language",
+    "langSelectDescription": "Choose a convenient language for the app interface",
+    "uzbek": "O‘zbekcha 🇺🇿",
+    "russian": "Русский 🇷🇺",
+    "english": "English 🇺🇸"
+  },
+  "home": {
+    "title": "Vijdon GO",
+    "greeting": "Hello!",
+    "greetingSub": "Where are we going today?",
+    "greetingUser": "Hello, {name}!",
+    "services": {
+      "taxi": "Taxi",
+      "delivery": "Delivery, Mail"
+    },
+    "promoBanner": "Promo Banner"
+  },
+  "taxi": {
+    "title": "Taxi",
+    "fromLabel": "From",
+    "fromPlaceholder": "Where are you?",
+    "toLabel": "To",
+    "toPlaceholder": "Where are you going?",
+    "emptyTitle": "Select locations",
+    "emptyDesc": "Indicate pickup and drop-off locations. Price and route will appear after.",
+    "calcRoute": "Calculating route...",
+    "priceLabel": "Price:",
+    "passengers": "Passengers",
+    "baggage": "Need baggage?",
+    "orderBtn": "Order Taxi",
+    "loadingRoute": "Calculating route...",
+    "selectPickupFirst": "Please select where you are departing from first!",
+    "waitRouteCalc": "Route is still calculating, please wait...",
+    "addressWaitOrMap": "Please wait for the address to resolve or select on map.",
+    "selectAddressesFirst": "Please select both pickup and destination locations fully first!",
+    "invalidCoords": "Invalid address coordinates! Please select locations on the map again.",
+    "tariffs": {
+      "start": "START",
+      "startDesc": "Regular car",
+      "komfort": "COMFORT",
+      "komfortDesc": "Comfortable car",
+      "biznes": "BUSINESS",
+      "biznesDesc": "Premium"
+    }
+  },
+  "delivery": {
+    "title": "Delivery",
+    "bannerTitle": "Mail and Parcel",
+    "bannerSub": "Fast and reliable delivery service",
+    "fromPlaceholder": "Mail from where?",
+    "toPlaceholder": "Mail to where?",
+    "tariffName": "DELIVERY",
+    "tariffSub": "Mail delivery",
+    "tariffRate": "100 sum/km",
+    "orderBtn": "Request Delivery",
+    "loadingRoute": "Calculating route...",
+    "selectAddressesFirst": "Please select pickup and delivery locations for the parcel!"
+  },
+  "pickup": {
+    "title": "Where are you?"
+  },
+  "dest": {
+    "title": "Where are you going?"
+  },
+  "waiting": {
+    "searchDriver": "Searching for driver...",
+    "searchDesc": "Please wait. Your request has been sent to drivers."
+  },
+  "trip": {
+    "statusActive": "Trip in progress",
+    "statusFinished": "YOU ARRIVED",
+    "statusDriverEnRoute": "DRIVER EN ROUTE",
+    "statusError": "ERROR: ROUTE NOT FOUND",
+    "driverName": "Driver",
+    "carInfo": "Car",
+    "cancelBtn": "Cancel Trip",
+    "kmLeft": "km left",
+    "mLeft": "m left"
+  },
+  "trips": {
+    "title": "My Trips",
+    "noTrips": "You have no trips yet.",
+    "completed": "Completed",
+    "active": "Active trip"
+  },
+  "messages": {
+    "title": "Messages",
+    "supportTitle": "Customer Support",
+    "supportWelcome": "Hello, how can I help you today?",
+    "promoTitle": "Deals & Discounts",
+    "promoWelcome": "New Year discounts have started!",
+    "driverOnWay": "On my way, will arrive in 5 minutes."
+  },
+  "profile": {
+    "title": "Profile",
+    "defaultName": "User",
+    "settings": "Settings",
+    "help": "Help",
+    "logout": "Log out"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language / Til",
+    "phoneUnchangeable": "Phone number (Cannot be changed)",
+    "savedSuccess": "Changes saved!"
+  },
+  "call": {
+    "status": "Calling..."
+  },
+  "chat": {
+    "inputPlaceholder": "Type a message...",
+    "online": "Online",
+    "edit": "Edit",
+    "delete": "Delete",
+    "edited": "(edited)",
+    "driverWelcome": "Hello! I have arrived, where are you?",
+    "confirmDelete": "Do you want to delete this message?",
+    "editPrompt": "Edit message:",
+    "supportReply1": "Please leave your issue, we will reply shortly.",
+    "supportReply2": "Our operators are busy right now, please wait.",
+    "supportReply3": "Your message is received. An operator will contact you shortly.",
+    "driverReply1": "Okay, understood.",
+    "driverReply2": "I will be there shortly.",
+    "driverReply3": "On my way.",
+    "driverReply4": "Can you specify the address?"
+  }
+}

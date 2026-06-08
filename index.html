@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Vijdon Go - Shaharlararo Taksi</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FFD600',
+                        primaryHover: '#E6C200',
+                        graphite: '#2D2D2D',
+                        textSecondary: '#888888',
+                        bgLight: '#F7F7F9'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    borderRadius: {
+                        '2xl': '1rem',
+                        '3xl': '1.5rem',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Yandex Maps API — API kalitini developer.tech.yandex.ru saytidan oling -->
+    <!-- MUHIM: Quyidagi YOUR_API_KEY o'rniga o'z kalitingizni qo'ying -->
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=e6a32eac-e56e-49ad-a394-2d6c1dea8717&lang=uz_UZ&coordorder=latlong&load=package.full" type="text/javascript"></script>
+
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css?v=2.0.1">
+    
+    <style>
+        [class*="ymaps"][class*="-copyright"], [class*="ymaps"][class*="-controls__bottom"] {
+            display: none !important;
+        }
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-graphite font-sans h-screen-dynamic w-screen overflow-hidden flex justify-center antialiased">
+    
+    <!-- App Container -->
+    <div id="app-container" class="w-full max-w-md h-full bg-white relative overflow-hidden shadow-2xl flex flex-col">
+        
+        <!-- ==============================
+             1. SPLASH SCREEN
+             ============================== -->
+        <div id="splash-screen" class="screen absolute inset-0 bg-white flex flex-col z-50 transition-transform duration-300 transform translate-x-0 overflow-hidden">
+            <!-- Full Splash Background -->
+            <img src="rasmlar/splash.jpeg" onerror="this.src='assets/images/splash.jpeg'" alt="Splash Background" class="absolute inset-0 w-full h-full object-cover z-0" loading="eager" decoding="async">
+            
+            <div class="absolute bottom-0 w-full p-6 pb-12 pb-safe bg-white z-50 rounded-t-[2.5rem] shadow-[0_-20px_50px_rgba(0,0,0,0.2)] border-t border-gray-100 flex flex-col gap-3">
+                <button id="start-journey-btn" class="w-full bg-primary hover:bg-yellow-500 text-graphite font-black text-xl py-5 rounded-2xl transition-all active:scale-95 shadow-xl shadow-yellow-400/40 relative z-[100]" style="touch-action: manipulation;" data-i18n="splash.startJourney">
+                    Safarni boshlash
+                </button>
+            </div>
+        </div>
+
+        <!-- ==============================
+             2. LOGIN FLOW (4 STEPS)
+             ============================== -->
+        <!-- STEP 1: Phone Number -->
+        <div id="login-step-1" class="screen absolute inset-0 bg-white flex flex-col z-50 transition-transform duration-300 transform translate-x-full">
+            <div class="px-4 py-5 flex items-center justify-between border-b border-gray-50 pt-safe shrink-0">
+                <button onclick="navigate('splash-screen')" class="w-10 h-10 flex items-center justify-center rounded-full bg-bgLight hover:bg-gray-200 transition-colors" style="touch-action: manipulation;">
+                    <i class="fa-solid fa-chevron-left text-sm"></i>
+                </button>
+                <h1 class="text-lg font-bold text-graphite" data-i18n="login.title">Tizimga kirish</h1>
+                <span class="text-sm font-bold text-textSecondary w-10 text-right">1/4</span>
+            </div>
+            
+            <form onsubmit="event.preventDefault(); validateStep1();" class="flex-1 p-6 flex flex-col justify-between overflow-y-auto no-scrollbar">
+                <div class="flex flex-col gap-6 mt-4">
+                    <div class="flex justify-center mb-2 shrink-0">
+                        <img src="assets/images/logo.jpeg" alt="Logo" class="h-20 w-auto object-contain mix-blend-multiply rounded-2xl shadow-sm">
+                    </div>
+                    
+                    <div class="text-center px-4 shrink-0">
+                        <h2 class="text-2xl font-bold text-graphite" data-i18n="login.phoneLabel">Telefon raqami</h2>
+                        <p class="text-sm text-textSecondary mt-2" data-i18n="login.phoneDescription">Safar buyurtma qilish va hisobingizga kirish uchun telefon raqamingizni kiriting</p>
+                    </div>
+
+                    <div class="shrink-0 mt-4">
+                        <label class="block text-xs font-bold text-textSecondary uppercase tracking-wider mb-2 ml-1" data-i18n="login.phoneLabel">Telefon raqami</label>
+                        <input type="tel" id="login-phone" placeholder="+998" value="+998" enterkeyhint="done" autocomplete="tel" onkeydown="if(event.key === 'Enter') { event.preventDefault(); validateStep1(); }" class="w-full bg-bgLight px-5 py-4 rounded-2xl border border-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-base font-semibold text-graphite shadow-sm">
+                        <p id="login-phone-error" class="text-xs text-red-500 font-semibold mt-2 ml-1 hidden"></p>
+                    </div>
+                </div>
+                
+                <div class="py-4 shrink-0">
+                    <button type="submit" class="w-full bg-primary hover:bg-primaryHover text-graphite font-bold text-lg py-4 rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-yellow-500/20" style="touch-action: manipulation;" data-i18n="common.continueBtn">
+                        Davom etish
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- STEP 2: Name & Surname -->
+        <div id="login-step-2" class="screen absolute inset-0 bg-white flex flex-col z-50 transition-transform duration-300 transform translate-x-full">
+            <div class="px-4 py-5 flex items-center justify-between border-b border-gray-50 pt-safe shrink-0">
+                <button onclick="navigate('login-step-1')" class="w-10 h-10 flex items-center justify-center rounded-full bg-bgLight hover:bg-gray-200 transition-colors" style="touch-action: manipulation;">
+                    <i class="fa-solid fa-chevron-left text-sm"></i>
+                </button>
+                <h1 class="text-lg font-bold text-graphite" data-i18n="login.title">Tizimga kirish</h1>
+                <span class="text-sm font-bold text-textSecondary w-10 text-right">2/4</span>
+            </div>
+            
+            <form onsubmit="event.preventDefault(); validateStep2();" class="flex-1 p-6 flex flex-col justify-between overflow-y-auto no-scrollbar">
+                <div class="flex flex-col gap-5 mt-4">
+                    <div class="text-center px-4 shrink-0">
+                        <h2 class="text-2xl font-bold text-graphite" data-i18n="login.nameSurnameTitle">Ism va familiya</h2>
+                        <p class="text-sm text-textSecondary mt-2" data-i18n="login.nameSurnameDescription">Iltimos, ismingiz va familiyangizni kiriting</p>
+                    </div>
+
+                    <div class="shrink-0 mt-4">
+                        <label class="block text-xs font-bold text-textSecondary uppercase tracking-wider mb-2 ml-1" data-i18n="login.nameLabel">Ism</label>
+                        <input type="text" id="login-name" placeholder="Ismingizni kiriting" data-i18n-placeholder="login.namePlaceholder" enterkeyhint="next" autocomplete="given-name" onkeydown="if(event.key === 'Enter') { event.preventDefault(); document.getElementById('login-surname').focus(); }" class="w-full bg-bgLight px-5 py-4 rounded-2xl border border-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-base font-semibold text-graphite shadow-sm">
+                        <p id="login-name-error" class="text-xs text-red-500 font-semibold mt-2 ml-1 hidden"></p>
+                    </div>
+
+                    <div class="shrink-0">
+                        <label class="block text-xs font-bold text-textSecondary uppercase tracking-wider mb-2 ml-1" data-i18n="login.surnameLabel">Familiya</label>
+                        <input type="text" id="login-surname" placeholder="Familiyangizni kiriting" data-i18n-placeholder="login.surnamePlaceholder" enterkeyhint="done" autocomplete="family-name" onkeydown="if(event.key === 'Enter') { event.preventDefault(); validateStep2(); }" class="w-full bg-bgLight px-5 py-4 rounded-2xl border border-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-base font-semibold text-graphite shadow-sm">
+                    </div>
+                </div>
+                
+                <div class="py-4 shrink-0">
+                    <button type="submit" class="w-full bg-primary hover:bg-primaryHover text-graphite font-bold text-lg py-4 rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-yellow-500/20" style="touch-action: manipulation;" data-i18n="common.continueBtn">
+                        Davom etish
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- STEP 3: Gender -->
+        <div id="login-step-3" class="screen absolute inset-0 bg-white flex flex-col z-50 transition-transform duration-300 transform translate-x-full">
+            <div class="px-4 py-5 flex items-center justify-between border-b border-gray-50 pt-safe shrink-0">
+                <button onclick="navigate('login-step-2')" class="w-10 h-10 flex items-center justify-center rounded-full bg-bgLight hover:bg-gray-200 transition-colors" style="touch-action: manipulation;">
+                    <i class="fa-solid fa-chevron-left text-sm"></i>
+                </button>
+                <h1 class="text-lg font-bold text-graphite" data-i18n="login.title">Tizimga kirish</h1>
+                <span class="text-sm font-bold text-textSecondary w-10 text-right">3/4</span>
+            </div>
+            
+            <div class="flex-1 p-6 flex flex-col justify-between overflow-y-auto no-scrollbar">
+                <div class="flex flex-col gap-6 mt-4">
+                    <div class="text-center px-4 shrink-0">
+                        <h2 class="text-2xl font-bold text-graphite" data-i18n="login.genderLabel">Jinsingiz</h2>
+                        <p class="text-sm text-textSecondary mt-2" data-i18n="login.genderDescription">Profil ma'lumotlarini to'ldirish uchun jinsingizni tanlang</p>
+                    </div>
+
+                    <div class="flex flex-col gap-4 mt-4">
+                        <!-- Male Button Card -->
+                        <button onclick="setLoginGender('male')" id="gender-male" class="gender-btn w-full bg-bgLight p-5 rounded-2xl border-2 border-transparent transition-all flex items-center gap-4 text-left shadow-sm active:scale-[0.98]" style="touch-action: manipulation;">
+                            <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-500 text-xl shadow-inner">
+                                <i class="fa-solid fa-mars"></i>
+                            </div>
+                            <div class="flex-1">
+                                <span class="block text-base font-bold text-graphite" data-i18n="login.male">Erkak</span>
+                                <!-- <span class="block text-xs text-textSecondary" data-i18n="login.maleDesc">Erkaklar uchun profil rasmi</span> -->
+                            </div>
+                            <div class="gender-check hidden text-primary">
+                                <i class="fa-solid fa-circle-check text-xl"></i>
+                            </div>
+                        </button>
+                        
+                        <!-- Female Button Card -->
+                        <button onclick="setLoginGender('female')" id="gender-female" class="gender-btn w-full bg-bgLight p-5 rounded-2xl border-2 border-transparent transition-all flex items-center gap-4 text-left shadow-sm active:scale-[0.98]" style="touch-action: manipulation;">
+                            <div class="w-12 h-12 rounded-full bg-pink-50 flex items-center justify-center text-pink-500 text-xl shadow-inner">
+                                <i class="fa-solid fa-venus"></i>
+                            </div>
+                            <div class="flex-1">
+                                <span class="block text-base font-bold text-graphite" data-i18n="login.female">Ayol</span>
+                                <!-- <span class="block text-xs text-textSecondary" data-i18n="login.femaleDesc">Ayollar uchun profil rasmi</span> -->
+                            </div>
+                            <div class="gender-check hidden text-primary">
+                                <i class="fa-solid fa-circle-check text-xl"></i>
+                            </div>
+                        </button>
+                    </div>
+                    <p id="login-gender-error" class="text-xs text-red-500 font-semibold mt-2 text-center hidden"></p>
+                </div>
+                
+                <div class="py-4 shrink-0 hidden">
+                    <button onclick="validateStep3()" class="w-full bg-primary hover:bg-primaryHover text-graphite font-bold text-lg py-4 rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-yellow-500/20" style="touch-action: manipulation;" data-i18n="common.continueBtn">
+                        Davom etish
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 4: Language Selection -->
+        <div id="login-step-4" class="screen absolute inset-0 bg-white flex flex-col z-50 transition-transform duration-300 transform translate-x-full">
+            <div class="px-4 py-5 flex items-center justify-between border-b border-gray-50 pt-safe shrink-0">
+                <button onclick="navigate('login-step-3')" class="w-10 h-10 flex items-center justify-center rounded-full bg-bgLight hover:bg-gray-200 transition-colors" style="touch-action: manipulation;">
+                    <i class="fa-solid fa-chevron-left text-sm"></i>
+                </button>
+                <h1 class="text-lg font-bold text-graphite" data-i18n="login.title">Tizimga kirish</h1>
+                <span class="text-sm font-bold text-textSecondary w-10 text-right">4/4</span>
+            </div>
+            
+            <div class="flex-1 p-6 flex flex-col justify-between overflow-y-auto no-scrollbar">
+                <div class="flex flex-col gap-6 mt-4">
+                    <div class="text-center px-4 shrink-0">
+                        <h2 class="text-2xl font-bold text-graphite" data-i18n="login.langSelectTitle">Tilni tanlang</h2>
+                        <p class="text-sm text-textSecondary mt-2" data-i18n="login.langSelectDescription">Ilova interfeysi uchun qulay tilni tanlang</p>
+                    </div>
+
+                    <div class="flex flex-col gap-3 mt-4">
+                        <!-- Uzbek Card -->
+                        <button onclick="setLoginLanguage('uz')" id="lang-uz" class="lang-btn w-full bg-bgLight p-5 rounded-2xl border border-transparent transition-all flex items-center justify-between text-left shadow-sm active:scale-[0.98]" style="touch-action: manipulation;">
+                            <span class="text-base font-bold text-graphite" data-i18n="login.uzbek">O‘zbekcha 🇺🇿</span>
+                            <div class="lang-check hidden text-primary">
+                                <i class="fa-solid fa-circle-check text-xl"></i>
+                            </div>
+                        </button>
+                        
+                        <!-- Russian Card -->
+                        <button onclick="setLoginLanguage('ru')" id="lang-ru" class="lang-btn w-full bg-bgLight p-5 rounded-2xl border border-transparent transition-all flex items-center justify-between text-left shadow-sm active:scale-[0.98]" style="touch-action: manipulation;">
+                            <span class="text-base font-bold text-graphite" data-i18n="login.russian">Русский 🇷🇺</span>
+                            <div class="lang-check hidden text-primary">
+                                <i class="fa-solid fa-circle-check text-xl"></i>
+                            </div>
+                        </button>
+                        
+                        <!-- English Card -->
+                        <button onclick="setLoginLanguage('en')" id="lang-en" class="lang-btn w-full bg-bgLight p-5 rounded-2xl border border-transparent transition-all flex items-center justify-between text-left shadow-sm active:scale-[0.98]" style="touch-action: manipulation;">
+                            <span class="text-base font-bold text-graphite" data-i18n="login.english">English 🇺🇸</span>
+                            <div class="lang-check hidden text-primary">
+                                <i class="fa-solid fa-circle-check text-xl"></i>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="py-4 shrink-0 hidden">
+                    <button onclick="handleLogin()" class="w-full bg-primary hover:bg-primaryHover text-graphite font-bold text-lg py-4 rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-yellow-500/20" style="touch-action: manipulation;" data-i18n="common.finishBtn">
+                        Tugatish
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ==============================
+             3. HOME SCREEN
+             ============================== -->
+        <div id="home-screen" class="screen absolute inset-0 bg-bgLight flex flex-col z-30 transition-transform duration-300 transform translate-x-full">
+            <!-- Header -->
+            <div class="px-5 py-4 flex justify-between items-center z-10 bg-bgLight pt-safe relative">
+                <div class="flex items-center gap-3 flex-1 overflow-hidden">
+                    <div class="w-12 h-12 rounded-2xl bg-white flex items-center justify-center border border-gray-100 shadow-sm shrink-0 overflow-hidden">
+                        <img src="rasmlar/logo.png" alt="Vijdon GO" class="w-[120%] h-[120%] object-contain mix-blend-multiply" onerror="this.src='assets/images/logo.jpeg'">
+                    </div>
+                    <div class="flex flex-col">
+                        <h1 class="text-[20px] font-extrabold tracking-tight text-graphite leading-none mt-1">Vijdon GO</h1>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="navigate('profil-screen')" class="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-full bg-white hover:bg-gray-50 transition-colors border border-gray-100 shadow-sm">
+                        <i class="fa-regular fa-user text-[16px] text-graphite"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Content container -->
+            <div class="flex-1 overflow-y-auto no-scrollbar pb-32 pb-safe relative flex flex-col">
+                <!-- Greeting -->
+                <div class="px-5 mt-2 mb-6">
+                    <h2 id="home-greeting" class="text-[28px] font-bold text-graphite tracking-tight leading-tight" data-i18n="home.greeting">Assalomu alaykum!</h2>
+                    <p class="text-[14px] font-medium text-textSecondary mt-1" data-i18n="home.greetingSub">Bugun qayerga boramiz?</p>
+                </div>
+
+                <!-- Services Grid -->
+                <div class="px-5">
+                    <div class="grid grid-cols-2 gap-3 sm:gap-4">
+                        <!-- Taxi Card -->
+                        <div onclick="startTaxiBookingFlow()" class="bg-white rounded-[24px] p-4 shadow-[0_4px_24px_rgba(0,0,0,0.04)] border border-gray-50 transition-all duration-300 active:scale-[0.96] flex flex-col justify-between cursor-pointer h-[150px] sm:h-[160px]">
+                            <div class="flex justify-between items-start">
+                                <h3 class="text-graphite font-bold text-[18px] tracking-tight leading-none" data-i18n="home.services.taxi">Taxi</h3>
+                                <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-sm shrink-0">
+                                    <i class="fa-solid fa-arrow-right text-graphite text-[12px] font-bold"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1 flex items-center justify-center pt-3 pb-1">
+                                <img src="rasmlar/taxi.png" alt="Taxi" class="w-[80%] max-h-full object-contain" onerror="this.src='rasmlar/logo.png'">
+                            </div>
+                        </div>
+                        
+                        <!-- Dostavka Card -->
+                        <div onclick="startDeliveryFlow()" class="bg-white rounded-[24px] p-4 shadow-[0_4px_24px_rgba(0,0,0,0.04)] border border-gray-50 transition-all duration-300 active:scale-[0.96] flex flex-col justify-between cursor-pointer h-[150px] sm:h-[160px]">
+                            <div class="flex justify-between items-start">
+                                <h3 class="text-graphite font-bold text-[16px] tracking-tight leading-[1.15]" data-i18n="home.services.delivery">Dostavka,<br>Pochta</h3>
+                                <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-sm shrink-0">
+                                    <i class="fa-solid fa-arrow-right text-graphite text-[12px] font-bold"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1 flex items-center justify-center pt-3 pb-1">
+                                <img src="rasmlar/dostavka.png" alt="Dostavka" class="w-[75%] max-h-full object-contain" onerror="this.src='rasmlar/logo.png'">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Promo Banner -->
+                <div class="px-5 mt-4">
+                    <div class="w-full bg-white rounded-[24px] shadow-[0_4px_24px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] border border-gray-50 transition-all duration-300 active:scale-[0.98] hover:scale-[1.01] cursor-pointer overflow-hidden flex">
+                        <img id="home-promo-banner" src="rasmlar/banner.png" alt="Promo Banner" class="w-full h-auto object-cover object-center pointer-events-none" onerror="this.parentElement.parentElement.style.display='none'">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ==============================
+             TAXI SCREEN
+             ============================== -->
+        <div id="taxi-screen" class="screen absolute inset-0 bg-[#F5F5F7] flex flex-col z-40 transition-transform duration-300 transform translate-x-full">
+            <!-- Header -->
+            <div class="px-4 py-3 flex items-center gap-3 z-10 bg-white pt-safe shadow-[0_4px_24px_rgba(0,0,0,0.04)] border-b border-gray-50/50">
+                <button onclick="navigate('home-screen')" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-50 active:bg-gray-100 transition-colors shrink-0">
+                    <i class="fa-solid fa-chevron-left text-sm text-graphite"></i>
+                </button>
+                <div class="flex items-center gap-2 flex-1">
+                    <div class="w-8 h-8 rounded-xl bg-primary/20 flex items-center justify-center">
+                        <i class="fa-solid fa-taxi text-primary text-sm"></i>
+                    </div>
+                    <h1 class="text-[18px] font-extrabold tracking-tight text-graphite" data-i18n="taxi.title">Taxi</h1>
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto no-scrollbar pb-6 pb-safe flex flex-col">
+                <!-- 1. Map Preview Container (Eng Tepada, hidden initially) -->
+                <div id="taxi-map-preview-container" class="h-[33vh] min-h-[220px] max-h-[260px] mt-2 relative z-0 mx-3 rounded-2xl shadow-md border border-gray-100 flex-shrink-0 transition-all duration-500 overflow-hidden opacity-0 translate-y-10 pointer-events-none" style="display: none; clip-path: inset(0 round 1rem);">
+                    <div id="home-map" class="w-full h-full"></div>
+                    <div class="absolute bottom-4 left-4 z-[400] bg-white/95 backdrop-blur-md rounded-2xl px-4 py-3 shadow-[0_8px_20px_rgba(0,0,0,0.1)] border border-gray-50 flex flex-col gap-1 hidden transition-all duration-300" id="preview-info-card">
+                        
+                        <!-- Ready Content -->
+                        <div id="preview-content-state" class="flex flex-col hidden">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 rounded-full bg-graphite"></div>
+                                <div id="preview-distance" class="text-[12px] font-bold text-textSecondary uppercase tracking-wide">-- km</div>
+                            </div>
+                        </div>
+
+                        <!-- Loading Skeletons -->
+                        <div id="preview-loading-state" class="flex flex-col py-0.5">
+                            <div class="flex items-center gap-2.5 mb-2">
+                                <div class="w-4 h-4 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
+                                <span class="text-[13px] font-bold text-graphite" data-i18n="taxi.calcRoute">Yo'nalish hisoblanmoqda...</span>
+                            </div>
+                            <div class="flex items-center gap-3 pl-6">
+                                <div class="h-3.5 w-12 bg-gray-200 rounded animate-pulse"></div>
+                                <div class="h-4 w-20 bg-gray-200 rounded animate-pulse"></div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- 2. Location Picker Card (Below the map, always visible) -->
+                <div id="taxi-location-picker-container" class="px-3 z-10 mt-2 transition-all duration-500">
+                    <div class="bg-white rounded-2xl p-3 shadow-sm border border-gray-100 relative">
+                        <div class="flex flex-col gap-3 relative">
+                            <!-- Decor line -->
+                            <div class="absolute left-[9px] top-4.5 bottom-4.5 w-[2px] bg-gray-100 rounded-full"></div>
+                            
+                            <div class="flex gap-3 items-center relative z-10">
+                                <div class="w-5 h-5 rounded-full bg-[#FFFBE6] flex items-center justify-center shrink-0 shadow-sm border border-yellow-100">
+                                    <div class="w-1.5 h-1.5 rounded-full bg-primary"></div>
+                                </div>
+                                <div class="flex-1 border-b border-gray-100 pb-2" onclick="startPickupFlow()" style="cursor: pointer;">
+                                    <p class="text-[9px] text-textSecondary mb-0 font-bold uppercase tracking-wide" data-i18n="taxi.fromLabel">Qayerdan</p>
+                                    <div id="from-display" class="w-full bg-transparent font-semibold text-xs text-graphite truncate" data-i18n="taxi.fromPlaceholder">Qayerdasiz?</div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex gap-3 items-center relative z-10">
+                                <div class="w-5 h-5 rounded-full bg-gray-50 flex items-center justify-center shrink-0 shadow-sm border border-gray-200">
+                                    <div class="w-1.5 h-1.5 rounded-full bg-graphite"></div>
+                                </div>
+                                <div class="flex-1 pt-0.5" onclick="startDestFlow()" style="cursor: pointer;">
+                                    <p class="text-[9px] text-textSecondary mb-0 font-bold uppercase tracking-wide" data-i18n="taxi.toLabel">Qayerga</p>
+                                    <div id="to-display" class="w-full bg-transparent font-semibold text-xs text-graphite truncate" data-i18n="taxi.toPlaceholder">Qayerga borasiz?</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 3. Route Preview Section (Tariffs & Options, hidden initially) -->
+                <div id="route-preview-section" class="flex flex-col opacity-0 translate-y-10 pointer-events-none transition-all duration-700 ease-out" style="display: none;">
+                    <!-- Tariffs Section -->
+                    <div class="mt-2.5 px-3">
+                        <div class="grid grid-cols-3 gap-2 w-full">
+                            <!-- START -->
+                            <div id="tariff-start" onclick="selectTariff('start')" class="tariff-card bg-white border-2 border-[#FFD400] rounded-2xl p-0 flex flex-col justify-between items-center cursor-pointer transition-all relative h-[125px] shadow-sm overflow-hidden">
+                                <div class="w-full flex justify-center items-center h-[65px] pt-1.5 relative overflow-hidden">
+                                    <img src="rasmlar/gentra.png" alt="Start" class="w-[80%] h-full object-contain">
+                                </div>
+                                <div class="w-full flex flex-col items-center text-center bg-white pt-[6px] px-[8px] pb-[10px] mt-auto">
+                                    <span class="text-[11px] font-extrabold uppercase tracking-tight text-graphite leading-none" data-i18n="taxi.tariffs.start">START</span>
+                                    <span class="text-[8px] text-textSecondary font-medium leading-none mt-0.5" data-i18n="taxi.tariffs.startDesc">Oddiy avto</span>
+                                    <span id="price-start" class="text-[11.5px] font-extrabold text-black mt-1 leading-none">-- so'm</span>
+                                </div>
+                            </div>
+                            
+                            <!-- KOMFORT -->
+                            <div id="tariff-komfort" onclick="selectTariff('komfort')" class="tariff-card bg-white border-2 border-transparent rounded-2xl p-0 flex flex-col justify-between items-center cursor-pointer transition-all relative h-[125px] shadow-sm overflow-hidden">
+                                <div class="w-full flex justify-center items-center h-[65px] pt-1.5 relative overflow-hidden">
+                                    <img src="rasmlar/malibu.png" alt="Komfort" class="w-[80%] h-full object-contain">
+                                </div>
+                                <div class="w-full flex flex-col items-center text-center bg-white pt-[6px] px-[8px] pb-[10px] mt-auto">
+                                    <span class="text-[11px] font-extrabold uppercase tracking-tight text-graphite leading-none" data-i18n="taxi.tariffs.komfort">KOMFORT</span>
+                                    <span class="text-[8px] text-textSecondary font-medium leading-none mt-0.5" data-i18n="taxi.tariffs.komfortDesc">Qulay avto</span>
+                                    <span id="price-komfort" class="text-[11.5px] font-extrabold text-black mt-1 leading-none">-- so'm</span>
+                                </div>
+                            </div>
+                            
+                            <!-- BIZNES -->
+                            <div id="tariff-biznes" onclick="selectTariff('biznes')" class="tariff-card bg-white border-2 border-transparent rounded-2xl p-0 flex flex-col justify-between items-center cursor-pointer transition-all relative h-[125px] shadow-sm overflow-hidden">
+                                <div class="w-full flex justify-center items-center h-[65px] pt-1.5 relative overflow-hidden">
+                                    <img src="rasmlar/byd.png" alt="Biznes" class="w-[80%] h-full object-contain">
+                                </div>
+                                <div class="w-full flex flex-col items-center text-center bg-white pt-[6px] px-[8px] pb-[10px] mt-auto">
+                                    <span class="text-[11px] font-extrabold uppercase tracking-tight text-graphite leading-none" data-i18n="taxi.tariffs.biznes">BIZNES</span>
+                                    <span class="text-[8px] text-textSecondary font-medium leading-none mt-0.5" data-i18n="taxi.tariffs.biznesDesc">Premium</span>
+                                    <span id="price-biznes" class="text-[11.5px] font-extrabold text-black mt-1 leading-none">-- so'm</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Options -->
+                    <div class="px-3 mt-2 flex flex-col gap-2">
+                        <div class="flex justify-between items-center bg-white p-2.5 rounded-xl shadow-sm border border-gray-50">
+                            <span class="font-semibold text-[11px] text-graphite" data-i18n="taxi.passengers">Yo'lovchilar soni</span>
+                            <div class="flex items-center gap-3.5">
+                                <button id="pax-minus" class="w-7 h-7 rounded-full bg-gray-50 shadow-sm flex items-center justify-center text-textSecondary active:bg-gray-100 transition-colors"><i class="fa-solid fa-minus text-xs"></i></button>
+                                <span id="pax-count" class="font-bold w-6 text-center text-sm text-graphite">1</span>
+                                <button id="pax-plus" class="w-7 h-7 rounded-full bg-gray-50 shadow-sm flex items-center justify-center text-textSecondary active:bg-gray-100 transition-colors"><i class="fa-solid fa-plus text-xs"></i></button>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between items-center bg-white p-2.5 rounded-xl shadow-sm border border-gray-50 cursor-pointer active:bg-gray-50 transition-colors">
+                            <span class="font-semibold text-[11px] text-graphite" data-i18n="taxi.baggage">Bagaj kerakmi?</span>
+                            <div class="flex items-center gap-2">
+                                <span id="baggage-status" class="text-xs font-medium text-textSecondary" data-i18n="common.no">Yo'q</span>
+                                <i class="fa-solid fa-chevron-right text-textSecondary text-[10px]"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div> <!-- End of route-preview-section -->
+            </div>
+
+            <!-- Sticky Bottom Bar (New container for sticky button) -->
+            <div id="taxi-sticky-bottom-bar" class="px-3 py-2.5 bg-white border-t border-gray-100/80 flex-shrink-0 z-20 pb-safe shadow-[0_-8px_35px_rgba(0,0,0,0.06)] opacity-0 translate-y-10 pointer-events-none transition-all duration-700 ease-out" style="display: none;">
+                <button onclick="createOrder()" id="order-btn" disabled class="w-full bg-primary active:bg-primaryHover text-graphite font-bold text-sm py-3 rounded-2xl transition-all active:scale-[0.98] opacity-50 cursor-not-allowed shadow-[0_4px_12px_rgba(0,0,0,0.02)]" data-i18n="taxi.orderBtn">
+                    Buyurtma berish
+                </button>
+            </div>
+
+        </div>
+
+        <!-- ==============================
+             3A. PICKUP REGION SCREEN
+             ============================== -->
+        <div id="pickup-region-screen" class="screen absolute inset-0 bg-white flex flex-col z-40 transition-transform duration-300 transform translate-x-full">
+            <div class="px-5 py-4 flex items-center justify-between shadow-sm z-10 pt-safe border-b border-gray-50">
+                <div class="flex items-center">
+                    <button onclick="goBackFromPickup()" class="w-10 h-10 flex items-center justify-center rounded-full bg-bgLight hover:bg-gray-200 transition-colors mr-3">
+                        <i class="fa-solid fa-chevron-left text-sm"></i>
+                    </button>
+                    <h1 class="text-xl font-bold" data-i18n="pickup.title">Qayerdasiz?</h1>
+                </div>
+
+            </div>
+            <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 pb-32 pb-safe" id="pickup-region-list">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+
+        <!-- ==============================
+             3B. PICKUP MAP SCREEN
+             ============================== -->
+        <div id="pickup-map-screen" class="screen absolute inset-0 bg-white flex flex-col z-50 transition-transform duration-300 transform translate-x-full">
+            <div class="absolute inset-0 z-0">
+                <div id="pickup-map-container" class="w-full h-full"></div>
+            </div>
+            
+            <!-- Top Controls -->
+            <div class="absolute top-0 left-0 right-0 p-4 z-50 pt-safe pointer-events-none flex gap-2 items-start">
+                <button onclick="navigate('pickup-region-screen')" class="w-12 h-12 bg-white rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.15)] flex items-center justify-center text-graphite pointer-events-auto hover:bg-gray-50 transition-transform active:scale-90 border border-gray-100 shrink-0">
+                    <i class="fa-solid fa-arrow-left text-lg"></i>
+                </button>
+                <div class="flex-1 relative flex flex-col pointer-events-auto">
+                    <!-- Search input field wrapper -->
+                    <div class="bg-white rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.15)] flex items-center px-4 py-3 gap-2 border border-gray-100/50 transition-all duration-300 focus-within:ring-2 focus-within:ring-primary">
+                        <i class="fa-solid fa-magnifying-glass text-gray-400 text-sm shrink-0"></i>
+                        <input id="pickup-search-input" data-i18n-placeholder="common.searchPlaceholder" type="text" placeholder="Manzil qidiring..." class="w-full bg-transparent text-sm text-graphite outline-none border-none placeholder-gray-400 font-semibold" autocomplete="off" />
+                        <button id="pickup-search-clear" class="hidden text-gray-400 hover:text-graphite shrink-0 transition-colors">
+                            <i class="fa-solid fa-circle-xmark"></i>
+                        </button>
+                    </div>
+                    <!-- Suggestions Dropdown -->
+                    <div id="pickup-search-suggestions" class="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.12)] border border-gray-100/80 max-h-[250px] overflow-y-auto z-[60] hidden no-scrollbar transition-all duration-300">
+                        <!-- Items injected dynamically -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Floating Map Controls -->
+            <!-- GPS Location Button -->
+            <div class="absolute right-4 bottom-44 flex flex-col gap-3 z-10 pointer-events-auto">
+                <button id="pickup-gps-btn" onclick="getCurrentLocation()" style="touch-action: manipulation;" class="w-12 h-12 bg-white/90 backdrop-blur rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] flex items-center justify-center text-[#1A73E8] hover:bg-gray-50 transition-transform active:scale-90 border border-gray-100/50">
+                    <i class="fa-solid fa-location-crosshairs text-xl"></i>
+                </button>
+            </div>
+            
+            <!-- Bottom Sheet -->
+            <div class="absolute bottom-0 w-full p-6 bg-white rounded-t-[2rem] shadow-[0_-10px_40px_rgba(0,0,0,0.08)] z-20 pb-safe">
+                <div class="mb-4">
+                    <p class="text-[11px] text-textSecondary uppercase font-bold tracking-wide" data-i18n="common.selectedAddress">Tanlangan manzil</p>
+                    <p id="pickup-address-text" class="text-sm font-bold text-graphite truncate mt-1" data-i18n="common.addressLoading">Manzil aniqlanmoqda...</p>
+                </div>
+                <button onclick="confirmPickupLocation()" class="w-full bg-primary hover:bg-primaryHover text-graphite font-semibold text-lg py-4 rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-yellow-500/20" data-i18n="common.confirmBtn">
+                    Tasdiqlash
+                </button>
+            </div>
+        </div>
+
+        <!-- ==============================
+             3C. DESTINATION REGION SCREEN
+             ============================== -->
+        <div id="dest-region-screen" class="screen absolute inset-0 bg-white flex flex-col z-40 transition-transform duration-300 transform translate-x-full">
+            <div class="px-5 py-4 flex items-center justify-between shadow-sm z-10 pt-safe border-b border-gray-50">
+                <div class="flex items-center">
+                    <button onclick="goBackFromDest()" class="w-10 h-10 flex items-center justify-center rounded-full bg-bgLight hover:bg-gray-200 transition-colors mr-3">
+                        <i class="fa-solid fa-chevron-left text-sm"></i>
+                    </button>
+                    <h1 class="text-xl font-bold" data-i18n="dest.title">Qayerga borasiz?</h1>
+                </div>
+
+            </div>
+            <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 pb-32 pb-safe" id="dest-region-list">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+
+        <!-- ==============================
+             3D. DESTINATION MAP SCREEN
+             ============================== -->
+        <div id="dest-map-screen" class="screen absolute inset-0 bg-white flex flex-col z-50 transition-transform duration-300 transform translate-x-full">
+            <div class="absolute inset-0 z-0">
+                <div id="dest-map-container" class="w-full h-full"></div>
+            </div>
+            
+            <!-- Top Controls -->
+            <div class="absolute top-0 left-0 right-0 p-4 z-50 pt-safe pointer-events-none flex gap-2 items-start">
+                <button onclick="navigate('dest-region-screen')" class="w-12 h-12 bg-white rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.15)] flex items-center justify-center text-graphite pointer-events-auto hover:bg-gray-50 transition-transform active:scale-90 border border-gray-100 shrink-0">
+                    <i class="fa-solid fa-arrow-left text-lg"></i>
+                </button>
+                <div class="flex-1 relative flex flex-col pointer-events-auto">
+                    <!-- Search input field wrapper -->
+                    <div class="bg-white rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.15)] flex items-center px-4 py-3 gap-2 border border-gray-100/50 transition-all duration-300 focus-within:ring-2 focus-within:ring-primary">
+                        <i class="fa-solid fa-magnifying-glass text-gray-400 text-sm shrink-0"></i>
+                        <input id="dest-search-input" data-i18n-placeholder="common.searchPlaceholder" type="text" placeholder="Manzil qidiring..." class="w-full bg-transparent text-sm text-graphite outline-none border-none placeholder-gray-400 font-semibold" autocomplete="off" />
+                        <button id="dest-search-clear" class="hidden text-gray-400 hover:text-graphite shrink-0 transition-colors">
+                            <i class="fa-solid fa-circle-xmark"></i>
+                        </button>
+                    </div>
+                    <!-- Suggestions Dropdown -->
+                    <div id="dest-search-suggestions" class="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.12)] border border-gray-100/80 max-h-[250px] overflow-y-auto z-[60] hidden no-scrollbar transition-all duration-300">
+                        <!-- Items injected dynamically -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Floating Map Controls -->
+            <!-- GPS Location Button -->
+            <div class="absolute right-4 bottom-44 flex flex-col gap-3 z-10 pointer-events-auto">
+                <button id="dest-gps-btn" onclick="getCurrentLocation()" style="touch-action: manipulation;" class="w-12 h-12 bg-white/90 backdrop-blur rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] flex items-center justify-center text-[#1A73E8] hover:bg-gray-50 transition-transform active:scale-90 border border-gray-100/50">
+                    <i class="fa-solid fa-location-crosshairs text-xl"></i>
+                </button>
+            </div>
+
+            <div class="absolute bottom-0 w-full p-6 bg-white rounded-t-[2rem] shadow-[0_-10px_40px_rgba(0,0,0,0.08)] z-20 pb-safe">
+                <div class="mb-4">
+                    <p class="text-[11px] text-textSecondary uppercase font-bold tracking-wide" data-i18n="common.selectedAddress">Tanlangan manzil</p>
+                    <p id="dest-address-text" class="text-sm font-bold text-graphite truncate mt-1" data-i18n="common.addressLoading">Manzil aniqlanmoqda...</p>
+                </div>
+                <button onclick="confirmDestLocation()" class="w-full bg-primary hover:bg-primaryHover text-graphite font-semibold text-lg py-4 rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-yellow-500/20" data-i18n="common.confirmBtn">
+                    Tasdiqlash
+                </button>
+            </div>
+        </div>
+
+        <!-- ==============================
+             4. WAITING SCREEN
+             ============================== -->
+        <div id="waiting-screen" class="screen absolute inset-0 bg-white flex flex-col items-center justify-center z-40 transition-transform duration-300 transform translate-x-full p-6 overflow-y-auto no-scrollbar">
+            <div class="relative w-32 h-32 flex items-center justify-center mb-8">
+                <div class="absolute inset-0 bg-primary/20 rounded-full animate-ping"></div>
+                <div class="absolute inset-2 bg-primary/40 rounded-full animate-ping" style="animation-delay: 300ms;"></div>
+                <div class="relative w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-lg z-10 border-2 border-primary overflow-hidden p-1">
+                    <img src="assets/images/logo.jpeg" alt="Logo" class="w-full h-full object-contain rounded-full" style="mix-blend-mode: multiply;">
+                </div>
+            </div>
+            <h2 class="text-xl font-bold mb-2" data-i18n="waiting.searchDriver">Haydovchi qidirilmoqda...</h2>
+            <p class="text-sm text-textSecondary px-8 text-center" data-i18n="waiting.searchDesc">Iltimos, kuting. Sizning yo'nalishingiz bo'yicha haydovchilarga so'rov yuborildi.</p>
+            <button onclick="cancelOrder()" class="mt-12 bg-red-50 text-red-600 font-bold py-3 px-8 rounded-full transition-colors active:bg-red-100 text-sm" data-i18n="common.cancelBtn">
+                Bekor qilish
+            </button>
+        </div>
+
+        <!-- ==============================
+             5. ACTIVE TRIP SCREEN
+             ============================== -->
+        <div id="active-trip-screen" class="screen absolute inset-0 bg-white flex flex-col z-50 transition-transform duration-300 transform translate-x-full overflow-hidden">
+            
+            <div class="relative w-full z-0 bg-gray-100 shadow-inner" style="height: 52vh; min-height: 420px;">
+                <div id="trip-map" class="w-full h-full"></div>
+            </div>
+            
+            <div class="absolute top-0 w-full p-4 z-10 pt-safe">
+                <div class="bg-white/90 backdrop-blur-md rounded-3xl p-3 shadow-[0_8px_30px_rgba(0,0,0,0.08)] flex items-center gap-3 border border-white">
+                    <button onclick="navigate('home-screen')" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-50 hover:bg-gray-100 transition-colors shrink-0">
+                        <i class="fa-solid fa-chevron-left text-sm"></i>
+                    </button>
+                    <div class="flex-1 text-center pr-10">
+                        <h1 id="trip-status" class="text-sm font-extrabold uppercase tracking-tight" data-i18n="trip.statusActive">Safar davom etmoqda</h1>
+                        <p id="trip-date" class="text-[10px] font-bold text-textSecondary">24 may, 08:30</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="absolute top-24 left-4 z-10 bg-white/95 backdrop-blur rounded-2xl p-4 shadow-[0_10px_30px_rgba(0,0,0,0.1)] border border-white flex flex-col gap-1 min-w-[140px]">
+                <div id="trip-distance" class="text-sm font-black text-graphite leading-none">... km</div>
+                <div id="trip-price" class="text-[12px] font-bold text-graphite mt-1 flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-primary"></span><span id="trip-price-value">-- so'm</span></div>
+            </div>
+
+            <button class="absolute bottom-[300px] right-4 z-10 w-12 h-12 bg-white rounded-full shadow-[0_8px_20px_rgba(0,0,0,0.1)] flex items-center justify-center text-graphite hover:bg-gray-50 border border-gray-50 transition-transform active:scale-95">
+                <i class="fa-solid fa-location-crosshairs text-lg"></i>
+            </button>
+            
+            <div class="flex-1 bg-white rounded-t-[2.5rem] shadow-[0_-15px_40px_rgba(0,0,0,0.12)] z-20 -mt-10 pb-safe relative flex flex-col overflow-hidden border-t border-gray-50">
+                <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto my-3"></div>
+                
+                <div class="p-5 pt-3">
+                    <div class="flex items-center gap-3 mb-6 bg-white p-2 rounded-2xl border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+                        <img src="rasmlar/avatar.png" id="trip-driver-img" class="w-14 h-14 rounded-full object-cover shadow-sm">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2">
+                                <span id="trip-driver-name" class="font-extrabold text-sm" data-i18n="trip.driverName">Haydovchi</span>
+                                <span class="text-[10px] font-bold text-yellow-600 bg-yellow-50 px-1.5 py-0.5 rounded flex items-center gap-1"><i class="fa-solid fa-star text-[8px]"></i> <span id="trip-driver-rating">5.0</span></span>
+                            </div>
+                            <div id="trip-car-info" class="text-[11px] font-medium text-textSecondary mt-0.5" data-i18n="trip.carInfo">Avtomobil</div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="showCallModal()" class="w-11 h-11 rounded-full bg-green-50 shadow-sm flex items-center justify-center text-green-600 hover:bg-green-100 transition-colors">
+                                <i class="fa-solid fa-phone"></i>
+                            </button>
+                            <button onclick="openActiveDriverChat()" class="w-11 h-11 rounded-full bg-blue-50 shadow-sm flex items-center justify-center text-blue-600 hover:bg-blue-100 transition-colors">
+                                <i class="fa-solid fa-comment-dots"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="relative pl-3 mb-6 bg-gray-50 p-4 rounded-2xl">
+                        <div class="absolute left-[26px] top-6 bottom-6 w-[2px] bg-gray-200 rounded-full"></div>
+                        
+                        <div class="flex items-center gap-4 mb-4 relative">
+                            <div class="w-3 h-3 rounded-full bg-primary border-2 border-white shadow-sm ring-1 ring-gray-200 z-10"></div>
+                            <div>
+                                <p class="text-[10px] text-textSecondary uppercase tracking-widest font-bold mb-0.5" data-i18n="taxi.fromLabel">Qayerdan</p>
+                                <p id="trip-from" class="text-sm font-bold text-graphite">...</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center gap-4 relative">
+                            <div class="w-3 h-3 rounded-full bg-graphite border-2 border-white shadow-sm ring-1 ring-gray-200 z-10"></div>
+                            <div>
+                                <p class="text-[10px] text-textSecondary uppercase tracking-widest font-bold mb-0.5" data-i18n="taxi.toLabel">Qayerga</p>
+                                <p id="trip-to" class="text-sm font-bold text-graphite">...</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button onclick="cancelOrder()" class="w-full bg-white border-2 border-red-100 hover:bg-red-50 text-red-600 font-bold py-4 rounded-2xl transition-colors text-sm" data-i18n="trip.cancelBtn">
+                        Safarni bekor qilish
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==============================
+             6. SAFARLARIM SCREEN
+             ============================== -->
+        <div id="safarlarim-screen" class="screen absolute inset-0 bg-bgLight flex flex-col z-30 transition-transform duration-300 transform translate-x-full">
+            <div class="px-5 py-4 bg-white shadow-sm z-10 pt-safe">
+                <h1 class="text-xl font-bold" data-i18n="trips.title">Safarlarim</h1>
+            </div>
+            <div id="safarlarim-list" class="flex-1 overflow-y-auto p-4 flex flex-col gap-4 pb-32 pb-safe">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+
+        <!-- ==============================
+             7. XABARLAR SCREEN
+             ============================== -->
+        <div id="xabarlar-screen" class="screen absolute inset-0 bg-bgLight flex flex-col z-30 transition-transform duration-300 transform translate-x-full">
+            <div class="px-5 py-4 bg-white shadow-sm z-10 pt-safe">
+                <h1 class="text-xl font-bold" data-i18n="messages.title">Xabarlar</h1>
+            </div>
+            <div id="xabarlar-list" class="flex-1 overflow-y-auto flex flex-col pb-32 pb-safe">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+
+        <!-- ==============================
+             8. PROFIL SCREEN
+             ============================== -->
+        <div id="profil-screen" class="screen absolute inset-0 bg-bgLight flex flex-col z-30 transition-transform duration-300 transform translate-x-full">
+            <div class="px-5 py-4 bg-white shadow-sm z-10 pt-safe">
+                <h1 class="text-xl font-bold" data-i18n="profile.title">Profil</h1>
+            </div>
+            <div class="flex-1 overflow-y-auto p-4 pb-32 pb-safe flex flex-col">
+                <div class="bg-white rounded-[1.5rem] p-5 shadow-sm border border-gray-50 flex items-center gap-4 mb-6">
+                    <img id="profile-avatar" src="rasmlar/boyavatar.png" class="w-16 h-16 rounded-full object-cover bg-primary/10">
+                    <div>
+                        <h2 id="profile-name" class="text-lg font-bold">Foydalanuvchi</h2>
+                        <p id="profile-phone" class="text-sm text-textSecondary">+998</p>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-[1.5rem] shadow-sm border border-gray-50 mb-6 overflow-hidden">
+                    <div onclick="openSettings()" class="p-4 border-b border-gray-50 flex items-center justify-between active:bg-gray-50 transition-colors cursor-pointer">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-gear text-textSecondary w-5 text-center"></i>
+                            <span class="font-medium text-sm" data-i18n="profile.settings">Sozlamalar</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-gray-300 text-xs"></i>
+                    </div>
+                    <div onclick="openHelp()" class="p-4 flex items-center justify-between active:bg-gray-50 transition-colors cursor-pointer">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-regular fa-circle-question text-textSecondary w-5 text-center"></i>
+                            <span class="font-medium text-sm" data-i18n="profile.help">Yordam</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-gray-300 text-xs"></i>
+                    </div>
+                </div>
+                
+                <button onclick="logout()" class="w-full bg-red-50 text-red-600 font-bold py-4 rounded-2xl transition-colors active:bg-red-100 text-sm mb-8" data-i18n="profile.logout">
+                    Tizimdan chiqish
+                </button>
+                
+                <div class="mt-auto flex flex-col items-center justify-center opacity-60">
+                    <img src="assets/images/logo.jpeg" alt="Logo" class="h-12 w-auto object-contain mix-blend-multiply mb-2" style="border-radius: 8px;">
+                    <p class="text-xs text-textSecondary font-medium">Vijdon GO © 2024</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==============================
+             9. SOZLAMALAR SCREEN
+             ============================== -->
+        <div id="settings-screen" class="screen absolute inset-0 bg-bgLight flex flex-col z-50 transition-transform duration-300 transform translate-x-full">
+            <div class="px-5 py-4 bg-white flex items-center shadow-sm z-10 pt-safe border-b border-gray-50">
+                <button onclick="navigate('profil-screen')" class="w-10 h-10 flex items-center justify-center rounded-full bg-bgLight hover:bg-gray-200 transition-colors mr-3">
+                    <i class="fa-solid fa-chevron-left text-sm"></i>
+                </button>
+                <h1 class="text-xl font-bold" data-i18n="settings.title">Sozlamalar</h1>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto p-6 flex flex-col gap-6 pb-10 pb-safe">
+                <div class="flex flex-col items-center mb-4">
+                    <div class="relative">
+                        <img id="settings-avatar" src="rasmlar/boyavatar.png" class="w-24 h-24 rounded-full object-cover border-4 border-white shadow-md">
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-textSecondary uppercase tracking-wider mb-2 ml-1" data-i18n="login.nameLabel">Ism</label>
+                        <input type="text" id="settings-name" class="w-full bg-white px-5 py-4 rounded-2xl border border-gray-100 shadow-sm focus:ring-2 focus:ring-primary outline-none transition-shadow text-base font-semibold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-textSecondary uppercase tracking-wider mb-2 ml-1" data-i18n="login.surnameLabel">Familiya</label>
+                        <input type="text" id="settings-surname" class="w-full bg-white px-5 py-4 rounded-2xl border border-gray-100 shadow-sm focus:ring-2 focus:ring-primary outline-none transition-shadow text-base font-semibold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-textSecondary uppercase tracking-wider mb-2 ml-1" data-i18n="login.genderLabel">Jinsingiz</label>
+                        <div class="flex gap-3">
+                            <button onclick="setSettingsGender('male')" id="settings-gender-male" class="settings-gender-btn flex-1 bg-white p-4 rounded-2xl border-2 border-gray-50 transition-all flex flex-col items-center gap-1">
+                                <span class="text-xs font-bold" data-i18n="login.male">Erkak</span>
+                            </button>
+                            <button onclick="setSettingsGender('female')" id="settings-gender-female" class="settings-gender-btn flex-1 bg-white p-4 rounded-2xl border-2 border-gray-50 transition-all flex flex-col items-center gap-1">
+                                <span class="text-xs font-bold" data-i18n="login.female">Ayol</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-textSecondary uppercase tracking-wider mb-2 ml-1" data-i18n="settings.language">Til / Language</label>
+                        <div class="relative">
+                            <select id="settings-language" onchange="setLanguage(this.value)" class="w-full bg-white px-5 py-4 rounded-2xl border border-gray-100 shadow-sm focus:ring-2 focus:ring-primary outline-none transition-shadow text-base font-semibold appearance-none cursor-pointer">
+                                <option value="uz">O‘zbekcha 🇺🇿</option>
+                                <option value="ru">Русский 🇷🇺</option>
+                                <option value="en">English 🇺🇸</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-5 text-textSecondary">
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-textSecondary uppercase tracking-wider mb-2 ml-1" data-i18n="settings.phoneUnchangeable">Telefon raqami (O'zgartirib bo'lmaydi)</label>
+                        <div class="w-full bg-gray-50 px-5 py-4 rounded-2xl border border-gray-100 text-base font-semibold text-textSecondary flex items-center justify-between">
+                            <span id="settings-phone"></span>
+                            <i class="fa-solid fa-lock text-[10px] opacity-40"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-auto pt-10 flex flex-col gap-3">
+                    <button onclick="saveSettings()" class="w-full bg-primary active:bg-primaryHover text-graphite font-bold text-lg py-4 rounded-2xl transition-all shadow-lg shadow-yellow-500/20" data-i18n="common.saveBtn">
+                        Saqlash
+                    </button>
+                    <button onclick="navigate('profil-screen')" class="w-full bg-white text-textSecondary font-bold py-4 rounded-2xl border border-gray-100 transition-colors active:bg-gray-50" data-i18n="common.cancelBtn">
+                        Bekor qilish
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==============================
+             DELIVERY SCREEN
+             ============================== -->
+        <div id="delivery-screen" class="screen absolute inset-0 bg-[#F5F5F7] flex flex-col z-40 transition-transform duration-300 transform translate-x-full">
+            <!-- Header -->
+            <div class="px-4 py-3 flex items-center gap-3 z-10 bg-white pt-safe shadow-[0_4px_24px_rgba(0,0,0,0.04)] border-b border-gray-50/50">
+                <button onclick="navigate('home-screen')" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-50 active:bg-gray-100 transition-colors shrink-0">
+                    <i class="fa-solid fa-chevron-left text-sm text-graphite"></i>
+                </button>
+                <div class="flex items-center gap-2 flex-1">
+                    <div class="w-8 h-8 rounded-xl bg-primary/20 flex items-center justify-center">
+                        <i class="fa-solid fa-box-open text-primary text-sm"></i>
+                    </div>
+                    <h1 class="text-[18px] font-extrabold tracking-tight text-graphite" data-i18n="delivery.title">Dostavka</h1>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="flex-1 overflow-y-auto no-scrollbar pb-32 pb-safe flex flex-col">
+
+                <!-- Delivery Info Banner -->
+                <div class="mx-4 mt-4 bg-white rounded-2xl p-4 flex items-center gap-3 shadow-[0_4px_15px_rgba(0,0,0,0.04)]">
+                    <div class="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
+                        <img src="rasmlar/dostavka.png" alt="Dostavka" class="w-10 h-10 object-contain mix-blend-multiply">
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-extrabold text-graphite" data-i18n="delivery.bannerTitle">Pochta va Posylka</h3>
+                        <p class="text-[11px] text-textSecondary font-medium mt-0.5" data-i18n="delivery.bannerSub">Tez va ishonchli yetkazib berish xizmati</p>
+                    </div>
+                </div>
+
+                <!-- Address Picker Card -->
+                <div class="px-4 z-10 mt-4">
+                    <div class="bg-white rounded-3xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100 relative">
+                        <div class="flex flex-col gap-4 relative">
+                            <!-- Decor line -->
+                            <div class="absolute left-[11px] top-6 bottom-6 w-[2px] bg-gray-100 rounded-full"></div>
+
+                            <div class="flex gap-4 items-center relative z-10">
+                                <div class="w-6 h-6 rounded-full bg-[#FFFBE6] flex items-center justify-center shrink-0 shadow-sm border border-yellow-100">
+                                    <div class="w-2 h-2 rounded-full bg-primary"></div>
+                                </div>
+                                <div class="flex-1 border-b border-gray-100 pb-3" onclick="startDeliveryPickupFlow()" style="cursor: pointer;">
+                                    <p class="text-[11px] text-textSecondary mb-0.5 font-medium uppercase tracking-wide" data-i18n="taxi.fromLabel">Qayerdan</p>
+                                    <div id="del-from-display" class="w-full bg-transparent font-semibold text-sm text-graphite truncate" data-i18n="delivery.fromPlaceholder">Pochta qayerdan?</div>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-4 items-center relative z-10">
+                                <div class="w-6 h-6 rounded-full bg-gray-50 flex items-center justify-center shrink-0 shadow-sm border border-gray-200">
+                                    <div class="w-2 h-2 rounded-full bg-graphite"></div>
+                                </div>
+                                <div class="flex-1 pt-1" onclick="startDeliveryDestFlow()" style="cursor: pointer;">
+                                    <p class="text-[11px] text-textSecondary mb-0.5 font-medium uppercase tracking-wide" data-i18n="taxi.toLabel">Qayerga</p>
+                                    <div id="del-to-display" class="w-full bg-transparent font-semibold text-sm text-graphite truncate" data-i18n="delivery.toPlaceholder">Pochta qayerga?</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Delivery Map Preview -->
+                <div id="del-route-preview" class="flex flex-col opacity-0 translate-y-10 pointer-events-none transition-all duration-700 ease-out" style="display: none;">
+                    <div class="h-[300px] sm:h-[350px] mt-4 relative z-0 mx-4 rounded-[2rem] shadow-xl border border-gray-100 flex-shrink-0 overflow-hidden" style="clip-path: inset(0 round 2rem);">
+                        <div id="del-map" class="w-full h-full"></div>
+                        <div class="absolute bottom-4 left-4 z-[400] bg-white/95 backdrop-blur-md rounded-2xl px-4 py-3 shadow-[0_8px_20px_rgba(0,0,0,0.1)] border border-gray-50 flex flex-col gap-1 hidden transition-all duration-300" id="del-info-card">
+                            <div id="del-content-state" class="flex flex-col hidden">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-2 h-2 rounded-full bg-graphite"></div>
+                                    <div id="del-distance" class="text-[12px] font-bold text-textSecondary uppercase tracking-wide">-- km</div>
+                                </div>
+                            </div>
+                            <div id="del-loading-state" class="flex flex-col py-0.5">
+                                <div class="flex items-center gap-2.5 mb-2">
+                                    <div class="w-4 h-4 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
+                                    <span class="text-[13px] font-bold text-graphite" data-i18n="taxi.calcRoute">Yo'nalish hisoblanmoqda...</span>
+                                </div>
+                                <div class="flex items-center gap-3 pl-6">
+                                    <div class="h-3.5 w-12 bg-gray-200 rounded animate-pulse"></div>
+                                    <div class="h-4 w-20 bg-gray-200 rounded animate-pulse"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Delivery Tariff Card -->
+                    <div class="mx-4 mt-4 bg-white rounded-2xl p-4 shadow-[0_4px_15px_rgba(0,0,0,0.04)] border border-gray-50">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+                                    <i class="fa-solid fa-truck-fast text-xl text-primary"></i>
+                                </div>
+                                <div>
+                                    <span class="text-[11px] font-black uppercase tracking-widest text-graphite" data-i18n="delivery.tariffName">DOSTAVKA</span>
+                                    <p class="text-[10px] text-textSecondary font-medium" data-i18n="delivery.tariffSub">Pochta yetkazish</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span id="del-price" class="text-[18px] font-extrabold text-graphite">-- so'm</span>
+                                <p class="text-[10px] text-textSecondary font-medium" data-i18n="delivery.tariffRate">100 so'm/km</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="px-4 mt-5">
+                        <button onclick="createDeliveryOrder()" id="del-order-btn" disabled class="w-full bg-primary active:bg-primaryHover text-graphite font-semibold text-lg py-4 rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-yellow-500/20 opacity-50 cursor-not-allowed flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-box-open"></i>
+                            <span data-i18n="delivery.orderBtn">Dostavka chaqirish</span>
+                        </button>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+
+        <!-- ==============================
+             BOTTOM NAVIGATION
+             ============================== -->
+        <nav id="bottom-nav" class="hidden absolute bottom-0 w-full bg-white border-t border-gray-100 justify-around items-center pb-safe pt-2 px-2 z-[35] shadow-[0_-5px_20px_rgba(0,0,0,0.03)] h-20 min-h-[5rem]">
+                    <button id="nav-btn-home-screen" onclick="navigate('home-screen')" class="nav-btn flex flex-col items-center justify-center w-16 h-full text-textSecondary active:text-graphite transition-colors" style="touch-action: manipulation;">
+                        <i class="fa-solid fa-house text-xl mb-1"></i>
+                        <span class="text-[10px] font-bold" data-i18n="nav.home">Asosiy</span>
+                    </button>
+                    <button id="nav-btn-safarlarim-screen" onclick="navigate('safarlarim-screen')" class="nav-btn flex flex-col items-center justify-center w-16 h-full text-textSecondary active:text-graphite transition-colors" style="touch-action: manipulation;">
+                        <i class="fa-solid fa-route text-xl mb-1"></i>
+                        <span class="text-[10px] font-semibold" data-i18n="nav.trips">Safarlarim</span>
+                    </button>
+                    <button id="nav-btn-xabarlar-screen" onclick="navigate('xabarlar-screen')" class="nav-btn flex flex-col items-center justify-center w-16 h-full text-textSecondary active:text-graphite transition-colors" style="touch-action: manipulation;">
+                        <i class="fa-regular fa-comment-dots text-xl mb-1"></i>
+                        <span class="text-[10px] font-semibold" data-i18n="nav.messages">Xabarlar</span>
+                    </button>
+                    <button id="nav-btn-profil-screen" onclick="navigate('profil-screen')" class="nav-btn flex flex-col items-center justify-center w-16 h-full text-textSecondary active:text-graphite transition-colors" style="touch-action: manipulation;">
+                        <i class="fa-regular fa-user text-xl mb-1"></i>
+                        <span class="text-[10px] font-semibold" data-i18n="nav.profile">Profil</span>
+                    </button>
+                </nav>
+                
+                <!-- Call Modal -->
+                <div id="call-modal" class="hidden absolute inset-0 z-[60] bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center p-6 opacity-0 transition-opacity duration-300">
+                    <div class="bg-white w-full max-w-xs rounded-3xl p-6 flex flex-col items-center shadow-2xl transform scale-95 transition-transform duration-300">
+                        <img src="rasmlar/avatar.png" id="call-avatar" class="w-24 h-24 rounded-full object-cover shadow-md mb-4 border-4 border-green-50">
+                        <h2 id="call-name" class="text-xl font-bold mb-1" data-i18n="trip.driverName">Haydovchi</h2>
+                        <p class="text-sm text-textSecondary mb-8 animate-pulse" data-i18n="call.status">Chaqirilmoqda...</p>
+                        <div class="flex gap-6">
+                            <button onclick="hideCallModal()" class="w-16 h-16 rounded-full bg-red-500 shadow-lg shadow-red-500/30 flex items-center justify-center text-white hover:bg-red-600 transition-transform active:scale-95" style="touch-action: manipulation;">
+                                <i class="fa-solid fa-phone-slash text-2xl"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+        
+                <!-- Chat Modal -->
+                <div id="chat-modal" class="hidden absolute inset-0 z-[60] bg-white flex flex-col transition-transform duration-300 transform translate-y-full">
+                    <div class="px-4 py-4 flex items-center border-b border-gray-100 shadow-sm pt-safe bg-white z-10">
+                        <button onclick="hideChatModal()" class="w-10 h-10 flex items-center justify-center rounded-full bg-bgLight hover:bg-gray-200 transition-colors" style="touch-action: manipulation;">
+                            <i class="fa-solid fa-chevron-down text-sm"></i>
+                        </button>
+                        <div class="flex-1 flex flex-col items-center mr-10">
+                            <h1 id="chat-name" class="text-base font-bold" data-i18n="trip.driverName">Haydovchi</h1>
+                            <span class="text-[10px] text-green-500 font-semibold" data-i18n="chat.online">Online</span>
+                        </div>
+                    </div>
+                    
+                    <div id="chat-messages" class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 bg-bgLight">
+                        <!-- Messages will be injected -->
+                    </div>
+                    
+                    <div class="p-4 pb-safe bg-white border-t border-gray-100 flex gap-2 items-center shrink-0">
+                        <input type="text" id="chat-input" placeholder="Xabar yozing..." data-i18n-placeholder="chat.inputPlaceholder" class="flex-1 bg-bgLight px-4 py-3 rounded-full border-none focus:ring-2 focus:ring-primary outline-none text-sm">
+                        <button onclick="sendChatMessage()" class="w-11 h-11 rounded-full bg-primary flex items-center justify-center text-graphite hover:bg-primaryHover transition-colors shadow-sm" style="touch-action: manipulation;">
+                            <i class="fa-solid fa-paper-plane text-sm ml-0.5"></i>
+                        </button>
+                    </div>
+                </div>
+        
+    </div>
+
+    <!-- App Logic -->
+    <script src="app.js?v=2.0.1"></script>
+</body>
+</html>
