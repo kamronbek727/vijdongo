@@ -2190,12 +2190,59 @@ function updateMarkerAndAddress(type, latlng) {
     
     setMarker(type, { lat, lng }, t('common.addressLoading') || "Manzil aniqlanmoqda...");
     
-    // Geocoding API vaqtinchalik o'chirilgan (403 xatosi sabali)
-    // Foydalanuvchi tanlagan koordinatalarni darhol saqlash
-    const displayName = `Tanlangan nuqta (${lat.toFixed(5)}, ${lng.toFixed(5)})`;
-    console.log("Selected coords:", lat, lng);
-    setMarker(type, { lat, lng }, displayName);
+    (async function resolveAddress() {
+        const fallback = `Tanlangan nuqta (${lat.toFixed(5)}, ${lng.toFixed(5)})`;
+        
+        // 1-urinish: Yandex ymaps.geocode()
+        if (typeof ymaps !== 'undefined' && ymaps.geocode) {
+            try {
+                const result = await ymaps.geocode([lat, lng], { results: 1 });
+                const geoObject = result.geoObjects.get(0);
+                if (geoObject) {
+                    const text = geoObject.properties.get('text') || '';
+                    if (text) {
+                        console.log("Yandex reverse geocode muvaffaqiyatli:", text);
+                        setMarker(type, { lat, lng }, text);
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.warn("Yandex geocode ishlamadi, Nominatim urinamiz:", e.message || e);
+            }
+        }
+        
+        // 2-urinish: OpenStreetMap Nominatim
+        try {
+            const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`;
+            const resp = await fetch(url, {
+                headers: { 'Accept-Language': 'uz,ru;q=0.8' }
+            });
+            if (resp.ok) {
+                const data = await resp.json();
+                const addr = data.address || {};
+                const parts = [];
+                if (addr.state)                                  parts.push(addr.state);
+                if (addr.city || addr.town || addr.village)      parts.push(addr.city || addr.town || addr.village);
+                if (addr.suburb || addr.neighbourhood)           parts.push(addr.suburb || addr.neighbourhood);
+                if (addr.road)                                   parts.push(addr.road);
+                if (addr.house_number)                           parts.push(addr.house_number);
+                const addressName = parts.join(', ');
+                if (addressName) {
+                    console.log("Nominatim reverse geocode muvaffaqiyatli:", addressName);
+                    setMarker(type, { lat, lng }, addressName);
+                    return;
+                }
+            }
+        } catch (e) {
+            console.warn("Nominatim geocode ham ishlamadi:", e.message || e);
+        }
+        
+        // 3-urinish: Koordinatalarni ko'rsat
+        console.log("Barcha geocoding usullari muvaffaqiyatsiz, koordinatalar ko'rsatiladi");
+        setMarker(type, { lat, lng }, fallback);
+    })();
 }
+
 
 function setMarker(type, latlng, addressName) {
     const map = type === 'pickup' ? pickupMap : destMap;
