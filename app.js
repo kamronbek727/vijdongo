@@ -3586,8 +3586,7 @@ async function yandexSearch(query, activeRegion) {
     
     try {
         const result = await ymaps.geocode(searchQuery, {
-            results: 20,
-            provider: 'yandex#map'
+            results: 20
         });
         
         result.geoObjects.each(function (geoObject) {
@@ -3626,7 +3625,7 @@ async function yandexReverseGeocode(lat, lng) {
     }
     
     try {
-        const result = await ymaps.geocode([lat, lng], { results: 1, provider: 'yandex#map' });
+        const result = await ymaps.geocode([lat, lng], { results: 1 });
         const geoObject = result.geoObjects.get(0);
         if (geoObject) {
             const meta = geoObject.properties.get('metaDataProperty.GeocoderMetaData');
