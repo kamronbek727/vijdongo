@@ -981,11 +981,11 @@ function buildDeliveryRoute() {
 
 function createDeliveryOrder() {
     if (!delPickup.latlng || !delDest.latlng || !delPickup.address || !delDest.address) {
-        alert(t('delivery.selectAddressesFirst'));
+        showToast(t('delivery.selectAddressesFirst'), 'error');
         return;
     }
     if (!delRouteState.ready) {
-        alert(t('taxi.waitRouteCalc'));
+        showToast(t('taxi.waitRouteCalc'), 'error');
         return;
     }
 
@@ -1936,15 +1936,15 @@ function handleLogin() {
     // 1. Validation
     const digits = phone.replace(/[^\d]/g, '');
     if (digits.length !== 12) {
-        alert(t('login.phoneError'));
+        showToast(t('login.phoneError'), 'error');
         return;
     }
     if (!name || name.length < 2) {
-        alert(t('login.nameError'));
+        showToast(t('login.nameError'), 'error');
         return;
     }
     if (!loginGender) {
-        alert(t('login.genderError'));
+        showToast(t('login.genderError'), 'error');
         return;
     }
 
@@ -2244,9 +2244,71 @@ function updateMarkerAndAddress(type, latlng) {
 }
 
 
-function setMarker(type, latlng, addressName) {
+function cyrillicToLatin(text) {
+    const cyrillicMap = {
+        'А': 'A', 'Б': 'B', 'В': 'V', 'Г': 'G', 'Д': 'D', 'Е': 'E', 'Ё': 'Yo', 'Ж': 'J', 'З': 'Z', 'И': 'I', 'Й': 'Y', 'К': 'K', 'Л': 'L', 'М': 'M', 'Н': 'N', 'О': 'O', 'П': 'P', 'Р': 'R', 'С': 'S', 'Т': 'T', 'У': 'U', 'Ф': 'F', 'Х': 'X', 'Ц': 'Ts', 'Ч': 'Ch', 'Ш': 'Sh', 'Щ': 'Shch', 'Ъ': '', 'Ы': 'Y', 'Ь': '', 'Э': 'E', 'Ю': 'Yu', 'Я': 'Ya',
+        'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo', 'ж': 'j', 'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u', 'ф': 'f', 'х': 'x', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'shch', 'ъ': '', 'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya',
+        'Қ': 'Q', 'қ': 'q', 'Ғ': 'G\'', 'ғ': 'g\'', 'Ҳ': 'H', 'ҳ': 'h', 'Ў': 'O\'', 'ў': 'o\''
+    };
+    return text.split('').map(char => cyrillicMap[char] || char).join('');
+}
+
+function formatAddressText(address) {
+    if (!address || address === t('common.addressLoading') || address === "Manzil aniqlanmoqda...") return address;
+    
+    let parts = address.split(',').map(p => p.trim());
+    
+    const hasCity = parts.some(p => /shahar|shahri/i.test(p));
+    if (hasCity) {
+        parts = parts.filter(p => !/viloyat|viloyati/i.test(p));
+    }
+    
+    parts = parts.map(p => {
+        let text = p;
+        if (text.toLowerCase().includes('проспект ислама каримова') || text.toLowerCase().includes('проспект ислам каримов')) {
+            return "Islom Karimov ko'chasi";
+        }
+        
+        let isStreet = false;
+        let isMahalla = false;
+        
+        if (/(улица|ул\.)/i.test(text)) {
+            text = text.replace(/(улица|ул\.)\s*/i, '').replace(/\s*(улица|ул\.)/i, '');
+            isStreet = true;
+        } else if (/(проспект|просп\.)/i.test(text)) {
+            text = text.replace(/(проспект|просп\.)\s*/i, '').replace(/\s*(проспект|просп\.)/i, '');
+            isStreet = true;
+        } else if (/(махалля|мах\.)/i.test(text)) {
+            text = text.replace(/(махалля|мах\.)\s*/i, '').replace(/\s*(махалля|мах\.)/i, '');
+            isMahalla = true;
+        }
+        
+        if (/[А-Яа-яЁё]/.test(text)) {
+            text = cyrillicToLatin(text);
+            
+            // Clean up typical Russian grammar endings translated to Latin incorrectly, 
+            // e.g. "Amira Temura" -> "Amir Temur" (this is hard to generalize, but we can try simple ones or ignore it for now)
+            text = text.replace(/([A-Z][a-z]+)a ([A-Z][a-z]+)a$/i, '$1 $2');
+        }
+        
+        if (isStreet && !/ko'chasi/i.test(text)) {
+            text = text.trim() + " ko'chasi";
+        }
+        if (isMahalla && !/mahallasi/i.test(text)) {
+            text = text.trim() + " mahallasi";
+        }
+        
+        return text.trim();
+    });
+    
+    return parts.join(', ');
+}
+
+function setMarker(type, latlng, rawAddressName) {
     const map = type === 'pickup' ? pickupMap : destMap;
     const isPickup = type === 'pickup';
+    
+    const addressName = formatAddressText(rawAddressName);
     
     if (isPickup) {
         selectedPickup.latlng = latlng;
@@ -2465,7 +2527,7 @@ function startPickupFlow() {
 
 function startDestFlow() {
     if (!selectedPickup.latlng) {
-        alert(t('taxi.selectPickupFirst'));
+        showToast(t('taxi.selectPickupFirst'), 'error');
         // Optional: animate the pickup input to draw attention
         const pickupContainer = document.getElementById('from-display')?.parentElement;
         if (pickupContainer) {
@@ -2513,7 +2575,7 @@ function confirmPickupLocation() {
     // Check if in delivery flow mode
     if (window._deliveryFlowMode === 'pickup') {
         if (!selectedPickup.latlng || !selectedPickup.address || selectedPickup.address === t('common.addressLoading')) {
-            alert(t('taxi.addressWaitOrMap'));
+            showToast(t('taxi.addressWaitOrMap'), 'error');
             return;
         }
         delPickup.latlng = { ...selectedPickup.latlng };
@@ -2536,7 +2598,7 @@ function confirmPickupLocation() {
     }
 
     if (!selectedPickup.latlng || !selectedPickup.address || selectedPickup.address === t('common.addressLoading')) {
-        alert(t('taxi.addressWaitOrMap'));
+        showToast(t('taxi.addressWaitOrMap'), 'error');
         return;
     }
     const display = document.getElementById('from-display');
@@ -2561,7 +2623,7 @@ function confirmDestLocation() {
     // Check if in delivery flow mode
     if (window._deliveryFlowMode === 'dest') {
         if (!selectedDest.latlng || !selectedDest.address || selectedDest.address === t('common.addressLoading')) {
-            alert(t('taxi.addressWaitOrMap'));
+            showToast(t('taxi.addressWaitOrMap'), 'error');
             return;
         }
         delDest.latlng = { ...selectedDest.latlng };
@@ -2581,7 +2643,7 @@ function confirmDestLocation() {
     }
 
     if (!selectedDest.latlng || !selectedDest.address || selectedDest.address === t('common.addressLoading')) {
-        alert(t('taxi.addressWaitOrMap'));
+        showToast(t('taxi.addressWaitOrMap'), 'error');
         return;
     }
     const display = document.getElementById('to-display');
@@ -2733,7 +2795,7 @@ function getCurrentLocation() {
 
     if (!navigator.geolocation) {
         logDebugToScreen("navigator.geolocation topilmadi! Brauzer xizmatni qo'llab-quvvatlamaydi.", "error");
-        alert(t('common.gpsNotSupported') || "Your browser does not support geolocation.");
+        showToast(t('common.gpsNotSupported') || "Your browser does not support geolocation.", 'error');
         return;
     }
 
@@ -2829,11 +2891,11 @@ function getCurrentLocation() {
                 logDebugToScreen("Joylashuv aniqlanmadi (iOS maxsus xatoligi).", "error");
                 showLocationDeniedModal('not_retrieved');
             } else if (err.code === 2) {
-                alert(t('gps.errorPositionUnavailable') || "Location unavailable.");
+                showToast(t('gps.errorPositionUnavailable') || "Location unavailable.", 'error');
             } else if (err.code === 3) {
-                alert(t('gps.errorTimeout') || "Location request timed out.");
+                showToast(t('gps.errorTimeout') || "Location request timed out.", 'error');
             } else {
-                alert(t('gps.errorGeneric') || "Unable to retrieve location.");
+                showToast(t('gps.errorGeneric') || "Unable to retrieve location.", 'error');
             }
         }
     }
@@ -2905,12 +2967,12 @@ function createOrder() {
     console.log("createOrder triggered", {selectedPickup, selectedDest, routeState});
 
     if (!selectedPickup.latlng || !selectedDest.latlng || !selectedPickup.address || !selectedDest.address) {
-        alert(t('taxi.selectAddressesFirst'));
+        showToast(t('taxi.selectAddressesFirst'), 'error');
         return;
     }
 
     if (!routeState.ready) {
-        alert(t('taxi.waitRouteCalc'));
+        showToast(t('taxi.waitRouteCalc'), 'error');
         return;
     }
 
@@ -2920,7 +2982,7 @@ function createOrder() {
     const toLng = Number(selectedDest.latlng.lng);
 
     if (isNaN(fromLat) || isNaN(fromLng) || isNaN(toLat) || isNaN(toLng)) {
-        alert(t('taxi.invalidCoords'));
+        showToast(t('taxi.invalidCoords'), 'error');
         return;
     }
 
@@ -3298,7 +3360,7 @@ function saveSettings() {
     const surname = document.getElementById('settings-surname').value.trim();
     
     if (!name) {
-        alert(t('login.nameError'));
+        showToast(t('login.nameError'), 'error');
         return;
     }
     
@@ -3311,7 +3373,7 @@ function saveSettings() {
         localStorage.setItem(DB_USER, JSON.stringify(user));
         
         renderProfil();
-        alert(t('settings.savedSuccess'));
+        showToast(t('settings.savedSuccess'), 'success');
         navigate('profil-screen');
     }
 }
@@ -3446,21 +3508,34 @@ function handleMessageAction(action, msgId) {
     if (msgIndex === -1) return;
     
     if (action === 'delete') {
-        if (confirm(t('chat.confirmDelete'))) {
-            chat.messages.splice(msgIndex, 1);
-            localStorage.setItem(DB_CHATS, JSON.stringify(chats));
-            renderMessages();
-            renderXabarlar();
-        }
+        showConfirmModal({
+            title: t('common.confirm') || 'Tasdiqlash',
+            message: t('chat.confirmDelete') || "Xabarni o'chirmoqchimisiz?",
+            confirmText: t('common.delete') || "O'chirish",
+            cancelText: t('common.cancel') || "Bekor qilish",
+            onConfirm: () => {
+                chat.messages.splice(msgIndex, 1);
+                localStorage.setItem(DB_CHATS, JSON.stringify(chats));
+                renderMessages();
+                renderXabarlar();
+            }
+        });
     } else if (action === 'edit') {
-        const newText = prompt(t('chat.editPrompt'), chat.messages[msgIndex].text);
-        if (newText !== null && newText.trim() !== '') {
-            chat.messages[msgIndex].text = newText.trim();
-            chat.messages[msgIndex].edited = true;
-            localStorage.setItem(DB_CHATS, JSON.stringify(chats));
-            renderMessages();
-            renderXabarlar();
-        }
+        showInputModal({
+            title: t('chat.editPrompt') || 'Xabarni tahrirlash',
+            value: chat.messages[msgIndex].text,
+            confirmText: t('common.save') || 'Saqlash',
+            cancelText: t('common.cancel') || 'Bekor qilish',
+            onSave: (newText) => {
+                if (newText !== null && newText.trim() !== '') {
+                    chat.messages[msgIndex].text = newText.trim();
+                    chat.messages[msgIndex].edited = true;
+                    localStorage.setItem(DB_CHATS, JSON.stringify(chats));
+                    renderMessages();
+                    renderXabarlar();
+                }
+            }
+        });
     }
 }
 
@@ -4218,3 +4293,103 @@ function initAddressSearch() {
 }
 
 
+
+// --- Custom UI Components ---
+function showToast(message, type = 'success') {
+    const container = document.getElementById('custom-toast-container');
+    if (!container) return;
+    
+    const toast = document.createElement('div');
+    toast.className = `px-5 py-3 rounded-full shadow-lg text-sm font-bold flex items-center gap-2 transform -translate-y-10 opacity-0 transition-all duration-300 pointer-events-auto ${type === 'error' ? 'bg-red-500 text-white' : 'bg-primary text-graphite'}`;
+    
+    const icon = type === 'error' ? '<i class="fa-solid fa-circle-exclamation"></i>' : '<i class="fa-solid fa-circle-check"></i>';
+    toast.innerHTML = `${icon} <span>${message}</span>`;
+    
+    container.appendChild(toast);
+    
+    requestAnimationFrame(() => {
+        toast.classList.remove('-translate-y-10', 'opacity-0');
+    });
+    
+    setTimeout(() => {
+        toast.classList.add('-translate-y-10', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+function showConfirmModal(options) {
+    const modal = document.getElementById('custom-confirm-modal');
+    if (!modal) return;
+    const titleEl = document.getElementById('confirm-title');
+    const messageEl = document.getElementById('confirm-message');
+    const cancelBtn = document.getElementById('confirm-cancel-btn');
+    const okBtn = document.getElementById('confirm-ok-btn');
+    
+    titleEl.innerText = options.title || 'Tasdiqlash';
+    messageEl.innerText = options.message || '';
+    cancelBtn.innerText = options.cancelText || 'Bekor qilish';
+    okBtn.innerText = options.confirmText || 'Tasdiqlash';
+    
+    modal.classList.remove('hidden');
+    requestAnimationFrame(() => {
+        modal.classList.remove('opacity-0');
+        modal.children[0].classList.remove('scale-95');
+    });
+    
+    const cleanup = () => {
+        modal.classList.add('opacity-0');
+        modal.children[0].classList.add('scale-95');
+        setTimeout(() => modal.classList.add('hidden'), 300);
+        cancelBtn.onclick = null;
+        okBtn.onclick = null;
+    };
+    
+    cancelBtn.onclick = () => {
+        cleanup();
+        if (options.onCancel) options.onCancel();
+    };
+    
+    okBtn.onclick = () => {
+        cleanup();
+        if (options.onConfirm) options.onConfirm();
+    };
+}
+
+function showInputModal(options) {
+    const modal = document.getElementById('custom-input-modal');
+    if (!modal) return;
+    const titleEl = document.getElementById('input-title');
+    const inputEl = document.getElementById('input-value');
+    const cancelBtn = document.getElementById('input-cancel-btn');
+    const okBtn = document.getElementById('input-ok-btn');
+    
+    titleEl.innerText = options.title || 'Kiriting';
+    inputEl.value = options.value || '';
+    cancelBtn.innerText = options.cancelText || 'Bekor qilish';
+    okBtn.innerText = options.confirmText || 'Saqlash';
+    
+    modal.classList.remove('hidden');
+    requestAnimationFrame(() => {
+        modal.classList.remove('opacity-0');
+        modal.children[0].classList.remove('scale-95');
+        inputEl.focus();
+    });
+    
+    const cleanup = () => {
+        modal.classList.add('opacity-0');
+        modal.children[0].classList.add('scale-95');
+        setTimeout(() => modal.classList.add('hidden'), 300);
+        cancelBtn.onclick = null;
+        okBtn.onclick = null;
+    };
+    
+    cancelBtn.onclick = () => {
+        cleanup();
+        if (options.onCancel) options.onCancel(null);
+    };
+    
+    okBtn.onclick = () => {
+        cleanup();
+        if (options.onSave) options.onSave(inputEl.value);
+    };
+}

@@ -512,18 +512,7 @@
                     <i class="fa-solid fa-arrow-left text-lg"></i>
                 </button>
                 <div class="flex-1 relative flex flex-col pointer-events-auto">
-                    <!-- Search input field wrapper -->
-                    <div class="bg-white rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.15)] flex items-center px-4 py-3 gap-2 border border-gray-100/50 transition-all duration-300 focus-within:ring-2 focus-within:ring-primary">
-                        <i class="fa-solid fa-magnifying-glass text-gray-400 text-sm shrink-0"></i>
-                        <input id="pickup-search-input" data-i18n-placeholder="common.searchPlaceholder" type="text" placeholder="Manzil qidiring..." class="w-full bg-transparent text-sm text-graphite outline-none border-none placeholder-gray-400 font-semibold" autocomplete="off" />
-                        <button id="pickup-search-clear" class="hidden text-gray-400 hover:text-graphite shrink-0 transition-colors">
-                            <i class="fa-solid fa-circle-xmark"></i>
-                        </button>
-                    </div>
-                    <!-- Suggestions Dropdown -->
-                    <div id="pickup-search-suggestions" class="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.12)] border border-gray-100/80 max-h-[250px] overflow-y-auto z-[60] hidden no-scrollbar transition-all duration-300">
-                        <!-- Items injected dynamically -->
-                    </div>
+                    <!-- Search input removed -->
                 </div>
             </div>
             
@@ -539,7 +528,7 @@
             <div class="absolute bottom-0 w-full p-6 bg-white rounded-t-[2rem] shadow-[0_-10px_40px_rgba(0,0,0,0.08)] z-20 pb-safe">
                 <div class="mb-4">
                     <p class="text-[11px] text-textSecondary uppercase font-bold tracking-wide" data-i18n="common.selectedAddress">Tanlangan manzil</p>
-                    <p id="pickup-address-text" class="text-sm font-bold text-graphite truncate mt-1" data-i18n="common.addressLoading">Manzil aniqlanmoqda...</p>
+                    <p id="pickup-address-text" class="text-sm font-bold text-graphite mt-1 line-clamp-3" style="word-break: break-word; overflow-wrap: break-word; white-space: normal; line-height: 1.4;" data-i18n="common.addressLoading">Manzil aniqlanmoqda...</p>
                 </div>
                 <button onclick="confirmPickupLocation()" class="w-full bg-primary hover:bg-primaryHover text-graphite font-semibold text-lg py-4 rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-yellow-500/20" data-i18n="common.confirmBtn">
                     Tasdiqlash
@@ -579,18 +568,7 @@
                     <i class="fa-solid fa-arrow-left text-lg"></i>
                 </button>
                 <div class="flex-1 relative flex flex-col pointer-events-auto">
-                    <!-- Search input field wrapper -->
-                    <div class="bg-white rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.15)] flex items-center px-4 py-3 gap-2 border border-gray-100/50 transition-all duration-300 focus-within:ring-2 focus-within:ring-primary">
-                        <i class="fa-solid fa-magnifying-glass text-gray-400 text-sm shrink-0"></i>
-                        <input id="dest-search-input" data-i18n-placeholder="common.searchPlaceholder" type="text" placeholder="Manzil qidiring..." class="w-full bg-transparent text-sm text-graphite outline-none border-none placeholder-gray-400 font-semibold" autocomplete="off" />
-                        <button id="dest-search-clear" class="hidden text-gray-400 hover:text-graphite shrink-0 transition-colors">
-                            <i class="fa-solid fa-circle-xmark"></i>
-                        </button>
-                    </div>
-                    <!-- Suggestions Dropdown -->
-                    <div id="dest-search-suggestions" class="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.12)] border border-gray-100/80 max-h-[250px] overflow-y-auto z-[60] hidden no-scrollbar transition-all duration-300">
-                        <!-- Items injected dynamically -->
-                    </div>
+                    <!-- Search input removed -->
                 </div>
             </div>
             
@@ -605,7 +583,7 @@
             <div class="absolute bottom-0 w-full p-6 bg-white rounded-t-[2rem] shadow-[0_-10px_40px_rgba(0,0,0,0.08)] z-20 pb-safe">
                 <div class="mb-4">
                     <p class="text-[11px] text-textSecondary uppercase font-bold tracking-wide" data-i18n="common.selectedAddress">Tanlangan manzil</p>
-                    <p id="dest-address-text" class="text-sm font-bold text-graphite truncate mt-1" data-i18n="common.addressLoading">Manzil aniqlanmoqda...</p>
+                    <p id="dest-address-text" class="text-sm font-bold text-graphite mt-1 line-clamp-3" style="word-break: break-word; overflow-wrap: break-word; white-space: normal; line-height: 1.4;" data-i18n="common.addressLoading">Manzil aniqlanmoqda...</p>
                 </div>
                 <button onclick="confirmDestLocation()" class="w-full bg-primary hover:bg-primaryHover text-graphite font-semibold text-lg py-4 rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-yellow-500/20" data-i18n="common.confirmBtn">
                     Tasdiqlash
@@ -1026,6 +1004,33 @@
                     </div>
                 </div>
         
+        <!-- Custom UI Components -->
+        <!-- Toast Container -->
+        <div id="custom-toast-container" class="absolute top-0 left-0 w-full z-[9999] pointer-events-none flex flex-col items-center gap-2 pt-safe px-4 mt-2"></div>
+
+        <!-- Custom Confirm Modal -->
+        <div id="custom-confirm-modal" class="hidden absolute inset-0 z-[9999] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity duration-300 opacity-0">
+            <div class="bg-white rounded-[20px] shadow-2xl w-full max-w-[320px] p-6 transform scale-95 transition-transform duration-300 flex flex-col gap-4">
+                <h3 id="confirm-title" class="text-xl font-bold text-graphite text-center">Tasdiqlash</h3>
+                <p id="confirm-message" class="text-sm text-textSecondary text-center font-medium">Xabarni o'chirmoqchimisiz?</p>
+                <div class="flex gap-3 mt-2">
+                    <button id="confirm-cancel-btn" class="flex-1 py-3 rounded-2xl bg-gray-100 hover:bg-gray-200 text-graphite font-bold text-sm transition-colors active:scale-95">Bekor qilish</button>
+                    <button id="confirm-ok-btn" class="flex-1 py-3 rounded-2xl bg-primary hover:bg-primaryHover text-graphite font-bold text-sm transition-colors active:scale-95 shadow-sm">O'chirish</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Custom Input Modal -->
+        <div id="custom-input-modal" class="hidden absolute inset-0 z-[9999] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity duration-300 opacity-0">
+            <div class="bg-white rounded-[20px] shadow-2xl w-full max-w-[320px] p-6 transform scale-95 transition-transform duration-300 flex flex-col gap-4">
+                <h3 id="input-title" class="text-xl font-bold text-graphite text-center">Xabarni tahrirlash</h3>
+                <input type="text" id="input-value" class="w-full bg-bgLight px-4 py-3 rounded-2xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none text-sm font-semibold text-graphite transition-all">
+                <div class="flex gap-3 mt-2">
+                    <button id="input-cancel-btn" class="flex-1 py-3 rounded-2xl bg-gray-100 hover:bg-gray-200 text-graphite font-bold text-sm transition-colors active:scale-95">Bekor qilish</button>
+                    <button id="input-ok-btn" class="flex-1 py-3 rounded-2xl bg-primary hover:bg-primaryHover text-graphite font-bold text-sm transition-colors active:scale-95 shadow-sm">Saqlash</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- App Logic -->
